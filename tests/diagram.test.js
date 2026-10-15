@@ -44,3 +44,19 @@ test('random play orders keep every partial diagram legible and topologically se
 test('crossing cuts never erase a nearby genuine branch point',()=>{
  const a=net('horizontal',{x:-40,y:0},{x:40,y:0},[{x:3,y:0}]);a.segments.push({a:{x:3,y:0},b:{x:3,y:25}});const d={networks:[a,net('vertical',{x:0,y:-30},{x:0,y:30})]};const g=renderGeometry(d);assert.ok(!g.networks[0].pieces.some(s=>pointOnSegment({x:0,y:0},s)));assert.ok(g.networks[0].pieces.some(s=>pointOnSegment({x:3,y:0},s)));
 });
+test('one child is directly below its sole visible parent instead of centered on the canvas',()=>{
+ const stage=stages[1],state=newGame(stage);state.placed=['sunday','black','stay','kitasan','equinox'];state.positions=layoutFamily(state);
+ assert.equal(state.positions.kitasan.x,state.positions.black.x);
+ assert.equal(state.positions.equinox.x,state.positions.kitasan.x);
+ const diagram=assertGeometry(state);
+ for(const id of ['family:black','family:kitasan']){
+  const family=diagram.networks.find(n=>n.id===id);
+  assert.ok(family.segments.every(s=>near(s.a.x,s.b.x)),'aligned parent-child chain needs no horizontal detour');
+ }
+});
+test('a single sibling row centers under its parent pair',()=>{
+ const state=newGame(stages[0]);state.placed=['hidetada','go','iemitsu','tadanaga','sen'];state.positions=layoutFamily(state);
+ const middle=(state.positions.hidetada.x+state.positions.go.x)/2;
+ const children=['iemitsu','tadanaga','sen'].map(id=>state.positions[id].x);
+ assert.ok(near(children.reduce((a,b)=>a+b,0)/3,middle));assertGeometry(state);
+});

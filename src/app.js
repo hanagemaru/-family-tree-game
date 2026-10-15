@@ -1,6 +1,7 @@
 import {stages,stageById} from './data.js';
 import {relationLabels,newGame,exchange,place,pack,restore,formatTime,fitCamera,revealCamera} from './core.js';
 import {layoutFamily,buildDiagram,diagramSvg} from './diagram.js';
+import {dragHotspot,screenNodes,targetItems,resolveDragTarget} from './interaction.js';
 const $=id=>document.getElementById(id),storageKey='family-tree-game:v1';
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let records={sessions:{},best:{}};
@@ -36,7 +37,7 @@ modal.addEventListener('click',e=>{const action=e.target.closest('[data-action]'
 function render(){renderBoard();renderHand();renderStats();renderHint();}
 function renderStats(){
  $('placed-count').textContent=state.placed.length;$('total-count').textContent=` / ${state.stage.people.length}`;$('timer').textContent=formatTime(state.elapsed);$('mistake-count').textContent=state.mistakes;$('hint-count').textContent=hintCount();$('progress-fill').style.width=`${state.placed.length/state.stage.people.length*100}%`;$('hand-count').textContent=`${state.hand.length}枚`;$('stock-count').textContent=`山札 ${state.deck.length}枚`;$('exchange-button').disabled=!state.deck.length||state.complete;$('hint-button').disabled=state.complete;
- $('board-caption').textContent=state.complete?'完成した系譜 · スワイプと拡縮で見渡せます':selected?'場のカードに近づけて、つなぐ関係を選ぶ':'カードをドラッグして、場の人物に近づけてみよう';
+ renderCaption();
 }
 function renderBoard(newId){
  $('nodes').innerHTML=state.placed.map(id=>{const p=person(id),position=state.positions[id];return `<button class="person-node ${state.stage.id==='thoroughbred'?'horse':''} ${id===state.stage.anchor?'anchor':''} ${id===newId?'new-card':''}" data-node="${id}" aria-pressed="false" style="left:${position.x}px;top:${position.y}px" aria-label="${escape(p.name)}${id===state.stage.anchor?'、起点のカード':''}"><span class="node-name">${escape(p.name)}</span><small>${id===state.stage.anchor?'START · 起点':state.stage.category}</small></button>`;}).join('');
@@ -61,26 +62,29 @@ function zoomAt(factor,x=board.clientWidth/2,y=board.clientHeight/2){const next=
 $('zoom-in').addEventListener('click',()=>zoomAt(1.2));$('zoom-out').addEventListener('click',()=>zoomAt(1/1.2));
 board.addEventListener('wheel',e=>{e.preventDefault();const rect=board.getBoundingClientRect();zoomAt(Math.exp(-e.deltaY*.002),e.clientX-rect.left,e.clientY-rect.top);},{passive:false});
 board.addEventListener('keydown',e=>{if(e.target!==board)return;const delta={ArrowLeft:[50,0],ArrowRight:[-50,0],ArrowUp:[0,50],ArrowDown:[0,-50]}[e.key];if(delta){e.preventDefault();camera.x+=delta[0];camera.y+=delta[1];updateTransform();}if(e.key==='+'||e.key==='=')zoomAt(1.2);if(e.key==='-')zoomAt(1/1.2);if(e.key==='0')fit();});
-function clearTargets(){targetAnchor=null;hotRelation=null;$('targets').innerHTML='';$('nodes').querySelectorAll('.targeted').forEach(n=>n.classList.remove('targeted'));}
+function clearTargets(){targetAnchor=null;hotRelation=null;$('targets').innerHTML='';$('nodes').querySelectorAll('.targeted').forEach(n=>n.classList.remove('targeted'));if(state)renderCaption();}
+function renderCaption(){
+ $('board-caption').textContent=targetAnchor?`${person(targetAnchor).name}に接続 · ガイドの外へ離すと接続先を変更`:state.complete?'完成した系譜 · スワイプと拡縮で見渡せます':selected?'場のカードに近づけて、つなぐ関係を選ぶ':'カードをドラッグして、場の人物に近づけてみよう';
+}
 function availableRelations(){return state.stage.id==='thoroughbred'?['parent','child','sibling']:['parent','child','spouse','sibling'];}
 function relationName(type){return state.stage.id==='thoroughbred'?({parent:'父・母',child:'産駒',sibling:'きょうだい'}[type]):relationLabels[type];}
 function drawTargets(){
  if(!targetAnchor||!selected)return;
- const p=state.positions[targetAnchor],cx=p.x*camera.scale+camera.x,cy=p.y*camera.scale+camera.y;
- const offsets={parent:[0,-90],child:[0,90],spouse:[108,0],sibling:[-108,0]},width=board.clientWidth,height=board.clientHeight;
- const items=availableRelations().map(type=>{const [dx,dy]=offsets[type];const x=Math.max(39,Math.min(width-39,cx+dx)),y=Math.max(60,Math.min(height-60,cy+dy));return {type,x,y};});
+ const node=screenNodes(state.positions,camera).find(n=>n.id===targetAnchor);
+ const items=targetItems(node,board.clientWidth,board.clientHeight,availableRelations());
  if($('targets').dataset.anchor!==targetAnchor||!$('targets').children.length){$('targets').dataset.anchor=targetAnchor;$('targets').innerHTML=items.map(t=>`<button class="relation-target" data-relation="${t.type}" aria-label="${escape(person(targetAnchor).name)}の${relationName(t.type)}として、${escape(person(selected).name)}を置く">${relationName(t.type)}</button>`).join('');}
  items.forEach(t=>{const b=$('targets').querySelector(`[data-relation="${t.type}"]`);b.style.left=`${t.x}px`;b.style.top=`${t.y}px`;b.classList.toggle('active',hotRelation===t.type);});
  for(const node of $('nodes').querySelectorAll('[data-node]'))node.classList.toggle('targeted',node.dataset.node===targetAnchor);
+ renderCaption();
 }
 function pointOnBoard(clientX,clientY){const r=board.getBoundingClientRect();return {x:clientX-r.left,y:clientY-r.top,inside:clientX>=r.left&&clientX<=r.right&&clientY>=r.top&&clientY<=r.bottom};}
 function hoverAt(clientX,clientY){
  const point=pointOnBoard(clientX,clientY);if(!point.inside){clearTargets();return;}
- // Keep the anchor while crossing from its card into one of its relation targets.
- if(targetAnchor){const hit=[...$('targets').children].find(button=>{const r=button.getBoundingClientRect();return clientX>=r.left-7&&clientX<=r.right+7&&clientY>=r.top-7&&clientY<=r.bottom+7;});if(hit){hotRelation=hit.dataset.relation;drawTargets();return;}}
- hotRelation=null;let nearest=null,distance=Infinity;
- for(const id of state.placed){const p=state.positions[id],d=Math.hypot(point.x-(p.x*camera.scale+camera.x),point.y-(p.y*camera.scale+camera.y));if(d<distance){nearest=id;distance=d;}}
- if(distance<Math.max(75,80*camera.scale)){targetAnchor=nearest;drawTargets();}else if(targetAnchor){const p=state.positions[targetAnchor];if(Math.hypot(point.x-(p.x*camera.scale+camera.x),point.y-(p.y*camera.scale+camera.y))>175)clearTargets();else drawTargets();}
+ const nodes=screenNodes(state.positions,camera),owner=nodes.find(n=>n.id===targetAnchor);
+ const items=owner?targetItems(owner,board.clientWidth,board.clientHeight,availableRelations()):[];
+ const next=resolveDragTarget(point,nodes,targetAnchor,items);
+ if(!next.anchor){clearTargets();return;}
+ targetAnchor=next.anchor;hotRelation=next.relation;drawTargets();
 }
 $('targets').addEventListener('click',e=>{const target=e.target.closest('[data-relation]');if(target&&selected&&targetAnchor)attempt(target.dataset.relation);});
 function attempt(relation){
@@ -102,15 +106,15 @@ board.addEventListener('pointerdown',e=>{
 });
 window.addEventListener('pointermove',e=>{
  if(drag&&e.pointerId===drag.pointerId){drag.x=e.clientX;drag.y=e.clientY;if(!drag.active&&Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)>6){drag.active=true;$('drag-ghost').textContent=person(drag.id).name;$('drag-ghost').hidden=false;document.body.classList.add('drag-active');$('hand').querySelector(`[data-card="${drag.id}"]`)?.classList.add('dragging');frame=requestAnimationFrame(autoPan);}
- if(drag.active){$('drag-ghost').style.left=`${e.clientX}px`;$('drag-ghost').style.top=`${e.clientY-28}px`;hoverAt(e.clientX,e.clientY);}return;}
+ if(drag.active){const point=dragHotspot(e.clientX,e.clientY);$('drag-ghost').style.left=`${point.x}px`;$('drag-ghost').style.top=`${point.y}px`;hoverAt(point.x,point.y);}return;}
  if(!pointers.has(e.pointerId))return;const old=[...pointers.values()];pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});const next=[...pointers.values()];
  if(pointers.size===2){const oldMid={x:(old[0].x+old[1].x)/2,y:(old[0].y+old[1].y)/2},mid={x:(next[0].x+next[1].x)/2,y:(next[0].y+next[1].y)/2},d1=Math.hypot(old[0].x-old[1].x,old[0].y-old[1].y),d2=Math.hypot(next[0].x-next[1].x,next[0].y-next[1].y),r=board.getBoundingClientRect();if(d1>2)zoomAt(d2/d1,oldMid.x-r.left,oldMid.y-r.top);camera.x+=mid.x-oldMid.x;camera.y+=mid.y-oldMid.y;updateTransform();if(pan)pan.moved=true;
  }else if(pan&&pan.id===e.pointerId){if(Math.hypot(e.clientX-pan.startX,e.clientY-pan.startY)>5)pan.moved=true;if(pan.moved){camera.x+=e.clientX-pan.x;camera.y+=e.clientY-pan.y;clearTargets();updateTransform();}pan.x=e.clientX;pan.y=e.clientY;}
 });
-function autoPan(){if(!drag?.active)return;const p=pointOnBoard(drag.x,drag.y);if(p.inside){const dx=p.x<28?3:p.x>board.clientWidth-28?-3:0,dy=p.y<34?3:p.y>board.clientHeight-34?-3:0;if(dx||dy){camera.x+=dx;camera.y+=dy;updateTransform();hoverAt(drag.x,drag.y);}}frame=requestAnimationFrame(autoPan);}
+function autoPan(){if(!drag?.active)return;const hotspot=dragHotspot(drag.x,drag.y),p=pointOnBoard(hotspot.x,hotspot.y);if(p.inside){const dx=p.x<28?3:p.x>board.clientWidth-28?-3:0,dy=p.y<34?3:p.y>board.clientHeight-34?-3:0;if(dx||dy){camera.x+=dx;camera.y+=dy;updateTransform();hoverAt(hotspot.x,hotspot.y);}}frame=requestAnimationFrame(autoPan);}
 function cancelDrag(){if(frame)cancelAnimationFrame(frame);frame=null;drag=null;$('drag-ghost').hidden=true;document.body.classList.remove('drag-active');$('hand').querySelectorAll('.dragging').forEach(b=>b.classList.remove('dragging'));}
 window.addEventListener('pointerup',e=>{
- if(drag&&e.pointerId===drag.pointerId){const active=drag.active;if(active)hoverAt(e.clientX,e.clientY);const relation=hotRelation,anchor=targetAnchor;cancelDrag();if(active&&relation&&anchor)attempt(relation);else if(active&&anchor)say('つなぐ関係を選んでください。');return;}
+ if(drag&&e.pointerId===drag.pointerId){const active=drag.active;if(active){const hotspot=dragHotspot(e.clientX,e.clientY);hoverAt(hotspot.x,hotspot.y);}const relation=hotRelation,anchor=targetAnchor;cancelDrag();if(active&&relation&&anchor)attempt(relation);else if(active&&anchor)say('つなぐ関係を選んでください。');return;}
  if(!pointers.has(e.pointerId))return;pointers.delete(e.pointerId);if(pan&&pan.id===e.pointerId&&!pan.moved&&pan.node){if(selected){targetAnchor=pan.node;drawTargets();say(`${person(selected).name}を、${person(pan.node).name}のどの関係へ置きますか？`);}else focusLines(pan.node);}
  if(pointers.size===1){const [id,p]=[...pointers.entries()][0];pan={id,x:p.x,y:p.y,startX:p.x,startY:p.y,moved:true};}else pan=null;
 });

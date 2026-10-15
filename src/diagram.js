@@ -14,7 +14,18 @@ export function layoutFamily(state){
  for(const p of state.stage.people)if(state.placed.includes(p.id)){if(!rows.has(p.generation))rows.set(p.generation,[]);rows.get(p.generation).push(p.id);}
  for(const row of rows.values())row.sort((a,b)=>(state.positions[a]?.x??0)-(state.positions[b]?.x??0));
  const origin=byId.get(state.stage.anchor).generation;
- const coordinates=()=>Object.fromEntries([...rows].flatMap(([generation,row])=>row.map((id,i)=>[id,{x:(i-(row.length-1)/2)*STEP_X,y:(generation-origin)*STEP_Y}])));
+ const coordinates=()=>{
+  const points={};
+  for(const [generation,row] of [...rows].sort((a,b)=>a[0]-b[0])){
+   const shifts=[];
+   row.forEach((id,i)=>{const parents=byId.get(id).parents.filter(id=>points[id]);if(parents.length)shifts.push(parents.reduce((sum,id)=>sum+points[id].x,0)/parents.length-(i-(row.length-1)/2)*STEP_X);});
+   // A single child sits below its parent; a sibling row centers on its family.
+   // Don't independently recenter every generation at the origin.
+   const shift=shifts.length?shifts.reduce((a,b)=>a+b,0)/shifts.length:0;
+   row.forEach((id,i)=>{points[id]={x:shift+(i-(row.length-1)/2)*STEP_X,y:(generation-origin)*STEP_Y};});
+  }
+  return points;
+ };
  function cost(){const points=coordinates();let sum=0;const arms=[];
  for(const family of groups){const ps=family.parents.map(id=>points[id]),x=ps.reduce((sum,p)=>sum+p.x,0)/ps.length;
  if(ps.length===2)sum+=Math.max(0,Math.abs(ps[0].x-ps[1].x)/STEP_X-1)*60;
@@ -28,13 +39,12 @@ function segment(network,a,b){if(!same(a,b))network.segments.push({a,b});}
 function polyline(network,points){for(let i=1;i<points.length;i++)segment(network,points[i-1],points[i]);}
 function uniquePoints(points){return points.filter((p,i)=>!points.slice(0,i).some(q=>same(p,q)));}
 export function buildDiagram(state){
- const positions=state.positions,groups=families(state),networks=[],lanes=new Map(),parentUses=new Map(),laneCounts=new Map();
+ const positions=state.positions,groups=families(state),networks=[],lanes=new Map(),laneCounts=new Map();
  const siblingEdges=visibleEdges(state).filter(e=>e.kind==='sibling');
  for(const g of groups){const y=positions[g.parents[0]].y;laneCounts.set(y,(laneCounts.get(y)||0)+1);}
  for(const e of siblingEdges){const y=positions[e.from].y;laneCounts.set(y,(laneCounts.get(y)||0)+1);}
  const channel=(y,index,upper=false)=>y+CARD_H/2+10+(index*2+(upper?1:2))*(STEP_Y-CARD_H-22)/(2*(laneCounts.get(y)||1)+1);
- for(const g of groups)for(const id of g.parents){if(!parentUses.has(id))parentUses.set(id,[]);parentUses.get(id).push(g.id);}
- function port(id,g){const uses=parentUses.get(id),index=uses.indexOf(g.id);return positions[id].x+(index-(uses.length-1)/2)*14;}
+ function port(id){return positions[id].x;}
  function lane(y){const current=lanes.get(y)||0;lanes.set(y,current+1);return current;}
  for(const g of groups){
  const network={id:g.id,kind:g.parents.length===2?'couple':'parent',members:[...g.parents,...g.children],segments:[],junctions:[],label:null};
@@ -70,7 +80,10 @@ function separateOverlappingVerticals(networks,positions){
  if(accepted.some(s=>s.net!==net.id&&verticalOverlap(segment,s))){
  for(let step=1;step<=20;step++){let found=false;for(const sign of [1,-1]){const dx=step*12*sign,candidate={a:{x:original.a.x+dx,y:original.a.y},b:{x:original.b.x+dx,y:original.b.y}};if(!crossesCardInterior(candidate,positions)&&!accepted.some(s=>s.net!==net.id&&verticalOverlap(candidate,s))){segment=candidate;found=true;break;}}if(found)break;}
  }
- if(!same(segment.a,original.a))routed.push({a:original.a,b:segment.a});routed.push(segment);if(!same(segment.b,original.b))routed.push({a:segment.b,b:original.b});accepted.push({...segment,net:net.id});
+ const sameCardPort=(a,b)=>Object.values(positions).some(p=>Math.abs(a.y-b.y)<EPS&&Math.abs(Math.abs(a.y-p.y)-CARD_H/2)<EPS&&Math.abs(a.x-p.x)<=CARD_W/2-4&&Math.abs(b.x-p.x)<=CARD_W/2-4);
+ // A shifted wire can attach directly to a different point on the card edge.
+ // Don't add a tiny sideways return merely to reach the old center port.
+ if(!same(segment.a,original.a)&&!sameCardPort(original.a,segment.a))routed.push({a:original.a,b:segment.a});routed.push(segment);if(!same(segment.b,original.b)&&!sameCardPort(original.b,segment.b))routed.push({a:segment.b,b:original.b});accepted.push({...segment,net:net.id});
  }
  net.segments=routed;
  }

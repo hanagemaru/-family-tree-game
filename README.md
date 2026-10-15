@@ -35,6 +35,7 @@ ES Modulesを使用するため、`index.html` の直接ファイル開きでは
 
 - `src/core.js`: 関係判定、手札、配置、保存データ検証、カメラ計算
 - `src/diagram.js`: 家族単位の配置、関係線、接続点、交差の切れ目
+- `src/interaction.js`: ドラッグの見た目と判定位置、接続先固定、関係ガイド
 - `src/data.js`: 登場人物・馬、実親子・婚姻、ヒント、出典
 - `src/app.js`: Pointer Events、画面、盤面、ローカル保存
 - `docs/design.md`: 決定事項、今回の暫定仕様、未決事項
