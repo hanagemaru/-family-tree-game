@@ -3,3 +3,21 @@
 @media(min-width:760px){#game-screen{max-width:820px;margin:auto}.hand{max-width:640px;margin:auto}.hand-card{min-height:120px}.hand-section{padding-top:8px}.game-heading{padding-top:25px}.app-footer{margin-top:12px}}
 @media(max-width:620px){#app{padding:0 16px}.app-header{height:71px}.brand{font-size:29px;gap:9px}.brand>span{font-size:15px}.brand small{font-size:9px}.intro{padding:39px 0 30px}.intro h1{font-size:28px;line-height:1.8;letter-spacing:.04em}.intro>p:not(.eyebrow){font-size:12px}.intro-tree{display:none}#stage-list{grid-template-columns:1fr;gap:12px}.stage-card{padding:21px;gap:12px}.stage-card h3{font-size:22px}.home-foot{padding:20px 0;font-size:10px}.game-heading{padding-top:17px}.game-heading h1{font-size:18px}.stats{gap:12px;font-size:10px}.hand{gap:6px;min-height:103px}.hand-card{min-height:103px;padding:8px 4px;gap:6px;border-radius:7px}.hand-card .card-name{font-size:16px;letter-spacing:0;line-height:1.45}.hand-card.horse .card-name{font-size:10px;line-height:1.65}.hand-card small{font-size:8px}.hand-footer{font-size:9px;gap:4px}.hand-heading>div{gap:7px}.hand-heading .text-button{font-size:11px}.progress{margin-bottom:10px}#board{border-radius:12px;height:clamp(245px,42dvh,440px)}.board-caption{font-size:9px}.status{min-height:34px}.app-footer{padding-top:10px}.prototype{font-size:9px}.icon-button{width:34px;min-height:34px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* Family networks: geometry is split at crossings; dots belong to true branches. */
+#edges .family-wire{fill:none;stroke:#718d72;stroke-width:1.8;stroke-linecap:butt;stroke-linejoin:round}
+#edges .couple .family-wire{stroke:#8a8666}
+#edges .sibling .family-wire{stroke:#899781;stroke-dasharray:5 5}
+#edges .connection-dot{fill:#617e62;stroke:none}
+#edges .family-network.dimmed{opacity:.18}
+#edges .family-network.focused .family-wire{stroke:#244e3d;stroke-width:2.8}
+#edges .family-network.focused .connection-dot{fill:#244e3d}
+#edges .family-network.focused text{fill:#244e3d}
+.person-node.line-focused{outline:2px solid var(--gold);outline-offset:4px}
+.line-legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;padding:8px 3px 0;font-size:10px;color:#6b7b61}
+.line-legend>span:last-child{margin-left:auto}
+.crossing-key{display:flex;align-items:center;gap:5px}
+.crossing-key i{position:relative;display:inline-block;width:18px;height:16px;background:linear-gradient(to right,transparent 8px,#718d72 8px,#718d72 10px,transparent 10px)}
+.crossing-key i:before,.crossing-key i:after{content:"";position:absolute;top:7px;height:2px;width:5px;background:#718d72}
+.crossing-key i:before{left:0}.crossing-key i:after{right:0}
+@media(max-width:620px){.line-legend{font-size:9px;gap:5px 10px}.line-legend>span:last-child{margin-left:0}}
