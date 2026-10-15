@@ -1,1 +1,41 @@
-# -family-tree-game
+# 家系図ならべ（仮）
+
+歴史人物と競走馬のカードをドラッグして、家系図・血統図を広げるブラウザゲーム。
+
+- 手札は最大5枚。配置すると山札から補充。
+- 場のカードへ近づけ、「親・子・配偶者・兄弟姉妹」の関係で配置。
+- 同じ人物は1枚。複数の正しい関係から配置可能。
+- タップ → 場のカード → 関係選択、キーボードによる代替操作あり。
+- 盤面のスワイプ移動、ピンチ・ボタンで拡縮、全体表示。
+- 2段階の任意ヒント、無料の手札入れ替え、自動保存、完成記録。
+- 徳川家9人、競走馬12頭の2ステージ。
+
+## 試作
+
+試作URL: https://family-tree-cards.ideal-betta-1941.chatgpt.site
+
+所有者向けの試遊環境。一般向け正式公開・独自ドメインは未設定。
+このGitHubリポジトリを開発元とし、試遊環境には同じ静的ファイルを配置する。
+
+## 開発
+
+依存パッケージなし。Node.js 22以上とPython 3で動作。
+
+```sh
+npm test
+npm run build
+npm run dev
+```
+
+`http://localhost:5173` を開く。`dist/` は任意の静的ホスティングへ配置できる。
+ES Modulesを使用するため、`index.html` の直接ファイル開きではなくHTTPサーバーを使う。
+
+## 構成
+
+- `src/core.js`: 関係判定、手札、配置、保存データ検証、カメラ計算
+- `src/data.js`: 登場人物・馬、実親子・婚姻、ヒント、出典
+- `src/app.js`: Pointer Events、画面、盤面、ローカル保存
+- `docs/design.md`: 決定事項、今回の暫定仕様、未決事項
+- `docs/validation.md`: 検証内容と未確認事項
+
+企画元: [hanage-ideas / new-game-ideas.md](https://github.com/hanagemaru/hanage-ideas/blob/main/games/new-game-ideas.md)
