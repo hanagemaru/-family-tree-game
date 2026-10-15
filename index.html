@@ -19,17 +19,17 @@
 <div class="stats"><span><b id="placed-count">1</b><span id="total-count"></span> 配置</span><span id="timer">0:00</span><span>ミス <b id="mistake-count">0</b></span><span>ヒント <b id="hint-count">0</b></span></div>
 <div class="progress"><div id="progress-fill"></div></div>
 <section id="board" aria-label="家系図の盤面。背景をドラッグして移動できます。" tabindex="0">
-<div class="board-paper"></div><div id="world"><svg id="edges" aria-label="配置済みカードの関係線"></svg><div id="nodes"></div></div><div id="targets" aria-label="カードを置く関係"></div>
-<div class="board-caption" id="board-caption">カードをドラッグして、場の人物に近づけてみよう</div>
+<div class="board-paper"></div><div id="world"><svg id="edges" aria-label="配置済みカードの関係線"></svg><div id="nodes"></div></div>
+<div class="board-caption" id="board-caption">手札を相手のカードへドロップ</div>
 <div class="board-tools"><button id="zoom-out" class="icon-button" aria-label="縮小">−</button><button id="fit-button" class="text-button">全体</button><button id="zoom-in" class="icon-button" aria-label="拡大">＋</button></div>
 </section>
 <div class="line-legend" aria-label="線の凡例"><span>● 接続</span><span class="crossing-key"><i aria-hidden="true"></i>切れ目は交差のみ</span><span>札をタップで関係を強調</span></div>
 <div id="status" class="status" role="status" aria-live="polite"></div>
-<section class="hand-section" aria-label="手札"><div class="hand-heading"><h2>手札 <small id="hand-count"></small></h2><div><span id="stock-count"></span><button class="text-button" id="exchange-button">手札を入れ替え</button></div></div><div id="hand" class="hand"></div><div class="hand-footer"><span>ドラッグで配置 / タップでカード選択</span><button class="text-button" id="hint-button">選択札のヒント</button></div><div id="hint-box" class="hint-box" hidden></div></section>
+<section class="hand-section" aria-label="手札"><div class="hand-heading"><h2>手札 <small id="hand-count"></small></h2><div><span id="stock-count"></span><button class="text-button" id="exchange-button">手札を入れ替え</button></div></div><div id="hand" class="hand"></div><div class="hand-footer"><span id="selection-summary">手札を選択してください</span><div><button class="text-button" id="choose-anchor-button" disabled>相手を一覧から</button><button class="text-button" id="hint-button">ヒント</button><button class="text-button" id="clear-selection-button" disabled>解除</button></div></div><div id="hint-box" class="hint-box" hidden></div></section>
 </main>
 <footer class="app-footer"><span>家系図ならべ</span><button class="text-button" id="sources-button">題材・出典</button></footer>
 </div>
-<dialog id="modal"><div id="modal-content"></div><button id="modal-close" class="button secondary">閉じる</button></dialog>
+<dialog id="modal" aria-labelledby="dialog-title"><div id="modal-content"></div><button id="modal-close" class="button secondary">閉じる</button></dialog>
 <div id="drag-ghost" hidden aria-hidden="true"></div>
 <script type="module" src="./src/app.js"></script>
 </body></html>

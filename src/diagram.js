@@ -10,20 +10,27 @@ function families(state){
 // Adjacent-swap minimization of family separation, crossing inversions and wire length.
 // Only placed cards participate; unseen cards never affect ordering or reveal a clue.
 export function layoutFamily(state){
- const byId=new Map(state.stage.people.map(p=>[p.id,p])),rows=new Map(),groups=families(state);
- for(const p of state.stage.people)if(state.placed.includes(p.id)){if(!rows.has(p.generation))rows.set(p.generation,[]);rows.get(p.generation).push(p.id);}
- for(const row of rows.values())row.sort((a,b)=>(state.positions[a]?.x??0)-(state.positions[b]?.x??0));
+ const byId=new Map(state.stage.people.map(p=>[p.id,p])),groups=families(state),links=new Map(state.placed.map(id=>[id,id]));
+ const root=id=>{while(links.get(id)!==id)id=links.get(id);return id;};
+ // Partner cards form one block. Descendant blocks reserve enough horizontal
+ // space for their own children instead of being forced onto an even row grid.
+ for(const g of groups)if(g.parents.length===2){const [a,b]=g.parents;if(byId.get(a).generation===byId.get(b).generation)links.set(root(b),root(a));}
+ const blocks=new Map();
+ for(const p of state.stage.people)if(links.has(p.id)){const key=root(p.id);if(!blocks.has(key))blocks.set(key,{ids:[],children:[],parent:null});blocks.get(key).ids.push(p.id);}
+ const blockOf=new Map();for(const block of blocks.values())for(const id of block.ids)blockOf.set(id,block);
+ for(const block of blocks.values()){
+  const incoming=new Map();for(const id of block.ids)for(const parent of byId.get(id).parents)if(blockOf.has(parent)){const source=blockOf.get(parent);if(source!==block)incoming.set(source,(incoming.get(source)||0)+1);}
+  block.parent=[...incoming].sort((a,b)=>b[1]-a[1])[0]?.[0]||null;
+  if(block.parent)block.parent.children.push(block);
+ }
+ const roots=[...blocks.values()].filter(b=>!b.parent);
+ const orders=[roots,...[...blocks.values()].map(b=>b.children),...[...blocks.values()].map(b=>b.ids)];
  const origin=byId.get(state.stage.anchor).generation;
  const coordinates=()=>{
-  const points={};
-  for(const [generation,row] of [...rows].sort((a,b)=>a[0]-b[0])){
-   const shifts=[];
-   row.forEach((id,i)=>{const parents=byId.get(id).parents.filter(id=>points[id]);if(parents.length)shifts.push(parents.reduce((sum,id)=>sum+points[id].x,0)/parents.length-(i-(row.length-1)/2)*STEP_X);});
-   // A single child sits below its parent; a sibling row centers on its family.
-   // Don't independently recenter every generation at the origin.
-   const shift=shifts.length?shifts.reduce((a,b)=>a+b,0)/shifts.length:0;
-   row.forEach((id,i)=>{points[id]={x:shift+(i-(row.length-1)/2)*STEP_X,y:(generation-origin)*STEP_Y};});
-  }
+  const points={},widths=new Map();
+  const width=block=>{if(!widths.has(block))widths.set(block,Math.max(block.ids.length*STEP_X,block.children.reduce((sum,c)=>sum+width(c),0)));return widths.get(block);};
+  function assign(block,x){block.ids.forEach((id,i)=>{points[id]={x:x+(i-(block.ids.length-1)/2)*STEP_X,y:(byId.get(id).generation-origin)*STEP_Y};});let edge=x-block.children.reduce((sum,c)=>sum+width(c),0)/2;for(const child of block.children){assign(child,edge+width(child)/2);edge+=width(child);}}
+  let edge=-roots.reduce((sum,r)=>sum+width(r),0)/2;for(const r of roots){assign(r,edge+width(r)/2);edge+=width(r);}
   return points;
  };
  function cost(){const points=coordinates();let sum=0;const arms=[];
@@ -32,7 +39,7 @@ export function layoutFamily(state){
  for(const child of family.children){const to=points[child];sum+=Math.abs(x-to.x)*.015;arms.push({family:family.id,generation:to.y,from:x,to:to.x});}}
  for(let i=0;i<arms.length;i++)for(let j=i+1;j<arms.length;j++){const a=arms[i],b=arms[j];if(a.family!==b.family&&a.generation===b.generation&&(a.from-b.from)*(a.to-b.to)<0)sum+=150;}
  return sum;}
- let current=cost();for(let pass=0;pass<16;pass++){let changed=false;for(const row of rows.values())for(let i=0;i<row.length-1;i++){[row[i],row[i+1]]=[row[i+1],row[i]];const next=cost();if(next<current-EPS){current=next;changed=true;}else [row[i],row[i+1]]=[row[i+1],row[i]];}if(!changed)break;}
+ let current=cost();for(let pass=0;pass<16;pass++){let changed=false;for(const order of orders)for(let i=0;i<order.length-1;i++){[order[i],order[i+1]]=[order[i+1],order[i]];const next=cost();if(next<current-EPS){current=next;changed=true;}else [order[i],order[i+1]]=[order[i+1],order[i]];}if(!changed)break;}
  return coordinates();
 }
 function segment(network,a,b){if(!same(a,b))network.segments.push({a,b});}
@@ -95,6 +102,11 @@ function normalizeWires(segments,positions){
  let wires=[...unique.values()];const touchesCard=p=>Object.values(positions).some(c=>(Math.abs(Math.abs(p.y-c.y)-CARD_H/2)<EPS&&Math.abs(p.x-c.x)<=CARD_W/2+EPS)||(Math.abs(Math.abs(p.x-c.x)-CARD_W/2)<EPS&&Math.abs(p.y-c.y)<=CARD_H/2+EPS));
  // Moving a vertical run can leave an obsolete tail on its former bus. Trim it.
  for(let pass=0;pass<200;pass++){const degree=new Map();for(const s of wires)for(const p of [s.a,s.b])degree.set(key(p),(degree.get(key(p))||0)+1);const next=wires.filter(s=>![s.a,s.b].some(p=>degree.get(key(p))===1&&!touchesCard(p)));if(next.length===wires.length)break;wires=next;}
+ // Join straight degree-two runs. Keep real T junctions and corners intact.
+ for(let pass=0;pass<200;pass++){const incident=new Map();for(const s of wires)for(const p of [s.a,s.b]){const k=key(p);if(!incident.has(k))incident.set(k,[]);incident.get(k).push(s);}let merged=false;
+ for(const [k,edges] of incident){if(edges.length!==2)continue;const [a,b]=edges,u=key(a.a)===k?a.b:a.a,v=key(b.a)===k?b.b:b.a;
+ if(Math.abs(u.x-v.x)<EPS&&Math.abs(a.a.x-a.b.x)<EPS&&Math.abs(b.a.x-b.b.x)<EPS||Math.abs(u.y-v.y)<EPS&&Math.abs(a.a.y-a.b.y)<EPS&&Math.abs(b.a.y-b.b.y)<EPS){wires=wires.filter(s=>s!==a&&s!==b);wires.push({a:u,b:v});merged=true;break;}}
+ if(!merged)break;}
  return wires;
 }
 function findJunctions(segments){

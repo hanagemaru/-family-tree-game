@@ -1,44 +1,25 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {dragHotspot,screenNodes,targetItems,resolveDragTarget} from '../src/interaction.js';
-const relations=['parent','child','spouse','sibling'];
-const point=(x,y)=>({x,y,inside:true});
-const nodes=[{id:'owner',x:170,y:190,width:72,height:45},{id:'neighbor',x:170,y:95,width:72,height:45}];
-const items=targetItems(nodes[0],360,380,relations);
-
-test('the visible held-card center is the drop hotspot, not the finger below it',()=>{
- assert.deepEqual(dragHotspot(170,128),{x:170,y:100});
+import {dragHotspot,screenNodes,pickDropCard,dropDecision} from '../src/interaction.js';
+const p=(x,y)=>({x,y,inside:true});
+const nodes=[{id:'a',x:120,y:150,width:72,height:45},{id:'b',x:215,y:150,width:72,height:45}];
+test('drop hotspot equals the center of the visible held card',()=>assert.deepEqual(dragHotspot(120,186),{x:120,y:150}));
+test('empty space never silently chooses the nearest card',()=>assert.equal(pickDropCard(p(20,20),nodes),null));
+test('card bodies are acquired with a minimum 44px touch area',()=>{
+ assert.equal(pickDropCard(p(120,150),nodes),'a');
+ assert.equal(pickDropCard(p(120,168),[{id:'a',x:120,y:150,width:20,height:12}]),'a');
 });
-test('acquire only a card body, not the nearest card across an empty gap',()=>{
- assert.deepEqual(resolveDragTarget(point(170,143),nodes,null),{anchor:null,relation:null});
- assert.deepEqual(resolveDragTarget(point(170,190),nodes,null),{anchor:'owner',relation:null});
+test('hover jitter stays stable but moving onto another card selects it',()=>{
+ assert.equal(pickDropCard(p(161,150),nodes,'a'),'a');
+ assert.equal(pickDropCard(p(215,150),nodes,'a'),'b');
 });
-test('owner does not switch while moving through the gap toward its parent guide',()=>{
- // At y=135 the neighbor is closer. The old nearest-card logic switched here.
- for(const y of [180,160,145,135,125])assert.equal(resolveDragTarget(point(170,y),nodes,'owner',items).anchor,'owner');
+test('leaving the board removes the drop preview',()=>assert.equal(pickDropCard({...p(120,150),inside:false},nodes,'a'),null));
+test('release on a card opens relation selection rather than placing automatically',()=>assert.deepEqual(dropDecision({active:true,inside:true,anchor:'a',card:'held'}),{type:'relation',card:'held',anchor:'a'}));
+test('release on empty board offers an explicit card list, not a dead end',()=>assert.deepEqual(dropDecision({active:true,inside:true,anchor:null,card:'held'}),{type:'choose-anchor',card:'held'}));
+test('tap and outside release keep the held card selected',()=>{
+ for(const active of [false,true])assert.deepEqual(dropDecision({active,inside:false,anchor:null,card:'held'}),{type:'selected',card:'held'});
 });
-test('guide ownership wins even when its target overlaps another card',()=>{
- const result=resolveDragTarget(point(170,100),nodes,'owner',items);
- assert.deepEqual(result,{anchor:'owner',relation:'parent'});
-});
-test('leaving the whole guide region releases the owner; a later card can be acquired',()=>{
- assert.deepEqual(resolveDragTarget(point(350,370),nodes,'owner',items),{anchor:null,relation:null});
- assert.deepEqual(resolveDragTarget(point(170,95),nodes,null),{anchor:'neighbor',relation:null});
-});
-test('leaving the board clears both owner and hot relation',()=>{
- assert.deepEqual(resolveDragTarget({x:170,y:100,inside:false},nodes,'owner',items),{anchor:null,relation:null});
-});
-test('diagonal free space can release a lock without leaving a narrow mobile board',()=>{
- assert.equal(resolveDragTarget(point(300,310),nodes,'owner',items).anchor,null);
-});
-test('a newly acquired card never auto-activates one of its guides',()=>{
- assert.equal(resolveDragTarget(point(170,95),nodes,null,items).relation,null);
-});
-test('pan and zoom transform the acquisition boxes consistently',()=>{
- for(const scale of [.3,.5,1,1.8]){
-  const list=screenNodes({a:{x:100,y:190},b:{x:100,y:0}},{x:90,y:70,scale});
-  const p=list[0];assert.equal(resolveDragTarget(point(p.x,p.y),list,null).anchor,'a');
-  const guide=targetItems(p,600,600,relations).find(t=>t.type==='parent');
-  assert.deepEqual(resolveDragTarget(point(guide.x,guide.y),list,'a',targetItems(p,600,600,relations)),{anchor:'a',relation:'parent'});
- }
+test('cancel without a held card has no placement effect',()=>assert.deepEqual(dropDecision({active:true,inside:true,anchor:'a',card:null}),{type:'cancel'}));
+test('pan and zoom consistently transform acquisition areas',()=>{
+ for(const scale of [.18,.5,1,1.8]){const list=screenNodes({a:{x:100,y:190},b:{x:100,y:0}},{x:90,y:70,scale});assert.equal(pickDropCard(p(list[0].x,list[0].y),list),'a');}
 });

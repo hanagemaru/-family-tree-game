@@ -5,6 +5,7 @@ const full=stage=>{const state=newGame(stage);state.placed=stage.people.map(p=>p
 const net=(id,a,b,junctions=[])=>({id,kind:'parent',members:[id],segments:[{a,b}],junctions,label:null});
 const near=(a,b)=>Math.abs(a-b)<1e-4;
 function assertGeometry(state){
+ const locations=Object.values(state.positions);for(let i=0;i<locations.length;i++)for(let j=i+1;j<locations.length;j++){const a=locations[i],b=locations[j];assert.ok(Math.abs(a.x-b.x)>=CARD_W+10||Math.abs(a.y-b.y)>=CARD_H+10,'family blocks never overlap cards');}
  const diagram=buildDiagram(state),geometry=renderGeometry(diagram),verticals=[];
  for(const n of diagram.networks){for(const s of n.segments){assert.ok(Number.isFinite(s.a.x+s.a.y+s.b.x+s.b.y));assert.ok(near(s.a.x,s.b.x)||near(s.a.y,s.b.y),'orthogonal line');if(near(s.a.x,s.b.x))verticals.push({...s,net:n.id});
  for(const p of Object.values(state.positions)){const x=(s.a.x+s.b.x)/2,y=(s.a.y+s.b.y)/2;assert.ok(!(x>p.x-CARD_W/2+1&&x<p.x+CARD_W/2-1&&y>p.y-CARD_H/2+1&&y<p.y+CARD_H/2-1),'line must not run through card interior');}}
@@ -59,4 +60,10 @@ test('a single sibling row centers under its parent pair',()=>{
  const middle=(state.positions.hidetada.x+state.positions.go.x)/2;
  const children=['iemitsu','tadanaga','sen'].map(id=>state.positions[id].x);
  assert.ok(near(children.reduce((a,b)=>a+b,0)/3,middle));assertGeometry(state);
+});
+test('current complete stages reserve subtree widths and avoid all crossings',()=>{
+ for(const stage of stages){const state=full(stage),diagram=assertGeometry(state);assert.equal(renderGeometry(diagram).crossings.length,0);}
+});
+test('a straight parent-child chain is emitted as one run without artificial bends',()=>{
+ const state=full(stages[1]),diagram=buildDiagram(state);for(const id of ['family:black','family:kitasan']){const wire=diagram.networks.find(n=>n.id===id);assert.equal(wire.segments.length,1);assert.equal(wire.segments[0].a.x,wire.segments[0].b.x);}
 });
