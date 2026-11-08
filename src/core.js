@@ -1,4 +1,5 @@
-export const CARD_W=144,CARD_H=90,STEP_X=180,STEP_Y=190;
+// Portrait cards in the field; shared geometry for connectors and hit testing.
+export const CARD_W=108,CARD_H=154,STEP_X=158,STEP_Y=225;
 export const relationLabels={parent:'親',child:'子',spouse:'配偶者',sibling:'兄弟姉妹'};
 export function relations(candidate,anchor){
  if(!candidate||!anchor||candidate.id===anchor.id)return [];
