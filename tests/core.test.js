@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {stages} from '../src/data.js';
-import {relations,newGame,place,exchange,connectable,visibleEdges,pack,restore,fitCamera,revealCamera,CARD_W,CARD_H,formatTime} from '../src/core.js';
+import {relations,newGame,place,exchange,connectable,visibleEdges,pack,restore,fitCamera,revealCamera,CARD_W,CARD_H,STEP_X,STEP_Y,formatTime} from '../src/core.js';
 const history=stages[0],horses=stages[1];
 const lookup=(stage,id)=>stage.people.find(p=>p.id===id);
 function randomSeed(seed){let x=seed;return ()=>{x=(1664525*x+1013904223)>>>0;return x/4294967296;};}
@@ -66,3 +66,9 @@ test('reveal camera keeps visible cards stationary and reveals new offscreen car
  const next=revealCamera(initial,{x:500,y:500},360,320);assert.equal(next.scale,1);assert.ok(500+next.x<360);assert.ok(500+next.y<320);
 });
 test('format time handles long sessions',()=>{assert.equal(formatTime(0),'0:00');assert.equal(formatTime(61500),'1:01');assert.equal(formatTime(3600000),'60:00');});
+
+test('portrait field-card geometry retains adequate space for readable wires',()=>{
+ assert.ok(CARD_H>CARD_W);
+ assert.ok(STEP_X-CARD_W>=40);
+ assert.ok(STEP_Y-CARD_H>=60);
+});
