@@ -71,3 +71,42 @@ dialog .placement-error{font-size:12px;color:var(--red);line-height:1.7;margin-t
 @media(prefers-reduced-motion:reduce){.hand-card{transition:none}}
 /* Visual review: keep the complete hand visible beside the board on desktop. */
 @media(min-width:721px){.app-header{height:72px}.game-heading{padding:18px 0 10px}.game-heading h1{font-size:21px}.stats{padding-bottom:10px}.progress{margin-bottom:16px}#board{height:clamp(245px,31dvh,360px)}.hand-section{padding:12px 24px 8px}.hand-heading{padding-bottom:4px}.hand{min-height:194px;padding:10px 0 17px}.hand-card{height:180px;min-height:180px;flex-basis:126px}.card-art{inset:20px 9px 52px}.hand-card .card-name{font-size:16px}.hand-card.horse .card-name{font-size:12px}.hand-footer{margin-top:6px;padding-top:4px}.status{padding:8px 2px;min-height:32px}.line-legend{padding-top:8px}}
+
+
+/* Field cards share the collectible-card face with the hand.
+   Keep width/height in sync with CARD_W / CARD_H in src/core.js. */
+#board{height:clamp(390px,55dvh,640px)}
+#board.expanded{height:min(80dvh,820px);min-height:550px}
+#board .table-card{position:absolute;width:108px;height:154px;min-height:154px;margin:-77px 0 0 -54px;padding:8px 7px 10px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:0;isolation:isolate;overflow:hidden;border:3px solid #d5ba7b;border-radius:9px;color:#fff3d2;background:linear-gradient(145deg,#183645,#326276 50%,#122b3d);box-shadow:inset 0 0 0 1px #fff0ba,inset 0 0 0 4px #152d3a,0 2px 0 #867452,0 5px 0 #c8b78a,0 8px 15px #031e2c66;cursor:grab;text-shadow:0 1px 2px #0009}
+#board .table-card.horse{background:linear-gradient(145deg,#172b4a,#3b5d8a 50%,#14213d)}
+#board .table-card::before{content:'';position:absolute;inset:5px;border:1px solid #f2dba36f;border-radius:4px;pointer-events:none;background:repeating-linear-gradient(135deg,transparent 0 13px,#ffffff06 13px 14px)}
+#board .table-card::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 15%,#ffffff14 36%,transparent 48%,#ffde8a14 67%,transparent 78%);pointer-events:none}
+#board .table-card .card-corner{top:7px;left:8px;font-size:14px;line-height:1;color:#f0d39c}
+#board .table-card .card-corner i{font-size:6px;line-height:1.8}
+#board .table-card .card-art{inset:20px 7px 46px}
+#board .table-card .card-art svg{filter:drop-shadow(0 3px 1px #09202f77)}
+#board .table-card .card-orbit{width:77px;height:77px}
+#board .table-card .card-seal{font-size:6px}
+#board .table-card .card-name{position:relative;z-index:2;width:100%;min-height:31px;display:grid;place-items:center;padding:5px 1px 2px;border-top:1px solid #e2c58391;color:#fff8e9;background:linear-gradient(transparent,#071b2c88);font-family:"Yu Mincho","Hiragino Mincho ProN",serif;font-size:14px;font-weight:700;line-height:1.2;letter-spacing:0;overflow-wrap:anywhere;text-align:center}
+#board .table-card.horse .card-name{font-family:inherit;font-size:11px;line-height:1.25;min-height:37px}
+#board .table-card small{position:relative;z-index:2;display:block!important;font-size:5px;line-height:1.7;letter-spacing:.03em;color:#e7d5a8;text-align:center}
+#board .table-card.anchor{border-color:#ffe2a2;background:linear-gradient(145deg,#244452,#467b80 48%,#173647);box-shadow:inset 0 0 0 1px #ffeccc,inset 0 0 0 4px #1c3945,0 2px 0 #a58a53,0 5px 0 #d7c294,0 0 18px #e9c87638,0 9px 15px #031e2c66}
+#board .table-card.targeted{outline:3px solid #ffe29c;outline-offset:4px;box-shadow:0 0 0 5px #f7dc9544,0 4px 22px #e8c57988}
+#board .table-card.line-focused{outline:2px solid #ffe29c;outline-offset:3px}
+#board .table-card.new-card{animation:land .35s ease-out}
+#board.overview .table-card .card-art{opacity:.64}
+#board.overview .table-card .card-name{font-size:17px;min-height:44px;background:linear-gradient(#102a39bb,#071b2cf2);text-shadow:0 1px 3px #000}
+#board.overview .table-card.horse .card-name{font-size:13px}
+#board.overview .table-card small{display:none!important}
+#board .board-caption{background:#113d37b0;left:50%;right:auto;transform:translateX(-50%);width:max-content;max-width:calc(100% - 26px);padding:6px 13px;border-radius:20px;color:#f8e8c6}
+#board .board-tools{display:flex;gap:2px;max-width:calc(100% - 20px)}
+#board .board-tools #board-expand{color:#214d47;font-weight:700;white-space:nowrap;padding:0 7px;min-width:40px;text-decoration:none}
+#board.expanded .board-tools #board-expand{background:#e2ca94}
+@media(max-width:720px){
+ #board{height:clamp(315px,46dvh,490px)}
+ #board.expanded{height:min(76dvh,750px);min-height:480px}
+ #board .board-caption{font-size:9px}
+ #board .board-tools .icon-button,#board .board-tools .text-button{min-width:34px;min-height:36px;font-size:11px}
+ #board .board-tools #board-expand{min-width:34px}
+}
+@media(prefers-reduced-motion:reduce){#board .table-card.new-card{animation:none}}
