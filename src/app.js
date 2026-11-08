@@ -28,7 +28,7 @@ $('stage-list').addEventListener('click',e=>{const button=e.target.closest('[dat
 function start(stage,fresh=false){
  persist();state=(!fresh&&savedGame(stage))||newGame(stage);if(state.complete&&!fresh)state=newGame(stage);selected=null;targetAnchor=null;lineFocus=null;state.positions=layoutFamily(state);
  board.classList.remove('expanded');$('board-expand').textContent='広く';$('board-expand').setAttribute('aria-pressed','false');$('home-screen').hidden=true;$('game-screen').hidden=false;$('stage-category').textContent=stage.category;$('stage-title').textContent=stage.title;hoverAnchor=null;
- document.body.dataset.stage=stage.id;render();fit();lastTick=performance.now();say('手札を相手へドロップ、または手札と相手を順にタップ。');persist();window.scrollTo({top:0,behavior:'instant'});
+ document.body.dataset.stage=stage.id;render();fit();previousWidth=board.clientWidth;previousHeight=board.clientHeight;lastTick=performance.now();say('手札を相手へドロップ、または手札と相手を順にタップ。');persist();window.scrollTo({top:0,behavior:'instant'});
 }
 function goHome(){persist();cancelDrag();pointers.clear();pan=null;state=null;selected=null;clearTargets();$('game-screen').hidden=true;$('home-screen').hidden=false;renderHome();closeDialog();}
 function menu(){if(!state){goHome();return;}openDialog(`<p class="eyebrow">${state.stage.category}</p><h2>${state.stage.title}</h2><p>進行は自動保存されています。</p><button class="button" data-action="home">ステージ選択へ</button><button class="button secondary" data-action="restart-confirm">最初からやり直す</button>${state.complete?'<button class="button secondary" data-action="result">完成記録を見る</button>':''}`);}
