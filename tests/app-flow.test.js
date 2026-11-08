@@ -45,3 +45,14 @@ test('actual app: both themes can be completed through real hand, picker and rel
   }finally{app.restore();}
  }
 });
+
+test('board uses illustrated portrait cards and offers a larger inspection view',async t=>{
+ const app=await setup(t),node=app.$('nodes').querySelector('[data-node="hidetada"]');
+ assert.ok(node.classList.contains('table-card'));
+ assert.ok(node.querySelector('.card-art'));
+ assert.ok(node.querySelector('.card-corner'));
+ assert.match(node.textContent,/秀忠/);
+ const button=app.$('board-expand');
+ button.click();assert.equal(button.attributes['aria-pressed'],'true');assert.ok(app.$('board').classList.contains('expanded'));
+ button.click();assert.equal(button.attributes['aria-pressed'],'false');assert.equal(app.$('board').classList.contains('expanded'),false);
+});
