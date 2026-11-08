@@ -27,7 +27,7 @@ $('sources-button').addEventListener('click',showSources);
 $('stage-list').addEventListener('click',e=>{const button=e.target.closest('[data-start]');if(button)start(stageById(button.dataset.start));});
 function start(stage,fresh=false){
  persist();state=(!fresh&&savedGame(stage))||newGame(stage);if(state.complete&&!fresh)state=newGame(stage);selected=null;targetAnchor=null;lineFocus=null;state.positions=layoutFamily(state);
- $('home-screen').hidden=true;$('game-screen').hidden=false;$('stage-category').textContent=stage.category;$('stage-title').textContent=stage.title;hoverAnchor=null;
+ board.classList.remove('expanded');$('board-expand').textContent='広く';$('board-expand').setAttribute('aria-pressed','false');$('home-screen').hidden=true;$('game-screen').hidden=false;$('stage-category').textContent=stage.category;$('stage-title').textContent=stage.title;hoverAnchor=null;
  document.body.dataset.stage=stage.id;render();fit();lastTick=performance.now();say('手札を相手へドロップ、または手札と相手を順にタップ。');persist();window.scrollTo({top:0,behavior:'instant'});
 }
 function goHome(){persist();cancelDrag();pointers.clear();pan=null;state=null;selected=null;clearTargets();$('game-screen').hidden=true;$('home-screen').hidden=false;renderHome();closeDialog();}
@@ -45,7 +45,7 @@ function renderSelection(){
  $('choose-anchor-button').disabled=!selected||state.complete;$('clear-selection-button').disabled=!selected;
 }
 function renderBoard(newId){
- $('nodes').innerHTML=state.placed.map(id=>{const p=person(id),position=state.positions[id];return `<button class="person-node ${state.stage.id==='thoroughbred'?'horse':''} ${id===state.stage.anchor?'anchor':''} ${id===newId?'new-card':''}" data-node="${id}" aria-pressed="false" style="left:${position.x}px;top:${position.y}px" aria-label="${escape(p.name)}${id===state.stage.anchor?'、起点のカード':''}"><span class="node-name">${escape(p.name)}</span><small>${id===state.stage.anchor?'START · 起点':state.stage.category}</small></button>`;}).join('');
+ $('nodes').innerHTML=state.placed.map(id=>{const p=person(id),position=state.positions[id];return `<button class="person-node table-card ${state.stage.id==='thoroughbred'?'horse':''} ${id===state.stage.anchor?'anchor':''} ${id===newId?'new-card':''}" data-node="${id}" aria-pressed="false" style="left:${position.x}px;top:${position.y}px" aria-label="${escape(p.name)}${id===state.stage.anchor?'、起点のカード':''}">${cardFace(id)}</button>`;}).join('');
  diagram=buildDiagram(state);renderLines();
  updateTransform();
 }
@@ -65,9 +65,10 @@ function renderHint(){const box=$('hint-box');box.hidden=true;if(!selected)retur
 function revealHint(){if(!selected){say('ヒントを見るカードを、手札から選んでください。');return;}state.hints[selected]=Math.min(2,(state.hints[selected]||0)+1);renderHint();renderStats();persist();}
 $('hint-button').addEventListener('click',revealHint);
 $('exchange-button').addEventListener('click',()=>{if(exchange(state)){selected=null;clearTargets();renderHand();renderHint();renderStats();persist();say('手札を入れ替えました。つながる札を探してみよう。');}});
-function updateTransform(animate=false){$('world').classList.toggle('following',animate);$('world').style.transform=`translate(${camera.x}px,${camera.y}px) scale(${camera.scale})`;renderLines();}
+function updateTransform(animate=false){board.classList.toggle('overview',camera.scale<.68);$('world').classList.toggle('following',animate);$('world').style.transform=`translate(${camera.x}px,${camera.y}px) scale(${camera.scale})`;renderLines();}
 function fit(){if(!state)return;camera=fitCamera(state.positions,board.clientWidth,board.clientHeight);updateTransform(true);}
 $('fit-button').addEventListener('click',fit);
+$('board-expand').addEventListener('click',()=>{const expanded=board.classList.toggle('expanded');$('board-expand').textContent=expanded?'戻す':'広く';$('board-expand').setAttribute('aria-pressed',String(expanded));previousWidth=board.clientWidth;previousHeight=board.clientHeight;fit();});
 function zoomAt(factor,x=board.clientWidth/2,y=board.clientHeight/2){const next=Math.max(.18,Math.min(1.8,camera.scale*factor)),ratio=next/camera.scale;camera={x:x-(x-camera.x)*ratio,y:y-(y-camera.y)*ratio,scale:next};updateTransform();}
 $('zoom-in').addEventListener('click',()=>zoomAt(1.2));$('zoom-out').addEventListener('click',()=>zoomAt(1/1.2));
 board.addEventListener('wheel',e=>{e.preventDefault();const rect=board.getBoundingClientRect();zoomAt(Math.exp(-e.deltaY*.002),e.clientX-rect.left,e.clientY-rect.top);},{passive:false});
