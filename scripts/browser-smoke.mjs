@@ -28,7 +28,10 @@ try{
   assert.equal(errors.length,0,'page errors '+errors);
   assert.ok(scene.anchor,'anchor must exist');
   assert.ok(scene.board.height>150,'board must have actual height');
-  assert.ok(scene.overlap>2000,'starting card must be visible in the board');
+  assert.ok(scene.overlap>12000,'starting card must be substantially visible in the board');
+  assert.ok(scene.anchor.left>=scene.board.left-2&&scene.anchor.right<=scene.board.right+2&&scene.anchor.top>=scene.board.top-2&&scene.anchor.bottom<=scene.board.bottom+2,'starting card must be fully inside the board');
+  assert.ok(Math.abs((scene.anchor.left+scene.anchor.right)/2-(scene.board.left+scene.board.right)/2)<12,'starting card must be centered horizontally');
+  assert.ok(Math.abs((scene.anchor.top+scene.anchor.bottom)/2-(scene.board.top+scene.board.bottom)/2)<12,'starting card must be centered vertically');
   await page.close();
  }
  await browser.close();browser=null;
