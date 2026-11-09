@@ -199,3 +199,19 @@ body.playing #game-screen .line-legend{display:none}
  body.playing #game-screen .hand-card.horse .card-name{font-size:8px}
 }
 @media(prefers-reduced-motion:reduce){body.playing #game-screen .status.flash{animation:none;opacity:1}body.playing #game-screen .hand-card{transition:none}}
+
+/* Native-feeling bottom relationship sheet: only the two card names and four answers. */
+body.playing dialog.placement-dialog{position:fixed;inset:auto 0 max(7px,env(safe-area-inset-bottom));width:min(480px,calc(100% - 18px));max-height:min(70dvh,530px);margin:0 auto;padding:18px 18px 12px;border:1px solid #e1cf9d;border-radius:21px;background:#f8f1e3;color:#28423e;box-shadow:0 -6px 55px #061b2385}
+body.playing dialog.placement-dialog::backdrop{background:#061f20a0;backdrop-filter:blur(3px)}
+body.playing .placement-dialog .eyebrow{font-size:10px;letter-spacing:.18em;color:#877446}
+body.playing .placement-dialog h2.compact-relation-title{margin:7px 0 16px;font:700 clamp(16px,4vw,22px)/1.5 "Yu Mincho","Hiragino Mincho ProN",serif;color:#253f3a;text-align:center;overflow-wrap:anywhere}
+body.playing .placement-dialog h2.compact-relation-title span{font:500 .75em/1.4 sans-serif;color:#7a8376}
+body.playing .placement-dialog .relation-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+body.playing .placement-dialog .relation-choice{min-height:61px;padding:12px 6px;background:#fffdf8;border:1px solid #ced9cd;border-radius:12px;color:#24493e;font-size:17px;font-weight:700;box-shadow:0 2px 0 #d5d7c9}
+body.playing .placement-dialog .relation-choice:active{background:#e2ecdf;transform:translateY(1px)}
+body.playing .placement-dialog .relation-choice:disabled{background:#e6e2db;color:#a2a49d;border-color:#e0ddd5}
+body.playing .placement-dialog #placement-error{margin-top:8px;min-height:0}
+body.playing .placement-dialog [data-action="change-anchor"]{display:block;min-height:38px;margin:8px auto 0;color:#4d6660;text-decoration:none}
+body.playing .placement-dialog~#modal-close{font-size:11px}
+body.playing dialog.placement-dialog #modal-content{padding:0}
+body.playing dialog.placement-dialog #modal-close{display:block;width:100%;min-height:38px;margin:3px 0 0;padding:8px;background:transparent;color:#50665c;font-size:12px;border:0;box-shadow:none}
