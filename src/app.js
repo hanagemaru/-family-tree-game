@@ -1,5 +1,5 @@
 import {stages,stageById} from './data.js';
-import {relationLabels,newGame,exchange,place,pack,restore,formatTime,fitCamera,revealCamera} from './core.js';
+import {relationLabels,newGame,place,pack,restore,formatTime,fitCamera,revealCamera} from './core.js';
 import {layoutFamily,buildDiagram,diagramSvg} from './diagram.js';
 import {dragHotspot,screenNodes,pickDropCard,dropDecision} from './interaction.js';
 const $=id=>document.getElementById(id),storageKey='family-tree-game:v1';
@@ -11,7 +11,7 @@ const board=$('board'),modal=$('modal'),pointers=new Map();
 const person=id=>state.stage.people.find(p=>p.id===id);
 const hintCount=()=>Object.values(state.hints).reduce((sum,n)=>sum+n,0);
 function persist(){try{if(state)records.sessions[state.stage.id]=pack(state);localStorage.setItem(storageKey,JSON.stringify(records));}catch{}}
-function say(message,error=false){$('status').textContent=message;$('status').classList.toggle('error',error);}
+function say(message,error=false){const box=$('status');box.textContent=message;box.classList.toggle('error',error);box.classList.remove('flash');void box.offsetWidth;if(message)box.classList.add('flash');}
 function savedGame(stage){try{return restore(records.sessions[stage.id],stage);}catch{return null;}}
 function renderHome(){
  $('stage-list').innerHTML=stages.map((stage,index)=>{const saved=savedGame(stage),resume=saved&&!saved.complete,best=records.best[stage.id],history=stage.id==='tokugawa';return `<article class="stage-card ${history?'history-theme':'horse-theme'}"><div class="stage-art" aria-hidden="true"><span class="art-index">COLLECTION 0${index+1}</span><div class="theme-emblem">${history?'<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="51"/><path d="M60 59C27 52 28 18 49 23C65 26 68 43 60 59ZM62 61C75 29 104 39 98 59C92 75 77 75 62 61ZM58 63C78 90 53 111 39 95C27 80 36 66 58 63Z"/><circle cx="60" cy="61" r="6"/></svg>':'<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="51"/><path d="M35 93C36 73 45 62 53 55L45 48L52 28L60 35L70 26L73 41C85 46 91 59 85 68L75 63L65 73L72 94Z"/></svg>'}</div><span class="art-caption">${history?'TOKUGAWA FAMILY':'THOROUGHBRED'}</span></div><div class="stage-content"><div class="stage-meta"><span>${stage.category}</span><span>${stage.people.length}${history?'人':'頭'}のカード</span></div><h3>${stage.title}</h3><p>${stage.summary}</p><span class="tag">${stage.tag}</span><div class="stage-bottom"><span class="best">${resume?`<span class="resume-dot"></span>${saved.placed.length} / ${stage.people.length} 配置済み`:best?`✓ クリア済み · ${formatTime(best.elapsed)}`:'いつでも、あなたのペースで'}</span><button class="button" data-start="${stage.id}">${resume?'つづきから':'はじめる'} <span aria-hidden="true">→</span></button></div></div></article>`;}).join('');
@@ -20,28 +20,28 @@ function openDialog(html,closeLabel='閉じる',kind='info'){dialogKind=kind;mod
 function closeDialog(){modal.close();lastTick=performance.now();}
 modal.addEventListener('close',()=>{lastTick=performance.now();if(state){renderCaption();if(selected)say(`${person(selected).name}を選択中。場の相手をタップするか、一覧から選べます。`);}});
 $('modal-close').addEventListener('click',closeDialog);
-function help(){openDialog(`<p class="eyebrow">HOW TO PLAY</p><h2>相手に置いて、関係を選ぶ。</h2><ol><li>手札を、場の相手のカードへドラッグして離します。</li><li>開いた画面で「親・子・配偶者・きょうだい」の関係を選ぶと配置できます。</li><li>手札をタップ → 相手をタップ、でも同じ操作ができます。押しにくい相手は「相手を一覧から」で選べます。</li><li>置ける札がなければ手札を入れ替え。困ったら選択札のヒント。時間制限はありません。</li><li>●は実際の接続点、線の切れ目は非接続の交差。手札未選択で場のカードをタップすると関係線を強調します。</li><li>盤面をスワイプして移動。ピンチ、＋ / −で拡縮し、「全体」で見渡せます。</li></ol><p class="scope">${state?escape(state.stage.scope):'進行はこのブラウザへ自動保存されます。'}</p>`);}
+function help(){openDialog(`<p class="eyebrow">HOW TO PLAY</p><h2>相手に置いて、関係を選ぶ。</h2><ol><li>手札を、場の相手のカードへドラッグして離します。</li><li>開いた画面で「親・子・配偶者・きょうだい」の関係を選ぶと配置できます。</li><li>手札をタップ → 相手をタップ、でも同じ操作ができます。押しにくい相手は「相手を一覧から」で選べます。</li><li>置ける札がない状態は自動で防ぎます。困ったら選択札のヒント。時間制限はありません。</li><li>●は実際の接続点、線の切れ目は非接続の交差。手札未選択で場のカードをタップすると関係線を強調します。</li><li>盤面をスワイプして移動。ピンチ、＋ / −で拡縮し、「全体」で見渡せます。</li></ol><p class="scope">${state?escape(state.stage.scope):'進行はこのブラウザへ自動保存されます。'}</p>`);}
 $('help-button').addEventListener('click',help);
 function showSources(){const list=state?[state.stage]:stages;openDialog(`<p class="eyebrow">ABOUT THE FAMILY TREES</p><h2>題材・出典</h2>${list.map(stage=>`<h3>${stage.title}</h3><p>${stage.description}</p><p class="scope">${stage.scope}</p><ul>${[...new Map([...stage.sources,...stage.people.map(p=>p.source)].map(s=>[s.url,s])).values()].map(s=>`<li><a href="${escape(s.url)}" target="_blank" rel="noopener noreferrer">${escape(s.label)}</a></li>`).join('')}</ul>`).join('')}<p class="scope">関係情報をもとに作成した選抜ステージです。人物・馬の肖像や写真は転載していません。</p>`);}
 $('sources-button').addEventListener('click',showSources);
 $('stage-list').addEventListener('click',e=>{const button=e.target.closest('[data-start]');if(button)start(stageById(button.dataset.start));});
 function start(stage,fresh=false){
  persist();state=(!fresh&&savedGame(stage))||newGame(stage);if(state.complete&&!fresh)state=newGame(stage);selected=null;targetAnchor=null;lineFocus=null;state.positions=layoutFamily(state);
- board.classList.remove('expanded');$('board-expand').textContent='広く';$('board-expand').setAttribute('aria-pressed','false');$('home-screen').hidden=true;$('game-screen').hidden=false;$('stage-category').textContent=stage.category;$('stage-title').textContent=stage.title;hoverAnchor=null;
- document.body.dataset.stage=stage.id;render();fit();previousWidth=board.clientWidth;previousHeight=board.clientHeight;lastTick=performance.now();say('手札を相手へドロップ、または手札と相手を順にタップ。');persist();window.scrollTo({top:0,behavior:'instant'});
+ $('game-screen').classList.remove('inspect-mode');board.classList.remove('expanded');$('board-expand').textContent='広く';$('board-expand').setAttribute('aria-pressed','false');$('home-screen').hidden=true;$('game-screen').hidden=false;document.body.classList.add('playing');$('stage-category').textContent=stage.category;$('stage-title').textContent=stage.title;hoverAnchor=null;
+ document.body.dataset.stage=stage.id;render();fit();previousWidth=board.clientWidth;previousHeight=board.clientHeight;lastTick=performance.now();say('');persist();window.scrollTo({top:0,behavior:'instant'});
 }
-function goHome(){persist();cancelDrag();pointers.clear();pan=null;state=null;selected=null;clearTargets();$('game-screen').hidden=true;$('home-screen').hidden=false;renderHome();closeDialog();}
-function menu(){if(!state){goHome();return;}openDialog(`<p class="eyebrow">${state.stage.category}</p><h2>${state.stage.title}</h2><p>進行は自動保存されています。</p><button class="button" data-action="home">ステージ選択へ</button><button class="button secondary" data-action="restart-confirm">最初からやり直す</button>${state.complete?'<button class="button secondary" data-action="result">完成記録を見る</button>':''}`);}
+function goHome(){persist();cancelDrag();pointers.clear();pan=null;state=null;selected=null;clearTargets();$('game-screen').hidden=true;$('home-screen').hidden=false;document.body.classList.remove('playing');renderHome();closeDialog();}
+function menu(){if(!state){goHome();return;}openDialog(`<p class="eyebrow">${state.stage.category}</p><h2>${state.stage.title}</h2><p>進行は自動保存されています。</p><button class="button secondary" data-action="help">遊び方</button><button class="button secondary" data-action="sources">題材・出典</button><button class="button" data-action="home">ステージ選択へ</button><button class="button secondary" data-action="restart-confirm">最初からやり直す</button>${state.complete?'<button class="button secondary" data-action="result">完成記録を見る</button>':''}`);}
 $('menu-button').addEventListener('click',menu);$('home-button').addEventListener('click',()=>state?menu():goHome());
-modal.addEventListener('click',e=>{const action=e.target.closest('[data-action]')?.dataset.action;if(action==='home')goHome();if(action==='restart-confirm')openDialog('<h2>この系譜をやり直しますか？</h2><p>今の配置と記録をリセットして、新しい手札で始めます。</p><button class="button" data-action="restart">やり直す</button>','続ける');if(action==='restart'){const stage=state.stage;closeDialog();start(stage,true);}if(action==='result')results();});
+modal.addEventListener('click',e=>{const action=e.target.closest('[data-action]')?.dataset.action;if(action==='home')goHome();if(action==='restart-confirm')openDialog('<h2>この系譜をやり直しますか？</h2><p>今の配置と記録をリセットして、新しい手札で始めます。</p><button class="button" data-action="restart">やり直す</button>','続ける');if(action==='restart'){const stage=state.stage;closeDialog();start(stage,true);}if(action==='result')results();if(action==='help')help();if(action==='sources')showSources();});
 function render(){renderBoard();renderHand();renderStats();renderHint();}
 function renderStats(){
- $('placed-count').textContent=state.placed.length;$('total-count').textContent=` / ${state.stage.people.length}`;$('timer').textContent=formatTime(state.elapsed);$('mistake-count').textContent=state.mistakes;$('hint-count').textContent=hintCount();$('progress-fill').style.width=`${state.placed.length/state.stage.people.length*100}%`;$('hand-count').textContent=`${state.hand.length}枚`;$('stock-count').textContent=`山札 ${state.deck.length}枚`;$('exchange-button').disabled=!state.deck.length||state.complete;$('hint-button').disabled=state.complete;
+ $('placed-count').textContent=state.placed.length;$('total-count').textContent=` / ${state.stage.people.length}`;$('timer').textContent=formatTime(state.elapsed);$('mistake-count').textContent=state.mistakes;$('hint-count').textContent=hintCount();$('progress-fill').style.width=`${state.placed.length/state.stage.people.length*100}%`;$('hand-count').textContent=`${state.hand.length}枚`;$('stock-count').textContent=`残り ${state.deck.length}`;$('stock-pile').classList.toggle('empty',!state.deck.length);$('hint-button').disabled=!selected||state.complete;
  renderCaption();
  renderSelection();
 }
 function renderSelection(){
- $('selection-summary').textContent=selected?`選択中：${person(selected).name}`:'手札を選択してください';
+ $('selection-summary').textContent=selected?`${person(selected).name} を選択中`:'';
  $('choose-anchor-button').disabled=!selected||state.complete;$('clear-selection-button').disabled=!selected;
 }
 function renderBoard(newId){
@@ -60,15 +60,24 @@ function renderHand(){
  $('hand').innerHTML=state.hand.map((id,index)=>`<button class="hand-card ${state.stage.id==='thoroughbred'?'horse':''} ${id===selected?'selected':''}" style="--slot:${index};--tint:${(state.stage.people.findIndex(p=>p.id===id)*19)%70}deg" data-card="${id}" aria-pressed="${id===selected}" aria-label="${escape(person(id).name)}。ドラッグするか、選択して場のカードをタップ">${cardFace(id)}</button>`).join('');
  if(state.complete)$('hand').innerHTML='<p class="complete-note">すべてのカードがつながりました。</p>';
 }
+function animateDraw(beforeHand){
+ const dealt=state.hand.find(id=>!beforeHand.includes(id));if(!dealt)return;
+ const card=$('hand').querySelector(`[data-card="${dealt}"]`),pile=$('stock-pile');
+ if(!card||typeof card.animate!=='function'||!pile?.getBoundingClientRect)return;
+ const start=pile.getBoundingClientRect(),end=card.getBoundingClientRect();
+ const dx=start.left+start.width/2-end.left-end.width/2,dy=start.top+start.height/2-end.top-end.height/2;
+ const reduce=window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+ if(!reduce)card.animate([{transform:`translate(${dx}px,${dy}px) scale(.6) rotate(-12deg)`,opacity:.15},{transform:'translate(0,0) scale(1) rotate(0deg)',opacity:1}],{duration:420,easing:'cubic-bezier(.16,.8,.22,1)'});
+}
 function selectCard(id){selected=id;lineFocus=null;renderLines();for(const node of $('nodes').querySelectorAll('[data-node]')){node.classList.remove('line-focused');node.setAttribute('aria-pressed','false');}clearTargets();for(const button of $('hand').querySelectorAll('[data-card]')){const active=button.dataset.card===id;button.classList.toggle('selected',active);button.setAttribute('aria-pressed',String(active));}renderHint();renderStats();say(`${person(id).name}を選択中。場の相手を選んでください。`);}
 function renderHint(){const box=$('hint-box');box.hidden=true;if(!selected)return;const level=state.hints[selected]||0;if(level){box.hidden=false;box.innerHTML=`<strong>${escape(person(selected).name)}</strong> <small>ヒント ${level} / 2</small><br>${escape(person(selected).clues[level-1])}${level<2?'<button class="text-button" id="next-hint">関係のヒントを見る</button>':''}`;if(level<2)$('next-hint').addEventListener('click',revealHint);}}
 function revealHint(){if(!selected){say('ヒントを見るカードを、手札から選んでください。');return;}state.hints[selected]=Math.min(2,(state.hints[selected]||0)+1);renderHint();renderStats();persist();}
 $('hint-button').addEventListener('click',revealHint);
-$('exchange-button').addEventListener('click',()=>{if(exchange(state)){selected=null;clearTargets();renderHand();renderHint();renderStats();persist();say('手札を入れ替えました。つながる札を探してみよう。');}});
+// No voluntary hand exchange: playable cards are guaranteed by core.deal/ensurePlayable.
 function updateTransform(animate=false){board.classList.toggle('overview',camera.scale<.68);$('world').classList.toggle('following',animate);$('world').style.transform=`translate(${camera.x}px,${camera.y}px) scale(${camera.scale})`;renderLines();}
 function fit(){if(!state)return;camera=fitCamera(state.positions,board.clientWidth,board.clientHeight);updateTransform(true);}
 $('fit-button').addEventListener('click',fit);
-$('board-expand').addEventListener('click',()=>{const expanded=board.classList.toggle('expanded');$('board-expand').textContent=expanded?'戻す':'広く';$('board-expand').setAttribute('aria-pressed',String(expanded));previousWidth=board.clientWidth;previousHeight=board.clientHeight;fit();});
+$('board-expand').addEventListener('click',()=>{const expanded=board.classList.toggle('expanded');$('game-screen').classList.toggle('inspect-mode',expanded);$('board-expand').textContent=expanded?'戻す':'広く';$('board-expand').setAttribute('aria-pressed',String(expanded));previousWidth=board.clientWidth;previousHeight=board.clientHeight;fit();});
 function zoomAt(factor,x=board.clientWidth/2,y=board.clientHeight/2){const next=Math.max(.18,Math.min(1.8,camera.scale*factor)),ratio=next/camera.scale;camera={x:x-(x-camera.x)*ratio,y:y-(y-camera.y)*ratio,scale:next};updateTransform();}
 $('zoom-in').addEventListener('click',()=>zoomAt(1.2));$('zoom-out').addEventListener('click',()=>zoomAt(1/1.2));
 board.addEventListener('wheel',e=>{e.preventDefault();const rect=board.getBoundingClientRect();zoomAt(Math.exp(-e.deltaY*.002),e.clientX-rect.left,e.clientY-rect.top);},{passive:false});
@@ -102,13 +111,13 @@ function hoverAt(clientX,clientY){
  hoverAnchor=pickDropCard(point,screenNodes(state.positions,camera),hoverAnchor);paintTarget();renderCaption();
 }
 function attempt(relation){
- if(!selected||!targetAnchor)return;const id=selected,anchor=targetAnchor,p=person(id),a=person(anchor),outcome=place(state,id,anchor,relation);
+ if(!selected||!targetAnchor)return;const id=selected,anchor=targetAnchor,p=person(id),a=person(anchor),beforeHand=[...state.hand],outcome=place(state,id,anchor,relation);
  if(!outcome.ok){if(outcome.reason==='relation'){const message=`${p.name}は${a.name}の「${relationName(relation)}」ではなさそうです。`;say(message,true);if($('placement-error'))$('placement-error').textContent=message;const button=$('modal-content').querySelector(`[data-place-relation="${relation}"]`);if(button)button.disabled=true;}renderStats();persist();return;}
  const oldAnchor=state.positions[anchor];state.positions=layoutFamily(state);camera.x+=(oldAnchor.x-state.positions[anchor].x)*camera.scale;camera.y+=(oldAnchor.y-state.positions[anchor].y)*camera.scale;lineFocus=null;
- selected=null;closeDialog();clearTargets();renderBoard(id);renderHand();renderStats();renderHint();camera=revealCamera(camera,state.positions[id],board.clientWidth,board.clientHeight);updateTransform(true);say(`${p.name}が、${a.name}の${relationName(relation)}としてつながりました。`);persist();
+ selected=null;closeDialog();clearTargets();renderBoard(id);renderHand();animateDraw(beforeHand);renderStats();renderHint();camera=revealCamera(camera,state.positions[id],board.clientWidth,board.clientHeight);updateTransform(true);say(`${p.name}が、${a.name}の${relationName(relation)}としてつながりました。`);persist();
  if(state.complete){records.best[state.stage.id]={elapsed:state.elapsed,mistakes:state.mistakes,hints:hintCount()};persist();results();}
 }
-function results(){fit();openDialog(`<p class="eyebrow">FAMILY TREE COMPLETED</p><h2>ひとつの系譜が、つながった。</h2><p>${state.stage.title} · ${state.stage.people.length}${state.stage.id==='tokugawa'?'人':'頭'}のカードを配置しました。</p><div class="result-stats"><div>プレイ時間<b>${formatTime(state.elapsed)}</b></div><div>ミス<b>${state.mistakes}</b></div><div>ヒント<b>${hintCount()}</b></div><div>手札の入れ替え<b>${state.exchanges}</b></div></div><details><summary>つながりを振り返る</summary><ul>${state.stage.people.filter(p=>p.id!==state.stage.anchor).map(p=>`<li><strong>${p.name}</strong><br>${p.clues[1]}</li>`).join('')}</ul></details><button class="button" data-action="home">ほかの系譜をたどる</button><button class="button secondary" data-action="restart-confirm">もう一度遊ぶ</button>`,'完成した系譜を見る');}
+function results(){fit();openDialog(`<p class="eyebrow">FAMILY TREE COMPLETED</p><h2>ひとつの系譜が、つながった。</h2><p>${state.stage.title} · ${state.stage.people.length}${state.stage.id==='tokugawa'?'人':'頭'}のカードを配置しました。</p><div class="result-stats"><div>プレイ時間<b>${formatTime(state.elapsed)}</b></div><div>ミス<b>${state.mistakes}</b></div><div>ヒント<b>${hintCount()}</b></div></div><details><summary>つながりを振り返る</summary><ul>${state.stage.people.filter(p=>p.id!==state.stage.anchor).map(p=>`<li><strong>${p.name}</strong><br>${p.clues[1]}</li>`).join('')}</ul></details><button class="button" data-action="home">ほかの系譜をたどる</button><button class="button secondary" data-action="restart-confirm">もう一度遊ぶ</button>`,'完成した系譜を見る');}
 // Pointer events unify mouse, pen and touch. No HTML Drag and Drop dependency on iOS.
 $('hand').addEventListener('pointerdown',e=>{
  const button=e.target.closest('[data-card]');if(!button||e.button!==0||drag)return;e.preventDefault();updateTransform();selectCard(button.dataset.card);drag={pointerId:e.pointerId,id:selected,startX:e.clientX,startY:e.clientY,x:e.clientX,y:e.clientY,active:false};$('app').setPointerCapture(e.pointerId);
