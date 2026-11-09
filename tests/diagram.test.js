@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {stages} from '../src/data.js';import {newGame,relations,place,exchange,CARD_W,CARD_H} from '../src/core.js';
+import {stages} from '../src/data.js';import {newGame,relations,place,CARD_W,CARD_H} from '../src/core.js';
 import {layoutFamily,buildDiagram,renderGeometry,intersection,splitSegment,pointOnSegment,diagramSvg} from '../src/diagram.js';
 const full=stage=>{const state=newGame(stage);state.placed=stage.people.map(p=>p.id);state.positions=layoutFamily(state);return state;};
 const net=(id,a,b,junctions=[])=>({id,kind:'parent',members:[id],segments:[{a,b}],junctions,label:null});
@@ -40,7 +40,7 @@ test('multiple partners stay separate and their children belong to the correct p
 });
 test('random play orders keep every partial diagram legible and topologically separate',()=>{
  let seed=9;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
- for(const stage of stages)for(let run=0;run<25;run++){const state=newGame(stage,random);let turns=0;while(!state.complete&&turns++<100){state.positions=layoutFamily(state);assertGeometry(state);const moves=state.hand.flatMap(id=>state.placed.flatMap(anchor=>relations(stage.people.find(p=>p.id===id),stage.people.find(p=>p.id===anchor)).map(relation=>({id,anchor,relation}))));if(!moves.length){exchange(state);continue;}const move=moves[Math.floor(random()*moves.length)];assert.ok(place(state,move.id,move.anchor,move.relation).ok);}state.positions=layoutFamily(state);assertGeometry(state);assert.ok(state.complete);}
+ for(const stage of stages)for(let run=0;run<25;run++){const state=newGame(stage,random);let turns=0;while(!state.complete&&turns++<100){state.positions=layoutFamily(state);assertGeometry(state);const moves=state.hand.flatMap(id=>state.placed.flatMap(anchor=>relations(stage.people.find(p=>p.id===id),stage.people.find(p=>p.id===anchor)).map(relation=>({id,anchor,relation}))));assert.ok(moves.length,'hand must contain a connected card');const move=moves[Math.floor(random()*moves.length)];assert.ok(place(state,move.id,move.anchor,move.relation).ok);}state.positions=layoutFamily(state);assertGeometry(state);assert.ok(state.complete);}
 });
 test('crossing cuts never erase a nearby genuine branch point',()=>{
  const a=net('horizontal',{x:-40,y:0},{x:40,y:0},[{x:3,y:0}]);a.segments.push({a:{x:3,y:0},b:{x:3,y:25}});const d={networks:[a,net('vertical',{x:0,y:-30},{x:0,y:30})]};const g=renderGeometry(d);assert.ok(!g.networks[0].pieces.some(s=>pointOnSegment({x:0,y:0},s)));assert.ok(g.networks[0].pieces.some(s=>pointOnSegment({x:3,y:0},s)));
