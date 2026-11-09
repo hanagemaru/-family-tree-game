@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {stages} from '../src/data.js';
-import {relations,newGame,place,exchange,connectable,visibleEdges,pack,restore,fitCamera,revealCamera,CARD_W,CARD_H,STEP_X,STEP_Y,formatTime} from '../src/core.js';
+import {relations,newGame,place,connectable,visibleEdges,pack,restore,fitCamera,revealCamera,CARD_W,CARD_H,STEP_X,STEP_Y,formatTime} from '../src/core.js';
 const history=stages[0],horses=stages[1];
 const lookup=(stage,id)=>stage.people.find(p=>p.id===id);
 function randomSeed(seed){let x=seed;return ()=>{x=(1664525*x+1013904223)>>>0;return x/4294967296;};}
@@ -12,12 +12,12 @@ for(const stage of stages){
  const ids=stage.people.map(p=>p.id);assert.equal(new Set(ids).size,ids.length);assert.ok(ids.includes(stage.anchor));
  for(const person of stage.people){assert.equal(person.clues.length,2);assert.ok(person.source.url.startsWith('https://'));for(const id of person.parents){const parent=lookup(stage,id);assert.ok(parent);assert.equal(parent.generation+1,person.generation);}for(const id of person.spouses){const partner=lookup(stage,id);assert.ok(partner);assert.ok(partner.spouses.includes(person.id));assert.equal(person.generation,partner.generation);}}
  });
- test(`${stage.id}: 200 seeded games can finish through every deal and exchange`,()=>{
+ test(`${stage.id}: 200 seeded games finish with automatic playable draws and no exchange`,()=>{
  for(let seed=1;seed<=200;seed++){
  const state=newGame(stage,randomSeed(seed));assertInventory(state);assert.ok(state.hand.some(id=>connectable(state,id)));let turns=0;
  while(!state.complete&&turns++<100){
  const moves=state.hand.flatMap(id=>state.placed.flatMap(anchor=>relations(lookup(stage,id),lookup(stage,anchor)).map(relation=>({id,anchor,relation}))));
- if(!moves.length){assert.ok(state.deck.length);assert.ok(exchange(state));assert.ok(state.hand.some(id=>connectable(state,id)));continue;}
+ assert.ok(moves.length,`seed ${seed} has no playable card after draw`);
  const move=moves[(seed+turns)%moves.length];const before=JSON.stringify(state.positions);assert.ok(place(state,move.id,move.anchor,move.relation).ok);assertInventory(state);assertNoOverlap(state);for(const [id,position] of Object.entries(JSON.parse(before)))assert.deepEqual(state.positions[id],position);
  }
  assert.ok(state.complete,`seed ${seed} stalled`);assert.equal(state.hand.length,0);assert.equal(state.deck.length,0);assert.equal(state.mistakes,0);assert.ok(visibleEdges(state).length>=stage.people.length-1);
@@ -32,7 +32,19 @@ for(const stage of stages){
  const hints=structuredClone(saved);hints.hints[state.hand[0]]='2';assert.equal(restore(hints,stage),null);
  assert.equal(restore({},stage),null);assert.equal(restore({...saved,hand:null},stage),null);
  });
- test(`${stage.id}: exchange never loses cards`,()=>{const state=newGame(stage,randomSeed(1));for(let i=0;i<100;i++){exchange(state);assertInventory(state);assert.ok(state.hand.some(id=>connectable(state,id)));}});
+ test(`${stage.id}: initial and consecutive draws always give a playable card`,()=>{
+  for(let seed=1;seed<=50;seed++){
+   const state=newGame(stage,randomSeed(seed));let steps=0;
+   while(!state.complete&&steps++<stage.people.length){
+    assert.ok(state.hand.some(id=>connectable(state,id)));
+    const id=state.hand.find(id=>connectable(state,id));
+    const anchor=state.placed.find(anchor=>relations(lookup(stage,id),lookup(stage,anchor)).length);
+    const relation=relations(lookup(stage,id),lookup(stage,anchor))[0];
+    assert.ok(place(state,id,anchor,relation).ok);
+   }
+   assert.equal(state.complete,true);
+  }
+ });
 }
 test('multiple legitimate attachment paths, including half siblings and mothers',()=>{
  assert.deepEqual(relations(lookup(history,'go'),lookup(history,'hidetada')),['spouse']);
@@ -71,4 +83,26 @@ test('portrait field-card geometry retains adequate space for readable wires',()
  assert.ok(CARD_H>CARD_W);
  assert.ok(STEP_X-CARD_W>=40);
  assert.ok(STEP_Y-CARD_H>=60);
+});
+
+test('expanded collections preserve the original connected graph and double the content',()=>{
+ assert.equal(history.people.length,18);
+ assert.equal(horses.people.length,24);
+ for(const stage of stages){
+  const seen=new Set([stage.anchor]);let modified=true;
+  while(modified){modified=false;for(const p of stage.people)if(!seen.has(p.id)&&[...seen].some(id=>relations(p,lookup(stage,id)).length)){seen.add(p.id);modified=true;}}
+  assert.equal(seen.size,stage.people.length,`${stage.id} has unreachable people`);
+ }
+});
+test('old nine/twelve-card saves migrate without resetting placed cards',()=>{
+ for(const stage of stages){
+  const old=stage.id==='tokugawa'?['ieyasu','hidetada','go','iemitsu','tadanaga','sen','yoshinao','yorinobu','yorifusa']:['sunday','wind','deep','black','stay','kizuna','contrail','gentil','orfevre','gold','kitasan','equinox'];
+  const saved={version:1,stageId:stage.id,placed:[stage.anchor],hand:old.filter(id=>id!==stage.anchor).slice(0,5),deck:old.filter(id=>id!==stage.anchor).slice(5),positions:{[stage.anchor]:{x:0,y:0}},mistakes:0,hints:{},exchanges:0,elapsed:100,complete:false};
+  const migrated=restore(saved,stage);
+  assert.ok(migrated);
+  assert.equal(migrated.placed.length,1);
+  assert.equal(migrated.hand.length,5);
+  assertInventory(migrated);
+  assert.ok(migrated.hand.some(id=>connectable(migrated,id)));
+ }
 });
