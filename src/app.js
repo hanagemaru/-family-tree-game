@@ -92,7 +92,7 @@ function relationName(type){return state.stage.id==='thoroughbred'?({parent:'父
 function chooseRelations(id){
  if(!selected||!state.hand.includes(selected)||!state.placed.includes(id))return;
  targetAnchor=id;hoverAnchor=null;paintTarget();
- openDialog(`<p class="eyebrow">つなぐ関係を選ぶ</p><h2>${escape(person(selected).name)}を置く</h2><div class="placement-pair"><span>選んだ手札<strong>${escape(person(selected).name)}</strong></span><span>場の相手<strong>${escape(person(id).name)}</strong></span></div><p class="placement-sentence">${escape(person(selected).name)}は、<strong>${escape(person(id).name)}の…</strong></p><div class="relation-choices">${availableRelations().map(type=>`<button class="relation-choice" data-place-relation="${type}">${relationName(type)}<small>として置く</small></button>`).join('')}</div><p id="placement-error" class="placement-error" role="alert"></p><button class="text-button" data-action="change-anchor">相手を選び直す</button>`,'戻る（配置しない）','relation');
+ openDialog(`<p class="eyebrow">関係を選択</p><h2 class="compact-relation-title">${escape(person(selected).name)}<span> は </span>${escape(person(id).name)}<span> の…</span></h2><div class="relation-choices">${availableRelations().map(type=>`<button class="relation-choice" data-place-relation="${type}">${relationName(type)}</button>`).join('')}</div><p id="placement-error" class="placement-error" role="alert"></p><button class="text-button" data-action="change-anchor">相手を変える</button>`,'キャンセル','relation');
 }
 function chooseAnchor(){
  if(!selected)return;say(`${person(selected).name}の相手を選んでください。`);
