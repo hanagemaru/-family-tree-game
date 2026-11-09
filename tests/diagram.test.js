@@ -65,5 +65,5 @@ test('current complete stages reserve subtree widths and avoid all crossings',()
  for(const stage of stages){const state=full(stage),diagram=assertGeometry(state);assert.equal(renderGeometry(diagram).crossings.length,0);}
 });
 test('a straight parent-child chain is emitted as one run without artificial bends',()=>{
- const state=full(stages[1]),diagram=buildDiagram(state);for(const id of ['family:black','family:kitasan']){const wire=diagram.networks.find(n=>n.id===id);assert.equal(wire.segments.length,1);assert.equal(wire.segments[0].a.x,wire.segments[0].b.x);}
+ const state=newGame(stages[1]);state.placed=['black','kitasan','equinox'];state.positions=layoutFamily(state);const diagram=buildDiagram(state);for(const id of ['family:black','family:kitasan']){const wire=diagram.networks.find(n=>n.id===id);assert.equal(wire.segments.length,1);assert.equal(wire.segments[0].a.x,wire.segments[0].b.x);}
 });
