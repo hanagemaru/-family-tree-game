@@ -75,7 +75,7 @@ function revealHint(){if(!selected){say('ヒントを見るカードを、手札
 $('hint-button').addEventListener('click',revealHint);
 // No voluntary hand exchange: playable cards are guaranteed by core.deal/ensurePlayable.
 function updateTransform(animate=false){board.classList.toggle('overview',camera.scale<.68);$('world').classList.toggle('following',animate);$('world').style.transform=`translate(${camera.x}px,${camera.y}px) scale(${camera.scale})`;renderLines();}
-function fit(){if(!state)return;camera=fitCamera(state.positions,board.clientWidth,board.clientHeight);updateTransform(true);}
+function fit(){if(!state||board.clientWidth<=0||board.clientHeight<=0)return;camera=fitCamera(state.positions,board.clientWidth,board.clientHeight);updateTransform(true);}
 $('fit-button').addEventListener('click',fit);
 $('board-expand').addEventListener('click',()=>{const expanded=board.classList.toggle('expanded');$('game-screen').classList.toggle('inspect-mode',expanded);$('board-expand').textContent=expanded?'戻す':'広く';$('board-expand').setAttribute('aria-pressed',String(expanded));previousWidth=board.clientWidth;previousHeight=board.clientHeight;fit();});
 function zoomAt(factor,x=board.clientWidth/2,y=board.clientHeight/2){const next=Math.max(.18,Math.min(1.8,camera.scale*factor)),ratio=next/camera.scale;camera={x:x-(x-camera.x)*ratio,y:y-(y-camera.y)*ratio,scale:next};updateTransform();}
@@ -146,7 +146,7 @@ window.addEventListener('blur',()=>{cancelDrag();pointers.clear();pan=null;if(!(
 $('nodes').addEventListener('click',e=>{if(e.detail!==0)return;const node=e.target.closest('[data-node]');if(node){if(selected)chooseRelations(node.dataset.node);else focusLines(node.dataset.node);}});
 window.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.open){cancelDrag();clearTargets();selected=null;lineFocus=null;renderLines();for(const node of $('nodes').querySelectorAll('[data-node]')){node.classList.remove('line-focused');node.setAttribute('aria-pressed','false');}if(state){renderHand();renderHint();renderStats();}}});
 let previousWidth=0,previousHeight=0;
-new ResizeObserver(()=>{if(!state||!board.clientWidth)return;if(!previousWidth){previousWidth=board.clientWidth;previousHeight=board.clientHeight;return;}camera.x+=(board.clientWidth-previousWidth)/2;camera.y+=(board.clientHeight-previousHeight)/2;previousWidth=board.clientWidth;previousHeight=board.clientHeight;updateTransform();}).observe(board);
+new ResizeObserver(()=>{if(!state||!board.clientWidth||!board.clientHeight)return;if(!previousWidth||!previousHeight||camera.scale<=0){previousWidth=board.clientWidth;previousHeight=board.clientHeight;fit();return;}camera.x+=(board.clientWidth-previousWidth)/2;camera.y+=(board.clientHeight-previousHeight)/2;previousWidth=board.clientWidth;previousHeight=board.clientHeight;updateTransform();}).observe(board);
 setInterval(()=>{const now=performance.now(),playingSheet=dialogKind==='relation'||dialogKind==='anchor';if(state&&!state.complete&&!document.hidden&&(!modal.open||playingSheet)){state.elapsed+=Math.max(0,Math.min(now-lastTick,1500));$('timer').textContent=formatTime(state.elapsed);if(now-lastSaved>10000){persist();lastSaved=now;}}lastTick=now;},500);
 document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelDrag();pointers.clear();pan=null;persist();}lastTick=performance.now();});window.addEventListener('pagehide',persist);
 renderHome();
