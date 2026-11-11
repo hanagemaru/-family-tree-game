@@ -16,7 +16,11 @@
 
 旧試作環境: https://family-tree-cards.ideal-betta-1941.chatgpt.site
 
-このURLが現行PRブランチを配信しているとは限りません。改修版は [PR #1](https://github.com/hanagemaru/-family-tree-game/pull/1) に保持し、マージ前に直接プレビューで試します。公開URLはPRの説明欄を参照してください。
+一体型UI・山札・18/24枚の改修は [PR #1](https://github.com/hanagemaru/-family-tree-game/pull/1) から **mainにマージ済み**（2026-11-11）。旧試作環境への自動反映は保証されません。確認済みの版は [コミット固定プレビュー](https://rawcdn.githack.com/hanagemaru/-family-tree-game/225fff326e4744a5a9f28e7e4dea70d95a18c440/index.html) を参照。
+
+## 次期方針
+
+[2026-11-11：ランダム出題・スコア・競走馬データベース・カード画像](docs/roadmap-2026-11-11.md) に、決定事項と未実装のアイデアを分けて記録。
 
 ## 開発
 
