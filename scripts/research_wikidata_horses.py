@@ -5,6 +5,7 @@ Does not ingest/rip any restricted commercial racing databases.
 """
 import collections
 import datetime
+import html
 import json
 import pathlib
 import sys
@@ -18,6 +19,7 @@ OUT=ROOT/"artifacts"
 OUT.mkdir(exist_ok=True)
 UA="HanageFamilyTreeAudit/0.1 (https://github.com/hanagemaru/-family-tree-game; user-facing research)"
 API="https://www.wikidata.org/w/api.php"
+COMMONS_API="https://commons.wikimedia.org/w/api.php"
 SPARQL="https://query.wikidata.org/sparql"
 # The existing 24 horses constitute the baseline coverage check.
 CURRENT=[
@@ -86,6 +88,42 @@ def get_entities(qids):
         entities.update(ret.get("entities",{}))
         time.sleep(.08)
     return entities
+def filenames(ent):
+    return list(dict.fromkeys(
+        s.get("mainsnak",{}).get("datavalue",{}).get("value")
+        for s in ent.get("claims",{}).get("P18",[])
+        if isinstance(s.get("mainsnak",{}).get("datavalue",{}).get("value"),str)
+    ))
+def audit_commons_images(names_to_id,entities):
+    filenames_by_horse={n:filenames(entities.get(id,{})) for n,id in names_to_id.items()}
+    unique=sorted({v for items in filenames_by_horse.values() for v in items})
+    filedata={}
+    errors=[]
+    for offset in range(0,len(unique),4):
+        files=unique[offset:offset+4]
+        try:
+            result=request_json(COMMONS_API,{"action":"query","format":"json","prop":"imageinfo",
+               "iiprop":"url|extmetadata","titles":"|".join("File:"+n for n in files)})
+            for page in result.get("query",{}).get("pages",{}).values():
+                if page.get("missing"):continue
+                f=page.get("title","").removeprefix("File:")
+                info=(page.get("imageinfo") or [{}])[0]
+                meta=info.get("extmetadata",{})
+                get=lambda key:html.unescape(meta.get(key,{}).get("value",""))
+                filedata[f]={"filename":f,"license":get("LicenseShortName"),"license_url":get("LicenseUrl"),
+                             "artist":get("Artist"),"credit":get("Credit"),"page":info.get("descriptionurl"),
+                             "image_url":info.get("url"),"attribution_required":get("AttributionRequired"),
+                             "restrictions":get("Restrictions")}
+        except Exception as e:
+            errors.append(str(e)[:240]);break
+        time.sleep(.18)
+    records=[]
+    for n,id in names_to_id.items():
+        candidates=filenames_by_horse[n]
+        source=filedata.get(candidates[0]) if candidates else None
+        records.append({"horse":n,"qid":id,"filenames":candidates,"commons":source,
+                        "license_verified":bool(source and source.get("license"))})
+    return records,errors
 def label(ent):
     labels=ent.get("labels",{})
     return labels.get("ja",labels.get("en",{})).get("value",ent.get("id","?"))
@@ -185,6 +223,12 @@ def main():
         "offspring_discovered":len(discovered),
         "candidate_named_in_seed_set":sum(id in connected for id in matches.values()),
     }
+    current_ids={n:matches[n] for n in CURRENT if n in matches}
+    image_audit,image_errors=audit_commons_images(current_ids,all_entities)
+    licenses=collections.Counter(x["commons"]["license"] for x in image_audit if x["commons"] and x["commons"].get("license"))
+    stats["image_licenses_verified"]=sum(x["license_verified"] for x in image_audit)
+    stats["image_license_types"]=dict(licenses)
+    methods.extend("Commons image metadata error: "+e for e in image_errors)
     status=[]
     for n in NAMES:
         id=matches.get(n)
@@ -194,7 +238,7 @@ def main():
                        "missing":not bool(r)})
     document={"retrieved_at_utc":datetime.datetime.now(datetime.timezone.utc).isoformat(),
               "methods":methods,"stats":stats,"horses":status,"ambiguous_labels":ambiguous,
-              "entities":records}
+              "entities":records,"image_audit":image_audit}
     (OUT/"wikidata-horse-audit.json").write_text(json.dumps(document,ensure_ascii=False,indent=2),encoding="utf-8")
     md=[
         "# Wikidata競走馬・血統データ検証（自動取得）",
@@ -207,6 +251,10 @@ def main():
         "","## 今の24頭の父母情報（Wikidata）","","| 競走馬 | QID | 父 | 母 | Deepと連結 | 画像参照 |","|---|---|---|---|---|---|",
         *[f"| {x['name']} | {x['qid'] or '未取得'} | {'有' if x['sire'] else '欠損'} | {'有' if x['dam'] else '欠損'} | {'はい' if x['connected_to_deep'] else 'いいえ'} | {'有' if x['image_reference'] else '無'} |" for x in status[:len(CURRENT)]],
         "","## 取得方法・注意","","- 父はP22、母はP25。親を2世代まで再帰的に取得、ディープの子はSPARQLから上限350件。","- 出典はWikidataのCC0構造化データ。参照URLは各QID。","- 父母の数値はWikidataの記録の有無であり、正確さを別途史料確認する必要がある。","- Wikidata P18は画像の参照のみ。画像の著作権や再利用許諾を示すものではない。","- 一部だけの連結成分を数えたもので、データベース全体の頭数ではない。","- 名称と個体の重複は再検証が必要。","",
+        "## 競走馬24頭の画像ライセンス", "",
+        "| 馬名 | 画像名 | ライセンス | ファイルのページ |","|---|---|---|---|",
+        *[f"| {x['horse']} | {x['filenames'][0] if x['filenames'] else 'なし'} | {x['commons']['license'] if x['commons'] else '未確認'} | {x['commons']['page'] if x['commons'] else ''} |" for x in image_audit],
+        "","ライセンスはCommonsの個別ファイルのメタデータに基づく。作者表記、利用条件、改変時の共有条件は画像採用前に確認する。","",
         "## APIの状況","",*[f"- {x}" for x in methods],
     ]
     (OUT/"wikidata-horse-audit.md").write_text("\n".join(md)+"\n",encoding="utf-8")
@@ -216,6 +264,8 @@ def main():
     print("WIKIDATA_DAM_MISSING_SEEDS="+json.dumps([x["name"] for x in status[:len(CURRENT)] if not x["dam"]],ensure_ascii=False))
     print("WIKIDATA_QIDS="+json.dumps({x["name"]:x["qid"] for x in status[:len(CURRENT)]},ensure_ascii=False))
     print("WIKIDATA_AMBIGUOUS="+json.dumps(ambiguous,ensure_ascii=False))
+    print("WIKIDATA_IMAGE_LICENSES="+json.dumps(dict(licenses),ensure_ascii=False))
+    print("WIKIDATA_IMAGE_ERRORS="+json.dumps(image_errors,ensure_ascii=False))
     print("Wrote artifacts/wikidata-horse-audit.md and .json")
 if __name__=="__main__":
     try:main()
