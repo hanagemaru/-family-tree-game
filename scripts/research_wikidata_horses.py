@@ -94,7 +94,7 @@ def main():
     matches={}
     # One narrow SPARQL query for exact Japanese labels avoids fuzzy ambiguity.
     term=" ".join(json.dumps(n,ensure_ascii=False)+"@ja" for n in NAMES)
-    query="SELECT DISTINCT ?horse ?name WHERE { VALUES ?name { "+term+" } ?horse rdfs:label ?name . }"
+    query="SELECT DISTINCT ?horse ?name WHERE { VALUES ?name { "+term+" } ?horse rdfs:label ?name . ?horse wdt:P31/wdt:P279* wd:Q726 . }"
     try:
         bindings=wdqs(query)
         options=collections.defaultdict(set)
@@ -103,7 +103,7 @@ def main():
             if id: options[name].add(id)
         matches={k:next(iter(v)) for k,v in options.items() if len(v)==1}
         ambiguous={k:sorted(v) for k,v in options.items() if len(v)>1}
-        methods.append(f"SPARQL exact-ja labels: {len(matches)}/{len(NAMES)} matched, {len(ambiguous)} ambiguous")
+        methods.append(f"SPARQL exact-ja horse labels: {len(matches)}/{len(NAMES)} matched, {len(ambiguous)} ambiguous")
     except Exception as e:
         methods.append("SPARQL exact-ja labels FAILED: "+str(e)[:250])
         ambiguous={}
@@ -215,6 +215,7 @@ def main():
     print("WIKIDATA_MISSING_SEEDS="+json.dumps([x["name"] for x in status[:len(CURRENT)] if x["missing"]],ensure_ascii=False))
     print("WIKIDATA_DAM_MISSING_SEEDS="+json.dumps([x["name"] for x in status[:len(CURRENT)] if not x["dam"]],ensure_ascii=False))
     print("WIKIDATA_QIDS="+json.dumps({x["name"]:x["qid"] for x in status[:len(CURRENT)]},ensure_ascii=False))
+    print("WIKIDATA_AMBIGUOUS="+json.dumps(ambiguous,ensure_ascii=False))
     print("Wrote artifacts/wikidata-horse-audit.md and .json")
 if __name__=="__main__":
     try:main()
