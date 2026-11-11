@@ -1,4 +1,5 @@
-export const CARD_W=144,CARD_H=90,STEP_X=180,STEP_Y=190;
+// Portrait cards in the field; shared geometry for connectors and hit testing.
+export const CARD_W=108,CARD_H=154,STEP_X=158,STEP_Y=225;
 export const relationLabels={parent:'親',child:'子',spouse:'配偶者',sibling:'兄弟姉妹'};
 export function relations(candidate,anchor){
  if(!candidate||!anchor||candidate.id===anchor.id)return [];
@@ -18,7 +19,6 @@ export function ensurePlayable(state){
  if(index>=0){const old=state.hand.pop();state.hand.push(state.deck.splice(index,1)[0]);state.deck.push(old);}
 }
 export function newGame(stage,random=Math.random){const state={version:1,stage,placed:[stage.anchor],hand:[],deck:shuffled(stage.people.filter(p=>p.id!==stage.anchor).map(p=>p.id),random),positions:{},mistakes:0,hints:{},exchanges:0,elapsed:0,complete:false};state.positions[stage.anchor]={x:0,y:0};deal(state);ensurePlayable(state);return state;}
-export function exchange(state){if(!state.deck.length)return false;state.deck.push(...state.hand);state.hand=[];deal(state);ensurePlayable(state);state.exchanges++;return true;}
 export function positionFor(state,id,anchorId,relation){
  const person=state.stage.people.find(p=>p.id===id),anchor=state.stage.people.find(p=>p.id===anchorId),point=state.positions[anchorId];
  const y=point.y+(person.generation-anchor.generation)*STEP_Y;
@@ -31,7 +31,7 @@ export function place(state,id,anchorId,relation){
  if(state.complete||!state.hand.includes(id)||!state.placed.includes(anchorId))return {ok:false,reason:'invalid'};
  const candidate=state.stage.people.find(p=>p.id===id),anchor=state.stage.people.find(p=>p.id===anchorId);
  if(!relations(candidate,anchor).includes(relation)){state.mistakes++;return {ok:false,reason:'relation'};}
- const position=positionFor(state,id,anchorId,relation);state.positions[id]=position;state.placed.push(id);state.hand.splice(state.hand.indexOf(id),1);deal(state);state.complete=state.placed.length===state.stage.people.length;return {ok:true,position};
+ const position=positionFor(state,id,anchorId,relation);state.positions[id]=position;state.placed.push(id);state.hand.splice(state.hand.indexOf(id),1);deal(state);ensurePlayable(state);state.complete=state.placed.length===state.stage.people.length;return {ok:true,position};
 }
 export function visibleEdges(state){
  const edges=[];const byId=new Map(state.stage.people.map(p=>[p.id,p]));
@@ -46,9 +46,15 @@ export function visibleEdges(state){
 export function pack(state){const {stage,...data}=state;return {...data,stageId:stage.id};}
 export function restore(data,stage){
  if(!data||data.version!==1||data.stageId!==stage.id||!Array.isArray(data.placed)||!Array.isArray(data.hand)||!Array.isArray(data.deck))return null;
- const all=[...data.placed,...data.hand,...data.deck],ids=stage.people.map(p=>p.id);
- if(all.length!==ids.length||new Set(all).size!==ids.length||all.some(id=>!ids.includes(id))||!data.placed.includes(stage.anchor)||data.hand.length>5||!data.placed.every(id=>Number.isFinite(data.positions?.[id]?.x)&&Number.isFinite(data.positions?.[id]?.y))||!Number.isFinite(data.elapsed)||data.elapsed<0||!Number.isInteger(data.mistakes)||data.mistakes<0||!Number.isInteger(data.exchanges)||data.exchanges<0||!data.hints||typeof data.hints!=='object'||Array.isArray(data.hints)||Object.entries(data.hints).some(([id,n])=>!ids.includes(id)||!Number.isInteger(n)||n<0||n>2))return null;
- return {...data,stage,complete:data.placed.length===ids.length};
+ const ids=stage.people.map(p=>p.id),all=[...data.placed,...data.hand,...data.deck];
+ const original=stage.id==='tokugawa'?['ieyasu','hidetada','go','iemitsu','tadanaga','sen','yoshinao','yorinobu','yorifusa']:stage.id==='thoroughbred'?['sunday','wind','deep','black','stay','kizuna','contrail','gentil','orfevre','gold','kitasan','equinox']:[];
+ // Old, valid nine/twelve-card saves can continue with new cards added to the deck.
+ const legacy=original.length&&all.length===original.length&&original.every(id=>all.includes(id));
+ if(!legacy&&all.length!==ids.length)return null;
+ if(new Set(all).size!==all.length||all.some(id=>!ids.includes(id))||!data.placed.includes(stage.anchor)||data.hand.length>5||!data.placed.every(id=>Number.isFinite(data.positions?.[id]?.x)&&Number.isFinite(data.positions?.[id]?.y))||!Number.isFinite(data.elapsed)||data.elapsed<0||!Number.isInteger(data.mistakes)||data.mistakes<0||!Number.isInteger(data.exchanges)||data.exchanges<0||!data.hints||typeof data.hints!=='object'||Array.isArray(data.hints)||Object.entries(data.hints).some(([id,n])=>!ids.includes(id)||!Number.isInteger(n)||n<0||n>2))return null;
+ const result={...data,hand:[...data.hand],deck:[...data.deck],stage,complete:data.placed.length===ids.length};
+ if(legacy){result.deck.push(...ids.filter(id=>!all.includes(id)));deal(result);ensurePlayable(result);}
+ return result;
 }
 export function formatTime(ms){const seconds=Math.floor(ms/1000);return `${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')}`;}
 export function fitCamera(positions,width,height){const pts=Object.values(positions);const minX=Math.min(...pts.map(p=>p.x))-CARD_W/2-55,maxX=Math.max(...pts.map(p=>p.x))+CARD_W/2+55,minY=Math.min(...pts.map(p=>p.y))-CARD_H/2-70,maxY=Math.max(...pts.map(p=>p.y))+CARD_H/2+70;const scale=Math.min(1,width/(maxX-minX),height/(maxY-minY));return {x:width/2-(minX+maxX)/2*scale,y:height/2-(minY+maxY)/2*scale,scale};}

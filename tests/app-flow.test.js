@@ -39,9 +39,41 @@ test('actual app: both themes can be completed through real hand, picker and rel
   const app=await loadApp({sessions:{[stage.id]:pack(newGame(stage))},best:{}});
   try{app.$('stage-list').querySelector(`[data-start="${stage.id}"]`).click();let turns=0;
    while(turns++<100){const state=app.storage().sessions[stage.id];if(state.complete)break;const byId=id=>stage.people.find(p=>p.id===id);const move=state.hand.flatMap(card=>state.placed.flatMap(anchor=>relations(byId(card),byId(anchor)).map(relation=>({card,anchor,relation}))))[0];
-    if(!move){app.$('exchange-button').click();continue;}select(app,move.card);app.$('choose-anchor-button').click();app.$('modal-content').querySelector(`[data-pick-anchor="${move.anchor}"]`).click();app.$('modal-content').querySelector(`[data-place-relation="${move.relation}"]`).click();
+    assert.ok(move,`${stage.id}: draw should always be playable`);select(app,move.card);app.$('choose-anchor-button').click();app.$('modal-content').querySelector(`[data-pick-anchor="${move.anchor}"]`).click();app.$('modal-content').querySelector(`[data-place-relation="${move.relation}"]`).click();
    }
    assert.ok(app.storage().sessions[stage.id].complete);assert.equal(app.$('nodes').querySelectorAll('[data-node]').length,stage.people.length);assert.match(app.$('modal-content').textContent,/系譜が、つながった/);
   }finally{app.restore();}
  }
+});
+
+test('board uses illustrated portrait cards and offers a larger inspection view',async t=>{
+ const app=await setup(t),node=app.$('nodes').querySelector('[data-node="hidetada"]');
+ assert.ok(node.classList.contains('table-card'));
+ assert.ok(node.querySelector('.card-art'));
+ assert.ok(node.querySelector('.card-corner'));
+ assert.match(node.textContent,/秀忠/);
+ const button=app.$('board-expand');
+ button.click();assert.equal(button.attributes['aria-pressed'],'true');assert.ok(app.$('board').classList.contains('expanded'));
+ button.click();assert.equal(button.attributes['aria-pressed'],'false');assert.equal(app.$('board').classList.contains('expanded'),false);
+});
+
+test('single tabletop displays a draw pile instead of an exchange button',async t=>{
+ const app=await setup(t);
+ assert.equal(app.$('exchange-button'),null);
+ assert.ok(app.$('stock-pile').querySelector('.stock-top'));
+ assert.match(app.$('stock-count').textContent,/残り/);
+ assert.equal(app.document.body.classList.contains('playing'),true);
+ assert.equal(app.$('game-screen').querySelector('.play-layout')!==null,true);
+ assert.equal(app.$('hand').querySelectorAll('[data-card]').length,5);
+ app.$('menu-button').click();app.$('modal-content').querySelector('[data-action="home"]').click();
+ assert.equal(app.document.body.classList.contains('playing'),false);
+});
+test('board-only inspection mode keeps zoom controls accessible',async t=>{
+ const app=await setup(t);
+ app.$('board-expand').click();
+ assert.ok(app.$('game-screen').classList.contains('inspect-mode'));
+ assert.equal(app.$('board').classList.contains('expanded'),true);
+ assert.ok(app.$('board').querySelector('.board-tools'));
+ app.$('board-expand').click();
+ assert.equal(app.$('game-screen').classList.contains('inspect-mode'),false);
 });

@@ -3,31 +3,37 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#203d37"><meta name="description" content="人物と名馬のつながりを、カードでたどる家系図パズル。知識で挑戦、困ったらヒント。">
-<title>家系図ならべ — つながりを、ひとつずつ。</title>
+<title>家系図ならべ | 系譜をつなぐカードパズル</title>
 <link rel="icon" href="./favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css">
 </head>
 <body>
 <div id="app">
-<header class="app-header"><button class="brand" id="home-button" aria-label="ステージ選択へ">結<span>家系図ならべ<small>つながりを、ひとつずつ。</small></span></button><span class="prototype">試作版</span><button class="icon-button" id="help-button" aria-label="遊び方">？</button></header>
+<header class="app-header"><button class="brand" id="home-button" aria-label="ステージ選択へ"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M16 9v7M7 23v-7h18v7" stroke="currentColor" stroke-width="2"/><rect x="12" y="3" width="8" height="8" rx="2" fill="currentColor"/><rect x="3" y="21" width="8" height="8" rx="2" fill="currentColor"/><rect x="21" y="21" width="8" height="8" rx="2" fill="currentColor"/></svg></span><span>家系図ならべ<small>FAMILY TREE PUZZLE</small></span></button><span class="header-note">知識で楽しむカードパズル</span><button class="text-button help-nav" id="help-button" aria-label="遊び方"><span aria-hidden="true">?</span> 遊び方</button></header>
 <main id="home-screen">
-<section class="intro"><p class="eyebrow">FAMILY TREE / CARD PUZZLE</p><h1>知っている名前から、<br>つながる家系図。</h1><p>カードをつかんで、親・子・きょうだいへ。<br>あなたの知識で、ひとつの系譜をつくろう。</p><div class="intro-tree" aria-hidden="true"><span>親</span><i></i><span class="intro-center">起点のカード</span><i></i><div><span>子</span><span>子</span></div></div></section>
-<section class="stages" aria-labelledby="stage-heading"><div class="section-heading"><h2 id="stage-heading">系譜を選ぶ</h2><span>2つのテーマ</span></div><div id="stage-list"></div></section>
-<p class="home-foot">時間制限なし · ヒントあり · 自動保存</p>
+<section class="intro"><div class="intro-copy"><p class="eyebrow">歴史と名馬のカードパズル</p><h1>歴史と名馬の系譜を、<br>カードでつなぐ。</h1><p>親子、夫婦、きょうだい。<br>カードを並べて、家系図を完成させましょう。</p><div class="intro-features"><span>時間制限なし</span><span>ヒントあり</span><span>自動保存</span></div></div><div class="intro-visual" aria-hidden="true"><div class="visual-label">FAMILY CONNECTIONS <span>01 — 03</span></div><svg class="demo-lines" viewBox="0 0 480 300"><path d="M240 67V140H112V202M240 140H368V202"/><circle cx="240" cy="140" r="4"/></svg><div class="demo-card demo-parent"><span class="demo-avatar">家</span><div><small>初代将軍</small><strong>徳川 家康</strong></div></div><div class="demo-card demo-child"><span class="demo-avatar">秀</span><div><small>二代将軍</small><strong>徳川 秀忠</strong></div><span class="demo-check">✓</span></div><div class="demo-card demo-next"><span class="demo-avatar">?</span><div><small>次につながる人物は？</small><strong>あなたの手札から</strong></div></div><span class="visual-foot">知っている関係から、少しずつ。</span></div></section>
+<section class="stages" aria-labelledby="stage-heading"><div class="section-heading"><div><p class="eyebrow">COLLECTION</p><h2 id="stage-heading">遊ぶテーマを選ぶ</h2></div><span>全2テーマ</span></div><div id="stage-list"></div></section>
+<div class="home-guide"><span class="guide-icon" aria-hidden="true">↗</span><p><strong>カードを選んで、相手につなぐ。</strong><br>ドラッグでもタップでも遊べます。迷ったらヒントをどうぞ。</p><span class="save-note">進行はこのブラウザに保存されます</span></div>
 </main>
 <main id="game-screen" hidden>
-<div class="game-heading"><div><p class="eyebrow" id="stage-category"></p><h1 id="stage-title"></h1></div><button id="menu-button" class="text-button">メニュー</button></div>
+<div class="game-heading"><div><p class="eyebrow" id="stage-category"></p><h1 id="stage-title"></h1></div><button id="menu-button" class="text-button" aria-label="メニュー">☰</button></div>
 <div class="stats"><span><b id="placed-count">1</b><span id="total-count"></span> 配置</span><span id="timer">0:00</span><span>ミス <b id="mistake-count">0</b></span><span>ヒント <b id="hint-count">0</b></span></div>
 <div class="progress"><div id="progress-fill"></div></div>
-<section id="board" aria-label="家系図の盤面。背景をドラッグして移動できます。" tabindex="0">
+<div class="play-layout">
+<div class="play-area"><section id="board" aria-label="家系図の盤面。指で動かし、ピンチで拡大縮小できます。" tabindex="0">
 <div class="board-paper"></div><div id="world"><svg id="edges" aria-label="配置済みカードの関係線"></svg><div id="nodes"></div></div>
-<div class="board-caption" id="board-caption">手札を相手のカードへドロップ</div>
-<div class="board-tools"><button id="zoom-out" class="icon-button" aria-label="縮小">−</button><button id="fit-button" class="text-button">全体</button><button id="zoom-in" class="icon-button" aria-label="拡大">＋</button></div>
-</section>
-<div class="line-legend" aria-label="線の凡例"><span>● 接続</span><span class="crossing-key"><i aria-hidden="true"></i>切れ目は交差のみ</span><span>札をタップで関係を強調</span></div>
+<div class="board-caption" id="board-caption"></div>
+<div class="board-tools"><button id="zoom-out" class="icon-button" aria-label="縮小">−</button><button id="fit-button" class="text-button" aria-label="系譜全体を表示">全体</button><button id="board-expand" class="text-button" aria-pressed="false" title="盤面だけを広く表示">広く</button><button id="zoom-in" class="icon-button" aria-label="拡大">＋</button></div>
+</section></div>
+<section class="hand-section" aria-label="手札と山札">
+<div class="hand-track"><div class="stock-pile" id="stock-pile" aria-label="山札">
+<div class="stock-cards" aria-hidden="true"><span class="stock-sheet stock-bottom"></span><span class="stock-sheet stock-middle"></span><span class="stock-sheet stock-top"><span class="stock-emblem">✦</span></span></div><span class="stock-count" id="stock-count">残り 0</span>
+</div><div class="hand-group"><span class="hand-count" id="hand-count">5枚</span><div id="hand" class="hand"></div></div></div>
+<div class="hand-footer"><span id="selection-summary"></span><div><button class="text-button" id="choose-anchor-button" disabled>相手を一覧から</button><button class="text-button" id="hint-button">ヒント</button><button class="text-button" id="clear-selection-button" disabled>解除</button></div></div>
+<div id="hint-box" class="hint-box" hidden></div></section>
 <div id="status" class="status" role="status" aria-live="polite"></div>
-<section class="hand-section" aria-label="手札"><div class="hand-heading"><h2>手札 <small id="hand-count"></small></h2><div><span id="stock-count"></span><button class="text-button" id="exchange-button">手札を入れ替え</button></div></div><div id="hand" class="hand"></div><div class="hand-footer"><span id="selection-summary">手札を選択してください</span><div><button class="text-button" id="choose-anchor-button" disabled>相手を一覧から</button><button class="text-button" id="hint-button">ヒント</button><button class="text-button" id="clear-selection-button" disabled>解除</button></div></div><div id="hint-box" class="hint-box" hidden></div></section>
+</div>
 </main>
-<footer class="app-footer"><span>家系図ならべ</span><button class="text-button" id="sources-button">題材・出典</button></footer>
+<footer class="app-footer"><span>家系図ならべ <span class="footer-sub">歴史と血統を楽しむパズル</span></span><button class="text-button" id="sources-button">題材・出典</button></footer>
 </div>
 <dialog id="modal" aria-labelledby="dialog-title"><div id="modal-content"></div><button id="modal-close" class="button secondary">閉じる</button></dialog>
 <div id="drag-ghost" hidden aria-hidden="true"></div>
