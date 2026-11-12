@@ -1,5 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {loadApp} from './dom-harness.js';import {newGame,pack,relations} from '../src/core.js';import {stages} from '../src/data.js';
+import {readFileSync} from 'node:fs';import {restoreRandomHorseSession} from '../src/random-horse-session.js';
+const horseSnapshot=JSON.parse(readFileSync(new URL('../data/horse-pedigree.v1.json',import.meta.url),'utf8'));
 function fixture(){const state=newGame(stages[0]);state.hand=['ieyasu','go','iemitsu','tadanaga','sen'];state.deck=['yoshinao','yorinobu','yorifusa'];return {sessions:{tokugawa:pack(state)},best:{}};}
 async function setup(t){const app=await loadApp(fixture());t.after(()=>app.restore());app.$('stage-list').querySelector('[data-start="tokugawa"]').click();return app;}
 function select(app,id='iemitsu'){app.$('hand').querySelector(`[data-card="${id}"]`).click({detail:0});}
@@ -91,4 +93,9 @@ test('random horse mode saves and restores the exact generated question, then re
  const before=structuredClone(resumed.storage().randomHorse);assert.deepEqual(resumed.storage().sessions[before.stageId],saved.sessions[before.stageId]);
  resumed.$('menu-button').click();resumed.$('modal-content').querySelector('[data-action="random-retry-confirm"]').click();resumed.$('modal-content').querySelector('[data-action="random-retry"]').click();
  const after=resumed.storage().randomHorse;assert.notEqual(after.seed,before.seed);assert.equal(after.cardIds.length,18);assert.ok(resumed.storage().sessions[after.stageId]);
+ const stage=restoreRandomHorseSession(horseSnapshot,after).stage;let turns=0;
+ while(turns++<30){const session=resumed.storage().sessions[after.stageId];if(session.complete)break;const byId=id=>stage.people.find(person=>person.id===id);const move=session.hand.flatMap(card=>session.placed.flatMap(anchor=>relations(byId(card),byId(anchor)).map(relation=>({card,anchor,relation}))))[0];
+  assert.ok(move,'random UI should always offer a legal move');select(resumed,move.card);resumed.$('choose-anchor-button').click();resumed.$('modal-content').querySelector(`[data-pick-anchor="${move.anchor}"]`).click();resumed.$('modal-content').querySelector(`[data-place-relation="${move.relation}"]`).click();
+ }
+ assert.equal(resumed.storage().sessions[after.stageId].complete,true);assert.equal(resumed.$('nodes').querySelectorAll('[data-node]').length,18);assert.match(resumed.$('modal-content').textContent,/系譜が、つながった/);
 });
