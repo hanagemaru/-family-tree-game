@@ -1,9 +1,9 @@
 name: Family tree checks
 on:
   push:
-    branches: [main, 'ui/polish-20261108']
+    branches: [main, 'ui/polish-20261108', 'feature/random-horse-ui-20261113']
   pull_request:
-    branches: [main]
+    branches: [main, 'feature/random-horse-stage-20261112']
 permissions:
   contents: read
 jobs:
