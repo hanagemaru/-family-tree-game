@@ -39,3 +39,13 @@ Wikidataを再取得してから同じデータを再生成する場合、`--enr
 - データ検査結果は `docs/horse-data-audit-2026-11-12.json`。今回取得分では構造的不整合による関係削除は0件。異常検出器の動作は `tests/test_horse_snapshot.py` に自己親・循環・複数親・不可能生年・同名の合成テストを置く。**0件は実父母を実証した意味ではない。**
 - `docs/random-horse-benchmark-2026-11-12.{json,md}` に生成実測の集計とサンプルを記録。世代・分岐は良好でも、線の交差やモバイル全体表示時の縮小は改良余地がある。数値は幾何学的代理指標で、実機の見やすさは未評価。
 - 既存の `src/data.js`、`src/app.js`、保存形式は触れていない。画面への導線追加は次のPRに分離する。
+
+### 2026-11-12 実測とセルフレビュー
+
+- GitHub Actions [実測 #43222711312](https://github.com/hanagemaru/-family-tree-game/actions/runs/43222711312) は改訂後の生成器・オフライン固定データで **1,000/1,000件完走成功**。異なる18枚セットは997件、良問の構造ソフト目標は929件。
+- 同じ1,000シードで初期版は関係線交差の平均12.65か所、2候補の盤面も採点する改訂後は **4.722か所**。ただし最大176か所の外れ値が残る。盤面品質の**保証**には別途しきい値や配置アルゴリズムの対策が必要。
+- 360×320pxの全体表示時の平均倍率は0.206倍で、縮小画面上の文字を常時読める水準ではない。ズーム／スクロールを前提とした既存UIとの実機接続検証が必要。
+- 計測値と系統の偏りは [集計レポート](random-horse-benchmark-2026-11-12.md)、個別3例の図は [seed 1](samples/horse-seed-1.svg)・[seed 2](samples/horse-seed-2.svg)・[seed 3](samples/horse-seed-3.svg)。同じシードで再生成するコードは `scripts/export-horse-stage-diagrams.mjs`。
+- コードレビューにより、元の固定2ステージのソースと保存形式は不変。シードが異なれば常に違うカード集合になるとは限らず、1,000件中3回の重複が実際にあった。将来のフリープレイでは問題履歴による重複回避が必要。
+
+GitHub Actionsの1000件リプレイは手動の [Random horse snapshot and replay audit](https://github.com/hanagemaru/-family-tree-game/actions/workflows/random-horse-snapshot.yml) で再実行可能。PRのたびに実行するCIでは既存モード回帰テストと新規100シードテスト、Pythonの異常データテスト、ビルドを確認する。

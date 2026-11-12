@@ -1,7 +1,5 @@
 name: Random horse snapshot and replay audit
 on:
-  push:
-    branches: ['feature/random-horse-stage-20261112']
   workflow_dispatch:
 permissions:
   contents: read
