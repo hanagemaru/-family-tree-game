@@ -141,12 +141,14 @@ test('answer reveal is always available, saves the diagram and never grants a wi
  assert.match(app.$('modal-content').textContent,/クリア記録には含まれません/);
 });
 
-test('fixed stage keeps its hints and can also exit without a false clear',async t=>{
+test('fixed stage keeps its hints and offers an exit directly from hint two',async t=>{
  const app=await setup(t);
  select(app,'iemitsu');app.$('hint-button').click();
  assert.match(app.$('hint-box').textContent,/将軍/);
- app.$('menu-button').click();
- app.$('modal-content').querySelector('[data-action="give-up-confirm"]').click();
+ app.$('next-hint').click();
+ assert.ok(app.$('hint-give-up'));
+ app.$('hint-give-up').click();
+ assert.match(app.$('modal-content').textContent,/答えを見て終了/);
  app.$('modal-content').querySelector('[data-action="give-up"]').click();
  assert.equal(app.storage().sessions.tokugawa.gaveUp,true);
  assert.equal(app.storage().best.tokugawa,undefined);
