@@ -4,6 +4,7 @@ import {layoutFamily,buildDiagram,diagramSvg} from './diagram.js';
 import {dragHotspot,screenNodes,pickDropCard,dropDecision} from './interaction.js';
 import {createRandomSeed,generateRandomHorseSession,restoreRandomHorseSession} from './random-horse-session.js';
 import {seededRandom} from './random-horse-stage.js';
+import {findCorrectPlacement,findPlayablePlacement,horsePlacementHint,completedAnswer} from './game-assistance.js';
 const $=id=>document.getElementById(id),storageKey='family-tree-game:v1';
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let records={sessions:{},best:{}};
@@ -32,7 +33,7 @@ function openDialog(html,closeLabel='閉じる',kind='info'){dialogKind=kind;mod
 function closeDialog(){modal.close();lastTick=performance.now();}
 modal.addEventListener('close',()=>{lastTick=performance.now();if(state){renderCaption();if(selected)say(`${person(selected).name}を選択中。場の相手をタップするか、一覧から選べます。`);}});
 $('modal-close').addEventListener('click',closeDialog);
-function help(){openDialog(`<p class="eyebrow">HOW TO PLAY</p><h2>相手に置いて、関係を選ぶ。</h2><ol><li>手札を、場の相手のカードへドラッグして離します。</li><li>開いた画面で「親・子・配偶者・きょうだい」の関係を選ぶと配置できます。</li><li>手札をタップ → 相手をタップ、でも同じ操作ができます。押しにくい相手は「相手を一覧から」で選べます。</li><li>置ける札がない状態は自動で防ぎます。困ったら選択札のヒント。時間制限はありません。</li><li>●は実際の接続点、線の切れ目は非接続の交差。手札未選択で場のカードをタップすると関係線を強調します。</li><li>盤面をスワイプして移動。ピンチ、＋ / −で拡縮し、「全体」で見渡せます。</li></ol><p class="scope">${state?escape(state.stage.scope):'進行はこのブラウザへ自動保存されます。'}</p>`);}
+function help(){openDialog(`<p class="eyebrow">HOW TO PLAY</p><h2>相手に置いて、関係を選ぶ。</h2><ol><li>手札を、場の相手のカードへドラッグして離します。</li><li>開いた画面で「親・子・配偶者・きょうだい」の関係を選ぶと配置できます。</li><li>手札をタップ → 相手をタップ、でも同じ操作ができます。押しにくい相手は「相手を一覧から」で選べます。</li><li>置ける札がない状態は自動で防ぎます。困ったらヒントを確認できます。メニューから答えを見ることもできます。時間制限はありません。</li><li>●は実際の接続点、線の切れ目は非接続の交差。手札未選択で場のカードをタップすると関係線を強調します。</li><li>盤面をスワイプして移動。ピンチ、＋ / −で拡縮し、「全体」で見渡せます。</li></ol><p class="scope">${state?escape(state.stage.scope):'進行はこのブラウザへ自動保存されます。'}</p>`);}
 $('help-button').addEventListener('click',help);
 function showSources(){const list=state?[state.stage]:stages;openDialog(`<p class="eyebrow">ABOUT THE FAMILY TREES</p><h2>題材・出典</h2>${list.map(stage=>`<h3>${stage.title}</h3><p>${stage.description}</p><p class="scope">${stage.scope}</p><ul>${[...new Map([...stage.sources,...stage.people.map(p=>p.source)].map(s=>[s.url,s])).values()].map(s=>`<li><a href="${escape(s.url)}" target="_blank" rel="noopener noreferrer">${escape(s.label)}</a></li>`).join('')}</ul>`).join('')}<p class="scope">関係情報をもとに作成した選抜ステージです。人物・馬の肖像や写真は転載していません。</p>`);}
 $('sources-button').addEventListener('click',showSources);
@@ -51,9 +52,9 @@ function start(stage,fresh=false){
  document.body.dataset.stage=stage.id;render();fit(false);previousWidth=board.clientWidth;previousHeight=board.clientHeight;lastTick=performance.now();say('');persist();window.scrollTo({top:0,behavior:'instant'});
 }
 function goHome(){persist();cancelDrag();pointers.clear();pan=null;state=null;selected=null;clearTargets();$('game-screen').hidden=true;$('home-screen').hidden=false;document.body.classList.remove('playing');renderHome();closeDialog();}
-function menu(){if(!state){goHome();return;}const random=isRandomHorseStage(state.stage);openDialog(`<p class="eyebrow">${state.stage.category}</p><h2>${state.stage.title}</h2>${random?`<p class="random-seed">問題ID <code>${escape(records.randomHorse?.seed||'')}</code></p>`:''}<p>進行は自動保存されています。</p><button class="button secondary" data-action="help">遊び方</button><button class="button secondary" data-action="sources">題材・出典</button><button class="button" data-action="home">ステージ選択へ</button><button class="button secondary" data-action="restart-confirm">${random?'同じ問題を最初から':'最初からやり直す'}</button>${random?'<button class="button secondary" data-action="random-retry-confirm">別の問題に挑戦</button>':''}${state.complete?'<button class="button secondary" data-action="result">完成記録を見る</button>':''}`);}
+function menu(){if(!state){goHome();return;}const random=isRandomHorseStage(state.stage);openDialog(`<p class="eyebrow">${state.stage.category}</p><h2>${state.stage.title}</h2>${random?`<p class="random-seed">問題ID <code>${escape(records.randomHorse?.seed||'')}</code></p>`:''}<p>進行は自動保存されています。</p><button class="button secondary" data-action="help">遊び方</button><button class="button secondary" data-action="sources">題材・出典</button><button class="button" data-action="home">ステージ選択へ</button><button class="button secondary" data-action="restart-confirm">${random?'同じ問題を最初から':'最初からやり直す'}</button>${random?'<button class="button secondary" data-action="random-retry-confirm">別の問題に挑戦</button>':''}${!state.complete?'<button class="button secondary" data-action="give-up-confirm">諦めて答えを見る</button>':''}${state.complete?'<button class="button secondary" data-action="result">完成記録を見る</button>':''}`);}
 $('menu-button').addEventListener('click',menu);$('home-button').addEventListener('click',()=>state?menu():goHome());
-modal.addEventListener('click',e=>{const action=e.target.closest('[data-action]')?.dataset.action;if(action==='home')goHome();if(action==='restart-confirm')openDialog('<h2>この系譜をやり直しますか？</h2><p>今の配置と記録をリセットして、同じカードで最初から始めます。</p><button class="button" data-action="restart">やり直す</button>','続ける');if(action==='random-retry-confirm')openDialog('<h2>別の問題に挑戦しますか？</h2><p>新しい問題IDで18頭を選び直します。今の問題の進行は終了します。</p><button class="button" data-action="random-retry">新しい問題を始める</button>','続ける');if(action==='restart'){const stage=state.stage;closeDialog();start(stage,true);}if(action==='random-retry'){closeDialog();startRandomHorse(true);}if(action==='result')results();if(action==='help')help();if(action==='sources')showSources();});
+modal.addEventListener('click',e=>{const action=e.target.closest('[data-action]')?.dataset.action;if(action==='home')goHome();if(action==='restart-confirm')openDialog('<h2>この系譜をやり直しますか？</h2><p>今の配置と記録をリセットして、同じカードで最初から始めます。</p><button class="button" data-action="restart">やり直す</button>','続ける');if(action==='random-retry-confirm')openDialog('<h2>別の問題に挑戦しますか？</h2><p>新しい問題IDで18頭を選び直します。今の問題の進行は終了します。</p><button class="button" data-action="random-retry">新しい問題を始める</button>','続ける');if(action==='restart'){const stage=state.stage;closeDialog();start(stage,true);}if(action==='random-retry'){closeDialog();startRandomHorse(true);}if(action==='give-up-confirm')openDialog('<h2>答えを見て終了しますか？</h2><p>残りのカードを正しい関係で配置し、完成図を表示します。通常のクリア記録には含まれません。</p><button class="button" data-action="give-up">答えを表示する</button>','プレイを続ける');if(action==='give-up')showAnswer();if(action==='result')results();if(action==='help')help();if(action==='sources')showSources();});
 function render(){renderBoard();renderHand();renderStats();renderHint();}
 function renderStats(){
  $('placed-count').textContent=state.placed.length;$('total-count').textContent=` / ${state.stage.people.length}`;$('timer').textContent=formatTime(state.elapsed);$('mistake-count').textContent=state.mistakes;$('hint-count').textContent=hintCount();$('progress-fill').style.width=`${state.placed.length/state.stage.people.length*100}%`;$('hand-count').textContent=`${state.hand.length}枚`;$('stock-count').textContent=`残り ${state.deck.length}`;$('stock-pile').classList.toggle('empty',!state.deck.length);$('hint-button').disabled=!selected||state.complete;
@@ -90,8 +91,28 @@ function animateDraw(beforeHand){
  if(!reduce)card.animate([{transform:`translate(${dx}px,${dy}px) scale(.6) rotate(-12deg)`,opacity:.15},{transform:'translate(0,0) scale(1) rotate(0deg)',opacity:1}],{duration:420,easing:'cubic-bezier(.16,.8,.22,1)'});
 }
 function selectCard(id){selected=id;lineFocus=null;renderLines();for(const node of $('nodes').querySelectorAll('[data-node]')){node.classList.remove('line-focused');node.setAttribute('aria-pressed','false');}clearTargets();for(const button of $('hand').querySelectorAll('[data-card]')){const active=button.dataset.card===id;button.classList.toggle('selected',active);button.setAttribute('aria-pressed',String(active));}renderHint();renderStats();say(`${person(id).name}を選択中。場の相手を選んでください。`);}
-function renderHint(){const box=$('hint-box');box.hidden=true;if(!selected)return;const level=state.hints[selected]||0;if(level){box.hidden=false;box.innerHTML=`<strong>${escape(person(selected).name)}</strong> <small>ヒント ${level} / 2</small><br>${escape(person(selected).clues[level-1])}${level<2?'<button class="text-button" id="next-hint">関係のヒントを見る</button>':''}`;if(level<2)$('next-hint').addEventListener('click',revealHint);}}
-function revealHint(){if(!selected){say('ヒントを見るカードを、手札から選んでください。');return;}state.hints[selected]=Math.min(2,(state.hints[selected]||0)+1);renderHint();renderStats();persist();}
+function renderHint(){
+ const box=$('hint-box');box.hidden=true;if(!selected)return;
+ const level=state.hints[selected]||0;if(!level)return;
+ const generated=isRandomHorseStage(state.stage),move=generated?findCorrectPlacement(state,selected):null;
+ const clue=generated?horsePlacementHint(state,selected,level):person(selected).clues[level-1];
+ const action=level<2?'<button class="text-button" id="next-hint">関係まで教えてもらう</button>':generated&&move?'<button class="text-button" id="hint-go-to-relation">この相手を選ぶ</button>':'';
+ box.hidden=false;
+ box.innerHTML=`<strong>${escape(person(selected).name)}</strong> <small>ヒント ${level} / 2</small><br>${escape(clue)}${action}`;
+ if(level<2)$('next-hint').addEventListener('click',revealHint);
+ if(generated&&move&&level===2)$('hint-go-to-relation').addEventListener('click',()=>chooseRelations(move.anchorId));
+}
+function revealHint(){
+ if(!selected){say('ヒントを見るカードを、手札から選んでください。');return;}
+ if(isRandomHorseStage(state.stage)&&!findCorrectPlacement(state,selected)){
+  const next=findPlayablePlacement(state);
+  if(next){selectCard(next.cardId);say(`今置ける「${person(next.cardId).name}」を選びました。ヒントを押すとつながる相手が分かります。`);}
+  else say('今置けるカードが見つかりません。メニューから答えを見るか、やり直してください。',true);
+  return;
+ }
+ state.hints[selected]=Math.min(2,(state.hints[selected]||0)+1);
+ renderHint();renderStats();persist();
+}
 $('hint-button').addEventListener('click',revealHint);
 // No voluntary hand exchange: playable cards are guaranteed by core.deal/ensurePlayable.
 function updateTransform(animate=false){board.classList.toggle('overview',camera.scale<.68);$('world').classList.toggle('following',animate);$('world').style.transform=`translate(${camera.x}px,${camera.y}px) scale(${camera.scale})`;renderLines();}
@@ -105,7 +126,7 @@ board.addEventListener('keydown',e=>{if(e.target!==board)return;const delta={Arr
 function paintTarget(){for(const node of $('nodes').querySelectorAll('[data-node]'))node.classList.toggle('targeted',node.dataset.node===(hoverAnchor||targetAnchor));$('drag-ghost').classList.toggle('over-card',!!hoverAnchor);}
 function clearTargets(){targetAnchor=null;hoverAnchor=null;paintTarget();if(state)renderCaption();}
 function renderCaption(){
- $('board-caption').textContent=hoverAnchor?`${person(hoverAnchor).name}へドロップ → 関係を選ぶ`:state.complete?'完成した系譜 · スワイプと拡縮で見渡せます':selected?`${person(selected).name}の相手をタップ、またはカードへドロップ`:'手札を相手のカードへドロップ';
+ $('board-caption').textContent=hoverAnchor?`${person(hoverAnchor).name}へドロップ → 関係を選ぶ`:state.complete?(state.gaveUp?'答えの系譜 · スワイプと拡縮で見渡せます':'完成した系譜 · スワイプと拡縮で見渡せます'):selected?`${person(selected).name}の相手をタップ、またはカードへドロップ`:'手札を相手のカードへドロップ';
 }
 function availableRelations(){return isHorseStage(state.stage)?['parent','child','sibling']:['parent','child','spouse','sibling'];}
 function relationName(type){return isHorseStage(state.stage)?({parent:'父・母',child:'産駒',sibling:'きょうだい'}[type]):relationLabels[type];}
@@ -137,7 +158,13 @@ function attempt(relation){
  selected=null;closeDialog();clearTargets();renderBoard(id);renderHand();animateDraw(beforeHand);renderStats();renderHint();camera=revealCamera(camera,state.positions[id],board.clientWidth,board.clientHeight);updateTransform(true);say(`${p.name}が、${a.name}の${relationName(relation)}としてつながりました。`);persist();
  if(state.complete){records.best[state.stage.id]={elapsed:state.elapsed,mistakes:state.mistakes,hints:hintCount()};persist();results();}
 }
-function results(){fit();const random=isRandomHorseStage(state.stage);openDialog(`<p class="eyebrow">FAMILY TREE COMPLETED</p><h2>ひとつの系譜が、つながった。</h2><p>${state.stage.title} · ${state.stage.people.length}${state.stage.id==='tokugawa'?'人':'頭'}のカードを配置しました。</p>${random?`<p class="random-seed">問題ID <code>${escape(records.randomHorse?.seed||'')}</code></p>`:''}<div class="result-stats"><div>プレイ時間<b>${formatTime(state.elapsed)}</b></div><div>ミス<b>${state.mistakes}</b></div><div>ヒント<b>${hintCount()}</b></div></div><details><summary>つながりを振り返る</summary><ul>${state.stage.people.filter(p=>p.id!==state.stage.anchor).map(p=>`<li><strong>${p.name}</strong><br>${p.clues[1]}</li>`).join('')}</ul></details><button class="button" data-action="home">ほかの系譜をたどる</button><button class="button secondary" data-action="restart-confirm">同じ問題でもう一度</button>${random?'<button class="button secondary" data-action="random-retry-confirm">別の問題に挑戦</button>':''}`,'完成した系譜を見る');}
+function showAnswer(){
+ const answer=completedAnswer(state);
+ if(!answer){say('答えを表示できませんでした。進行は変更されていません。',true);closeDialog();return;}
+ try{answer.positions=layoutFamily(answer);}catch{say('完成図を作成できませんでした。進行は変更されていません。',true);closeDialog();return;}
+ state=answer;selected=null;lineFocus=null;closeDialog();clearTargets();render();fit(false);persist();results();
+}
+function results(){fit();const random=isRandomHorseStage(state.stage);openDialog(`<p class="eyebrow">${state.gaveUp?'ANSWER REVEALED':'FAMILY TREE COMPLETED'}</p><h2>${state.gaveUp?'答えの系譜':'ひとつの系譜が、つながった。'}</h2>${state.gaveUp?'<p>降参して残りの答えを表示しました。クリア記録には含まれません。</p>':''}<p>${state.stage.title} · ${state.stage.people.length}${state.stage.id==='tokugawa'?'人':'頭'}のカードを配置しました。</p>${random?`<p class="random-seed">問題ID <code>${escape(records.randomHorse?.seed||'')}</code></p>`:''}<div class="result-stats"><div>プレイ時間<b>${formatTime(state.elapsed)}</b></div><div>ミス<b>${state.mistakes}</b></div><div>ヒント<b>${hintCount()}</b></div></div><details><summary>つながりを振り返る</summary><ul>${state.stage.people.filter(p=>p.id!==state.stage.anchor).map(p=>`<li><strong>${escape(p.name)}</strong><br>${escape(p.clues[1])}</li>`).join('')}</ul></details><button class="button" data-action="home">ほかの系譜をたどる</button><button class="button secondary" data-action="restart-confirm">同じ問題でもう一度</button>${random?'<button class="button secondary" data-action="random-retry-confirm">別の問題に挑戦</button>':''}`,state.gaveUp?'答えの系譜を見る':'完成した系譜を見る');}
 // Pointer events unify mouse, pen and touch. No HTML Drag and Drop dependency on iOS.
 $('hand').addEventListener('pointerdown',e=>{
  const button=e.target.closest('[data-card]');if(!button||e.button!==0||drag)return;e.preventDefault();updateTransform();selectCard(button.dataset.card);drag={pointerId:e.pointerId,id:selected,startX:e.clientX,startY:e.clientY,x:e.clientX,y:e.clientY,active:false};$('app').setPointerCapture(e.pointerId);
