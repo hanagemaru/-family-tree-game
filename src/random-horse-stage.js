@@ -166,12 +166,19 @@ export function generateRandomHorseStage(snapshot,{seed=1,count=18,attempts=24}=
   candidates.push({candidate,metrics});
  }
  candidates.sort((a,b)=>b.metrics.quality-a.metrics.quality);
- for(const {candidate,metrics} of candidates){
+ // Evaluate the real game layout for several structurally promising candidates.
+ // Comparing only structural quality would ignore line crossings and phone fit.
+ let best=null;
+ for(const {candidate,metrics} of candidates.slice(0,Math.min(2,candidates.length))){
   const stage=toStage(snapshot,graph,candidate,seed),replay=replayHorseStage(stage,seed);
   if(!replay.ok){reject(replay.reason);continue;}
-  // Quality includes real diagram crossings and actual phone-view fit.
-  const score=metrics.quality-Math.min(40,replay.crossings*3)+replay.scale360x320*12-(replay.rowOverlap?20:0);
-  return {stage,metrics:{...metrics,...replay,score},diagnostics:{candidateAttempts:attempts,validCandidates:candidates.length,rejections}};
+  if(replay.rowOverlap){reject('overlapping_cards');continue;}
+  const score=metrics.quality-Math.min(80,replay.crossings*3)+replay.scale360x320*18
+   -Math.max(0,metrics.maxRowCards-8)*4;
+  if(!best||score>best.metrics.score){
+   best={stage,metrics:{...metrics,...replay,score}};
+  }
  }
+ if(best)return {...best,diagnostics:{candidateAttempts:attempts,validCandidates:candidates.length,rejections}};
  const error=new Error('generation_failed');error.diagnostics={candidateAttempts:attempts,rejections};throw error;
 }
