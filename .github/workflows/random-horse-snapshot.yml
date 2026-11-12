@@ -1,0 +1,38 @@
+name: Random horse snapshot and replay audit
+on:
+  push:
+    branches: ['feature/random-horse-stage-20261112']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Refresh stored QIDs with their current Wikidata names and parents
+        run: |
+          python3 scripts/build_horse_snapshot.py \
+            --horse-audit data/source/horse-audit-2026-11-11.json \
+            --lineage-audit data/source/lineage-audit-2026-11-11.json \
+            --enrich --save-enriched artifacts/wikidata-live-entities.json \
+            --output artifacts/horse-pedigree-live.v1.json \
+            --audit-output artifacts/horse-data-live-audit.json
+      - name: Test enriched data using actual core, layout and diagram
+        run: node scripts/benchmark-horse-stages.mjs --runs=1000 --attempts=24 --data=artifacts/horse-pedigree-live.v1.json --output=artifacts/horse-benchmark-live.json
+      - name: Bundle exact source for local diagnosis
+        if: always()
+        run: tar -czf artifacts/checked-source.tgz src scripts tests data package.json README.md || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: random-horse-snapshot-and-benchmark
+          path: artifacts/
+          if-no-files-found: warn
