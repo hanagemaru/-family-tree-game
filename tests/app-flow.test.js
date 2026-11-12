@@ -1,6 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {loadApp} from './dom-harness.js';import {newGame,pack,relations} from '../src/core.js';import {stages} from '../src/data.js';
 import {readFileSync} from 'node:fs';import {restoreRandomHorseSession} from '../src/random-horse-session.js';
+import {findPlayablePlacement} from '../src/game-assistance.js';
 const horseSnapshot=JSON.parse(readFileSync(new URL('../data/horse-pedigree.v1.json',import.meta.url),'utf8'));
 function fixture(){const state=newGame(stages[0]);state.hand=['ieyasu','go','iemitsu','tadanaga','sen'];state.deck=['yoshinao','yorinobu','yorifusa'];return {sessions:{tokugawa:pack(state)},best:{}};}
 async function setup(t){const app=await loadApp(fixture());t.after(()=>app.restore());app.$('stage-list').querySelector('[data-start="tokugawa"]').click();return app;}
@@ -98,4 +99,56 @@ test('random horse mode saves and restores the exact generated question, then re
   assert.ok(move,'random UI should always offer a legal move');select(resumed,move.card);resumed.$('choose-anchor-button').click();resumed.$('modal-content').querySelector(`[data-pick-anchor="${move.anchor}"]`).click();resumed.$('modal-content').querySelector(`[data-place-relation="${move.relation}"]`).click();
  }
  assert.equal(resumed.storage().sessions[after.stageId].complete,true);assert.equal(resumed.$('nodes').querySelectorAll('[data-node]').length,18);assert.match(resumed.$('modal-content').textContent,/系譜が、つながった/);
+});
+
+test('random horse hints identify a visible counterpart and the correct relationship',async t=>{
+ const app=await loadApp(fixture());t.after(()=>app.restore());
+ app.$('stage-list').querySelector('[data-random-start]').click();
+ const saved=app.storage(),descriptor=saved.randomHorse;
+ const stage=restoreRandomHorseSession(horseSnapshot,descriptor).stage;
+ const session={...saved.sessions[descriptor.stageId],stage},move=findPlayablePlacement(session);
+ assert.ok(move);
+ const anchor=stage.people.find(person=>person.id===move.anchorId);
+ select(app,move.cardId);
+ app.$('hint-button').click();
+ assert.ok(app.$('hint-box').textContent.includes(anchor.name));
+ assert.doesNotMatch(app.$('hint-box').textContent,/Wikidata|Q[1-9]\\d+/);
+ app.$('next-hint').click();
+ assert.ok(app.$('hint-box').textContent.includes(anchor.name));
+ assert.match(app.$('hint-box').textContent,/産駒|父または母|きょうだい/);
+ app.$('hint-go-to-relation').click();
+ assert.equal(app.$('modal').open,true);
+ app.$('modal-content').querySelector(`[data-place-relation="${move.relation}"]`).click();
+ assert.equal(app.$('placed-count').textContent,'2');
+});
+
+test('answer reveal is always available, saves the diagram and never grants a win',async t=>{
+ const app=await loadApp(fixture());t.after(()=>app.restore());
+ app.$('stage-list').querySelector('[data-random-start]').click();
+ const descriptor=app.storage().randomHorse;
+ app.$('menu-button').click();
+ assert.ok(app.$('modal-content').querySelector('[data-action="give-up-confirm"]'));
+ app.$('modal-content').querySelector('[data-action="give-up-confirm"]').click();
+ assert.match(app.$('modal-content').textContent,/クリア記録には含まれません/);
+ app.$('modal-content').querySelector('[data-action="give-up"]').click();
+ const storage=app.storage(),finished=storage.sessions[descriptor.stageId];
+ assert.equal(finished.gaveUp,true);
+ assert.equal(finished.complete,true);
+ assert.equal(finished.placed.length,18);
+ assert.equal(app.$('nodes').querySelectorAll('[data-node]').length,18);
+ assert.equal(storage.best[descriptor.stageId],undefined);
+ assert.match(app.$('modal-content').textContent,/答えの系譜/);
+ assert.match(app.$('modal-content').textContent,/クリア記録には含まれません/);
+});
+
+test('fixed stage keeps its hints and can also exit without a false clear',async t=>{
+ const app=await setup(t);
+ select(app,'iemitsu');app.$('hint-button').click();
+ assert.match(app.$('hint-box').textContent,/将軍/);
+ app.$('menu-button').click();
+ app.$('modal-content').querySelector('[data-action="give-up-confirm"]').click();
+ app.$('modal-content').querySelector('[data-action="give-up"]').click();
+ assert.equal(app.storage().sessions.tokugawa.gaveUp,true);
+ assert.equal(app.storage().best.tokugawa,undefined);
+ assert.equal(app.$('placed-count').textContent,'18');
 });
