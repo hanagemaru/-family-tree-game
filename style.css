@@ -215,3 +215,11 @@ body.playing .placement-dialog [data-action="change-anchor"]{display:block;min-h
 body.playing .placement-dialog~#modal-close{font-size:11px}
 body.playing dialog.placement-dialog #modal-content{padding:0}
 body.playing dialog.placement-dialog #modal-close{display:block;width:100%;min-height:38px;margin:3px 0 0;padding:8px;background:transparent;color:#50665c;font-size:12px;border:0;box-shadow:none}
+
+/* Seeded horse challenge on the collection screen. */
+.random-theme .stage-art{background:linear-gradient(135deg,#e5edf5,#eef2e8);color:#526f8a}
+.random-emblem{position:absolute;right:48px;top:15px;font:300 104px/1 system-ui,sans-serif;opacity:.55;transform:rotate(-18deg)}
+.random-theme .tag{background:#eaf0f5;color:#536f88}
+.random-seed{font-size:11px!important;color:#66747c!important}.random-seed code{user-select:all;padding:3px 7px;border-radius:5px;background:#eef1f3;color:#344b57}
+@media(min-width:1001px){#stage-list{grid-template-columns:repeat(3,minmax(0,1fr))}.stage-card .stage-bottom{align-items:flex-end;flex-wrap:wrap}.stage-card .stage-bottom .button{margin-left:auto}}
+@media(max-width:720px){.random-emblem{right:34px;top:7px;font-size:82px}}

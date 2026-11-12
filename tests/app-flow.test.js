@@ -77,3 +77,18 @@ test('board-only inspection mode keeps zoom controls accessible',async t=>{
  app.$('board-expand').click();
  assert.equal(app.$('game-screen').classList.contains('inspect-mode'),false);
 });
+
+test('random horse mode saves and restores the exact generated question, then retries with another seed',async t=>{
+ const first=await loadApp(fixture());
+ let saved;
+ try{
+  const button=first.$('stage-list').querySelector('[data-random-start]');assert.equal(button.disabled,false);button.click();
+  saved=structuredClone(first.storage());assert.equal(saved.randomHorse.cardIds.length,18);assert.ok(saved.sessions[saved.randomHorse.stageId]);
+  assert.match(first.$('stage-title').textContent,/自動生成/);
+ }finally{first.restore();}
+ const resumed=await loadApp(saved);t.after(()=>resumed.restore());
+ resumed.$('stage-list').querySelector('[data-random-start]').click();
+ const before=structuredClone(resumed.storage().randomHorse);assert.deepEqual(resumed.storage().sessions[before.stageId],saved.sessions[before.stageId]);
+ resumed.$('menu-button').click();resumed.$('modal-content').querySelector('[data-action="random-retry-confirm"]').click();resumed.$('modal-content').querySelector('[data-action="random-retry"]').click();
+ const after=resumed.storage().randomHorse;assert.notEqual(after.seed,before.seed);assert.equal(after.cardIds.length,18);assert.ok(resumed.storage().sessions[after.stageId]);
+});
