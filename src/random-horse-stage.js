@@ -113,7 +113,7 @@ function toStage(snapshot,graph,selection,seed){
   const h=graph.named.get(id),parents=[h.sire,h.dam].filter(Boolean);
   const readableName=parentId=>{
    const parent=graph.all.get(parentId);
-   return parent?.named&&typeof parent.name==='string'&&!/^Q[1-9]\\d*$/.test(parent.name)?parent.name:null;
+   return parent?.named&&typeof parent.name==='string'&&!/^Q[1-9]\d*$/.test(parent.name)?parent.name:null;
   };
   const sireName=h.sire?readableName(h.sire):null,damName=h.dam?readableName(h.dam):null;
   const summary=sireName?`父は${sireName}。`:damName?`母は${damName}。`:'父母の馬名は未取得です。';
