@@ -33,7 +33,7 @@ function renderHome(){
 }
 function openDialog(html,closeLabel='閉じる',kind='info'){dialogKind=kind;modal.classList.toggle('placement-dialog',kind==='relation'||kind==='anchor');$('modal-content').innerHTML=html;const heading=$('modal-content').querySelector('h2');if(heading)heading.id='dialog-title';$('modal-close').textContent=closeLabel;if(!modal.open)modal.showModal();const first=$('modal-content').querySelector('button');if(first)first.focus({preventScroll:true});lastTick=performance.now();}
 function closeDialog(){modal.close();lastTick=performance.now();}
-modal.addEventListener('close',()=>{lastTick=performance.now();if(state){renderCaption();if(selected)say(`${person(selected).name}を選択中。場の相手をタップするか、一覧から選べます。`);}});
+modal.addEventListener('close',()=>{clearPlacementPreview();lastTick=performance.now();if(state){renderCaption();if(selected)say(`${person(selected).name}を選択中。場の相手をタップするか、一覧から選べます。`);}});
 $('modal-close').addEventListener('click',closeDialog);
 function help(){openDialog(`<p class="eyebrow">HOW TO PLAY</p><h2>相手に置いて、関係を選ぶ。</h2><ol><li>手札を、場の相手のカードへドラッグして離します。</li><li>開いた画面で「親・子・配偶者・きょうだい」の関係を選ぶと配置できます。</li><li>手札をタップ → 相手をタップ、でも同じ操作ができます。押しにくい相手は「相手を一覧から」で選べます。</li><li>置ける札がない状態は自動で防ぎます。困ったらヒントを確認できます。メニューから答えを見ることもできます。時間制限はありません。</li><li>●は実際の接続点、線の切れ目は非接続の交差。手札未選択で場のカードをタップすると関係線を強調します。</li><li>盤面をスワイプして移動。ピンチ、＋ / −で拡縮し、「全体」で見渡せます。</li></ol><p class="scope">${state?escape(state.stage.scope):'進行はこのブラウザへ自動保存されます。'}</p>`);}
 $('help-button').addEventListener('click',help);
@@ -136,6 +136,40 @@ function renderCaption(){
 }
 function availableRelations(){return isHorseStage(state.stage)?['parent','child','sibling']:['parent','child','spouse','sibling'];}
 function relationName(type){return isHorseStage(state.stage)?({parent:'父・母',child:'産駒',sibling:'きょうだい'}[type]):relationLabels[type];}
+function placementPreviewData(){
+ if(!state||!selected||!targetAnchor||!pendingRelation)return null;
+ const anchor=state.positions[targetAnchor],point=previewPosition(state.positions,targetAnchor,pendingRelation);
+ return anchor&&point?{anchor,point}:null;
+}
+function placementPreviewCard(){
+ const preview=placementPreviewData();
+ if(!preview)return '';
+ return `<div class="placement-preview-card table-card ${isHorseStage(state.stage)?'horse':''}" style="left:${preview.point.x}px;top:${preview.point.y}px" aria-hidden="true">${cardFace(selected)}</div>`;
+}
+function placementPreviewWire(){
+ const preview=placementPreviewData();
+ if(!preview)return '';
+ const {anchor,point}=preview;
+ return `<path class="placement-preview-wire ${pendingRelation==='sibling'?'preview-sibling':''}" d="M${anchor.x} ${anchor.y} L${point.x} ${point.y}" vector-effect="non-scaling-stroke"/>`;
+}
+function clearPlacementPreview(){
+ if(!pendingRelation)return;
+ pendingRelation=null;
+ if(state)renderBoard();
+}
+function showPlacementPreview(relation){
+ if(!selected||!targetAnchor||!placementLabels[relation])return;
+ pendingRelation=relation;
+ renderBoard();
+ for(const button of $('modal-content').querySelectorAll('[data-place-relation]')){
+  const active=button.dataset.placeRelation===relation;
+  button.classList.toggle('preview-selected',active);
+  button.setAttribute('aria-pressed',String(active));
+ }
+ const info=$('relation-preview-info');
+ if(info)info.textContent=`「${relationName(relation)}」の位置を仮表示中。もう一度同じボタンで確定します（確定後は自動整列）。`;
+ const error=$('placement-error');if(error)error.textContent='';
+}
 function chooseRelations(id){
  if(!selected||!state.hand.includes(selected)||!state.placed.includes(id))return;
  clearPlacementPreview();targetAnchor=id;hoverAnchor=null;paintTarget();
@@ -147,7 +181,7 @@ function chooseRelations(id){
 }
 function chooseAnchor(){
  if(!selected)return;clearPlacementPreview();say(`${person(selected).name}の相手を選んでください。`);
- openDialog(`<p class="eyebrow">場のカードを選ぶ</p><h2>${escape(person(selected).name)}の相手</h2><p>このあと、相手との関係を選びます。</p><div class="anchor-choices">${state.placed.map(id=>`<button class="anchor-choice" data-pick-anchor="${id}">${escape(person(id).name)}</button>`).join('')}</div>`,'戻る（選択札は保持）','anchor');
+ openDialog(`<p class="eyebrow">場のカードを選ぶ</p><h2>${escape(person(selected).name)}の相手</h2><p>${camera.scale<.55?'盤面が縮小されているため、名前の一覧から選びます。':'このあと、相手との関係を選びます。'}</p><div class="anchor-choices">${state.placed.map(id=>`<button class="anchor-choice" data-pick-anchor="${id}">${escape(person(id).name)}</button>`).join('')}</div>`,'戻る（選択札は保持）','anchor');
 }
 $('choose-anchor-button').addEventListener('click',chooseAnchor);
 $('clear-selection-button').addEventListener('click',()=>{selected=null;clearTargets();renderHand();renderHint();renderStats();say('選択を解除しました。');});
@@ -159,7 +193,7 @@ modal.addEventListener('click',e=>{
 function pointOnBoard(clientX,clientY){const r=board.getBoundingClientRect();return {x:clientX-r.left,y:clientY-r.top,inside:clientX>=r.left&&clientX<=r.right&&clientY>=r.top&&clientY<=r.bottom};}
 function hoverAt(clientX,clientY){
  const point=pointOnBoard(clientX,clientY);
- hoverAnchor=pickDropCard(point,screenNodes(state.positions,camera),hoverAnchor);paintTarget();renderCaption();
+ hoverAnchor=pickDropCard(point,screenNodes(state.positions,camera),hoverAnchor);$('drag-ghost').classList.toggle('in-board',point.inside);paintTarget();renderCaption();
 }
 function attempt(relation){
  if(!selected||!targetAnchor)return;const id=selected,anchor=targetAnchor,p=person(id),a=person(anchor),beforeHand=[...state.hand],outcome=place(state,id,anchor,relation);
@@ -192,9 +226,9 @@ window.addEventListener('pointermove',e=>{
  }else if(pan&&pan.id===e.pointerId){if(Math.hypot(e.clientX-pan.startX,e.clientY-pan.startY)>5)pan.moved=true;if(pan.moved){camera.x+=e.clientX-pan.x;camera.y+=e.clientY-pan.y;clearTargets();updateTransform();}pan.x=e.clientX;pan.y=e.clientY;}
 });
 function autoPan(){if(!drag?.active)return;const hotspot=dragHotspot(drag.x,drag.y),p=pointOnBoard(hotspot.x,hotspot.y);if(p.inside){const dx=p.x<28?3:p.x>board.clientWidth-28?-3:0,dy=p.y<34?3:p.y>board.clientHeight-34?-3:0;if(dx||dy){camera.x+=dx;camera.y+=dy;updateTransform();hoverAt(hotspot.x,hotspot.y);}}frame=requestAnimationFrame(autoPan);}
-function cancelDrag(){if(frame)cancelAnimationFrame(frame);frame=null;if(drag){try{if($('app').hasPointerCapture(drag.pointerId))$('app').releasePointerCapture(drag.pointerId);}catch{}}drag=null;hoverAnchor=null;$('drag-ghost').hidden=true;document.body.classList.remove('drag-active');$('hand').querySelectorAll('.dragging').forEach(b=>b.classList.remove('dragging'));paintTarget();if(state)renderCaption();}
+function cancelDrag(){if(frame)cancelAnimationFrame(frame);frame=null;if(drag){try{if($('app').hasPointerCapture(drag.pointerId))$('app').releasePointerCapture(drag.pointerId);}catch{}}drag=null;hoverAnchor=null;$('drag-ghost').hidden=true;$('drag-ghost').classList.remove('in-board');document.body.classList.remove('drag-active');$('hand').querySelectorAll('.dragging').forEach(b=>b.classList.remove('dragging'));paintTarget();if(state)renderCaption();}
 window.addEventListener('pointerup',e=>{
- if(drag&&e.pointerId===drag.pointerId){const active=drag.active,hotspot=dragHotspot(e.clientX,e.clientY),point=pointOnBoard(hotspot.x,hotspot.y);if(active)hoverAt(hotspot.x,hotspot.y);const decision=dropDecision({active,inside:point.inside,anchor:hoverAnchor,card:selected});cancelDrag();if(decision.type==='relation')chooseRelations(decision.anchor);else if(decision.type==='choose-anchor')chooseAnchor();else if(selected)say(`${person(selected).name}を選択中。場の相手をタップしてください。`);return;}
+ if(drag&&e.pointerId===drag.pointerId){const active=drag.active,hotspot=dragHotspot(e.clientX,e.clientY),point=pointOnBoard(hotspot.x,hotspot.y);if(active)hoverAt(hotspot.x,hotspot.y);const decision=dropDecision({active,inside:point.inside,anchor:camera.scale<.55?null:hoverAnchor,card:selected});cancelDrag();if(decision.type==='relation')chooseRelations(decision.anchor);else if(decision.type==='choose-anchor')chooseAnchor();else if(selected)say(`${person(selected).name}を選択中。場の相手をタップしてください。`);return;}
  if(!pointers.has(e.pointerId))return;pointers.delete(e.pointerId);if(pan&&pan.id===e.pointerId&&!pan.moved){if(selected){const point=pointOnBoard(e.clientX,e.clientY),id=pan.node||pickDropCard(point,screenNodes(state.positions,camera));if(id)chooseRelations(id);else say('場のカードをタップするか「相手を一覧から」で選んでください。');}else if(pan.node)focusLines(pan.node);}
  if(pointers.size===1){const [id,p]=[...pointers.entries()][0];pan={id,x:p.x,y:p.y,startX:p.x,startY:p.y,moved:true};}else pan=null;
 });
