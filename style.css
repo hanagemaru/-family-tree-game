@@ -223,3 +223,67 @@ body.playing dialog.placement-dialog #modal-close{display:block;width:100%;min-h
 .random-seed{font-size:11px!important;color:#66747c!important}.random-seed code{user-select:all;padding:3px 7px;border-radius:5px;background:#eef1f3;color:#344b57}
 @media(min-width:1001px){#stage-list{grid-template-columns:repeat(3,minmax(0,1fr))}.stage-card .stage-bottom{align-items:flex-end;flex-wrap:wrap}.stage-card .stage-bottom .button{margin-left:auto}}
 @media(max-width:720px){.random-emblem{right:34px;top:7px;font-size:82px}}
+
+/* Horse sex: a short readable label on both hand and field cards. */
+.horse .card-sex{
+ position:absolute;right:5px;top:7px;z-index:8;
+ display:grid;place-items:center;min-width:27px;min-height:23px;
+ padding:2px 4px;border:1px solid #e5d098;border-radius:6px;
+ background:#f5ecd5;color:#223a45;font:700 12px/1.2 system-ui,sans-serif;
+ text-shadow:none;letter-spacing:0;
+}
+.horse .card-sex:not(:empty){white-space:nowrap}
+.horse .card-sex:has(+ .card-art){pointer-events:none}
+body.playing .hand-card.horse .card-sex{font-size:11px;top:5px;right:5px;min-width:23px;min-height:21px}
+#board .table-card.horse .card-sex{top:6px;right:5px}
+.horse .card-sex[aria-label="性別：不明"]{font-size:9px;background:#d8dfdf;color:#536267;border-color:#cbd4cf}
+
+/* While dragging onto the board, keep only a small nonblocking targeting dot. */
+#drag-ghost.in-board{
+ width:19px;height:19px;min-height:19px;padding:0;
+ border:3px solid #fff2c6;border-radius:50%;
+ background:#b48a46;transform:translate(-50%,-50%);
+ box-shadow:0 0 0 3px #113d39bb,0 3px 10px #041d1fcc;
+ overflow:visible;
+}
+#drag-ghost.in-board > *{display:none!important}
+#drag-ghost.in-board.over-card{outline:3px solid #eedca5;outline-offset:4px}
+
+/* A provisional node and wire are shown on the real board, before any move is committed. */
+#board .table-card.placement-preview-card{
+ pointer-events:none;opacity:.62;filter:grayscale(.22);
+ outline:5px dashed #e9c46d;outline-offset:5px;
+ box-shadow:0 0 0 6px #143b3bb3,0 10px 22px #071f2299;
+ z-index:10;
+}
+#edges .placement-preview-wire{
+ fill:none;stroke:#ffe49a;stroke-width:5;stroke-dasharray:9 6;
+ stroke-linecap:round;filter:drop-shadow(0 0 3px #162d23);
+}
+#edges .placement-preview-wire.preview-sibling{stroke-dasharray:5 5}
+
+/* Directional relation picker: tap once to preview, tap the same choice to confirm. */
+body.playing .placement-dialog .relation-choices.three-choice{
+ grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;
+}
+body.playing .placement-dialog .relation-choice{
+ display:flex;flex-direction:column;align-items:center;justify-content:center;
+ gap:3px;min-height:90px;padding:9px 4px;
+}
+body.playing .placement-dialog .relation-choice .relation-arrow{
+ display:block;font:700 27px/1 system-ui,sans-serif;color:#385c51;
+}
+body.playing .placement-dialog .relation-choice .relation-text{font-size:15px;line-height:1.2}
+body.playing .placement-dialog .relation-choice small{
+ display:block;line-height:1.2;font-size:9px;letter-spacing:0;color:#677a72;
+}
+body.playing .placement-dialog .relation-choice.preview-selected{
+ background:#d9e9d4;border:3px solid #39705b;
+ box-shadow:0 0 0 2px #a7ba84,inset 0 0 0 1px #fff;
+}
+body.playing .placement-dialog .relation-choice.preview-selected .relation-arrow{color:#234f3a}
+body.playing .placement-dialog .relation-preview-info{
+ min-height:2.8em;margin-top:12px;text-align:center;
+ color:#405a4d;font-size:12px;line-height:1.5;
+}
+body.playing .placement-dialog .anchor-choice{font-size:15px}
