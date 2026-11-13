@@ -163,6 +163,7 @@ function updateDragPreview(point){
  dragPlacement={anchorId:hit.anchorId,relation:hit.relation,side:hit.side,
   frame,overSlot,enteredAt:same?prior.enteredAt:now};
  const ready=dragDropReady(dragPlacement,now)&&camera.scale>=.55;
+ const wasArmed=overlay.classList.contains('armed');
  overlay.hidden=false;
  overlay.style.left=`${frame.x}px`;
  overlay.style.top=`${frame.y}px`;
@@ -171,6 +172,11 @@ function updateDragPreview(point){
  overlay.classList.toggle('armed',ready);
  overlay.classList.toggle('disabled',camera.scale<.55);
  overlay.innerHTML=`<span>${placementLabels[hit.relation].arrow}</span><small>${placementLabels[hit.relation].label}</small>`;
+ if(ready&&!wasArmed){
+  say(`「${relationName(hit.relation)}」として配置します。指を離してください。`);
+ }else if(overSlot&&!prior?.overSlot&&camera.scale>=.55){
+  say('点線枠の中で少し止めてください。');
+ }
 }
 function chooseRelations(id){
  if(!selected||!state.hand.includes(selected)||!state.placed.includes(id))return;
