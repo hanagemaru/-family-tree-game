@@ -24,7 +24,7 @@
 
 [競走馬データ実測・写真ライセンス調査](docs/research-wikidata-horses-2026-11-11.md)：著名40頭の識別、285頭の連結グラフ、現行24頭の画像ライセンス確認済み。コードは `scripts/research_wikidata_horses.py`。
 
-競走馬のランダム18枚出題エンジンは [実装・再現手順](docs/random-horse-implementation.md) と [1,000シード検証](docs/random-horse-benchmark-2026-11-12.md) に記録。現在はデータと出題生成器の検証用で、ゲーム画面には未接続です。
+競走馬のランダム18枚出題エンジンは [実装・再現手順](docs/random-horse-implementation.md) と [1,000シード検証](docs/random-horse-benchmark-2026-11-12.md) に記録。UIへの接続は [PR #5](https://github.com/hanagemaru/-family-tree-game/pull/5)、性別表示・縮小ドラッグ・仮配置プレビューは [実装記録](docs/horse-usability-2026-11-13.md) に記録しています。PRをマージするまではmainには反映されません。
 
 ## 開発
 
