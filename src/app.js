@@ -149,8 +149,15 @@ function updateDragPreview(point){
  if(!hit){frame.hidden=true;frame.textContent='';return;}
  const pos=dragFramePosition(state.positions,hit.anchorId,hit.relation,hit.side);
  if(!pos){frame.hidden=true;frame.textContent='';return;}
+ // The completed layout may extend beyond today's viewport. Keep the dotted
+ // directional guide visible even when the intended grid slot is off-screen.
+ const insetX=38*camera.scale+6,insetY=53*camera.scale+6;
+ const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
+ const sx=clamp(pos.x*camera.scale+camera.x,insetX,Math.max(insetX,board.clientWidth-insetX));
+ const sy=clamp(pos.y*camera.scale+camera.y,insetY,Math.max(insetY,board.clientHeight-insetY));
  frame.hidden=false;
- frame.style.left=`${pos.x}px`;frame.style.top=`${pos.y}px`;
+ frame.style.left=`${(sx-camera.x)/camera.scale}px`;
+ frame.style.top=`${(sy-camera.y)/camera.scale}px`;
  frame.style.borderWidth=`${Math.max(3,2.5/Math.max(camera.scale,.18))}px`;
  frame.dataset.relation=hit.relation;
  frame.textContent=placementLabels[hit.relation].arrow;
