@@ -48,3 +48,12 @@ test('preview avoids an already occupied slot without mutating game positions',(
  assert.notEqual(preview.x,0);
  assert.deepEqual(positions,original);
 });
+
+test('corrected animal-sex Wikidata claims plus JRA/JBIS eliminate unknown sex for all 991 source records',()=>{
+ const unknown=snapshot.horses.filter(h=>!horseSex(h.id,snapshot));
+ assert.deepEqual(unknown.map(h=>h.name),[]);
+ assert.equal(horseSex('Q11321082',snapshot),'male'); // Tokai Teio: JRA
+ assert.equal(horseSex('Q140512508',snapshot),'gelding'); // Bold Brian: JRA
+ assert.equal(horseSex('Q140512523',snapshot),'gelding'); // Erimo Maxim: JBIS
+ assert.equal(horseSexLabel(horseSex('Q140512523',snapshot)),'セ');
+});
