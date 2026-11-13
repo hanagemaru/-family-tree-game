@@ -175,9 +175,9 @@ test('drag-only dotted frame follows above, sideways and below directions withou
  assert.equal(app.$('drag-preview').dataset.relation,'parent');
  // The empty frame must remain visible even though the normal parent slot
  // extends beyond the initially centered 300px-tall mobile board.
- const transform=app.$('world').style.transform.match(/translate\\(([-\\d.]+)px,\\s*([-\\d.]+)px\\) scale\\(([-\\d.]+)\\)/);
+ const transform=app.$('world').style.transform.match(/[-0-9.]+/g);
  assert.ok(transform);
- const previewY=Number(app.$('drag-preview').style.top.slice(0,-2))*Number(transform[3])+Number(transform[2]);
+ const previewY=Number(app.$('drag-preview').style.top.slice(0,-2))*Number(transform[2])+Number(transform[1]);
  assert.ok(previewY>50&&previewY<250,`dotted frame should stay inside board: ${previewY}`);
  assert.equal(app.$('placed-count').textContent,'1');
  assert.equal(app.$('mistake-count').textContent,'0');
