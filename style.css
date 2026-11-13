@@ -285,7 +285,7 @@ body.playing .placement-dialog .anchor-choice{font-size:15px}
    It becomes a placement target only after the marker is held INSIDE it. */
 #board #drag-preview{
  position:absolute;left:0;top:0;z-index:30;
- margin:-27px 0 0 -28px;width:56px;height:54px;
+ margin:-24px 0 0 -26px;width:52px;height:48px;
  border:3px dashed #f2d489;border-radius:9px;
  box-shadow:0 0 0 2px #162f3588,inset 0 0 0 1px #fbe9ba;
  background:#e5c98617;pointer-events:none;
