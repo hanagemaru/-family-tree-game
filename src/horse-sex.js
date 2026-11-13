@@ -1,4 +1,5 @@
 import {wikidataSex} from './horse-sex-data.js';
+import {officialHorseSex} from './horse-sex-official.js';
 
 // Fixed stage identities, checked against the historical racehorse descriptions.
 // A separate map avoids confusing the stage's internal short IDs with Wikidata QIDs.
@@ -31,6 +32,16 @@ export function pedigreeSex(snapshot){
 export function horseSex(id,snapshot){
  const fromWikidata=wikidataSex[id];
  const inferred=snapshot?pedigreeSex(snapshot).get(id):null;
+ const official=officialHorseSex[id];
+ if(official){
+  const horse=snapshot?.horses?.find(h=>h.id===id);
+  if(horse&&(horse.name!==official.name||horse.birthYear!==official.birthYear))return null;
+  // A registered gelding is biologically male; animal-sex P21 may therefore say male.
+  const biological=official.sex==='gelding'?'male':official.sex;
+  if(fromWikidata&&fromWikidata!==biological)return null;
+  if(inferred&&inferred!==biological)return null;
+  return official.sex;
+ }
  // Contradictory sources must not be silently resolved in favor of either.
  if(fromWikidata&&inferred&&inferred!==fromWikidata)return null;
  if(inferred==='unknown')return null;
