@@ -50,15 +50,15 @@ export function dragFramePosition(positions,anchorId,relation,side='left'){
 
 // The outlined slot is a deliberate drop target, not the entire directional
 // area around a card. Coordinates are in SCREEN pixels, independent of zoom.
-export const DROP_SLOT_W=56,DROP_SLOT_H=54,DROP_SLOT_HOLD_MS=250;
+export const DROP_SLOT_W=52,DROP_SLOT_H=48,DROP_SLOT_HOLD_MS=250;
 export function dragFrameScreen(node,relation,side,viewport,nodes=[]){
  if(!node||!['parent','child','sibling'].includes(relation))return null;
- const gap=8,halfW=DROP_SLOT_W/2,halfH=DROP_SLOT_H/2;
+ const gap=3,halfW=DROP_SLOT_W/2,halfH=DROP_SLOT_H/2;
  const x=relation==='sibling'
   ?node.x+(side==='right'?1:-1)*(node.width/2+halfW+gap):node.x;
  const y=relation==='parent'?node.y-(node.height/2+halfH+gap):
    relation==='child'?node.y+(node.height/2+halfH+gap):node.y;
- const margin=8;
+ const margin=4;
  // Never clamp to the opposite side of a parent: that would misrepresent its
  // relationship. If the slot is not visible, use the explicit picker.
  if(x-halfW<margin||y-halfH<margin||x+halfW>viewport.width-margin||
