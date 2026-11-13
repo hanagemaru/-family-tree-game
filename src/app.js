@@ -1,7 +1,7 @@
 import {stages,stageById} from './data.js';
 import {relationLabels,newGame,place,pack,restore,formatTime,fitCamera,revealCamera} from './core.js';
 import {horseSex,horseSexLabel} from './horse-sex.js';
-import {placementLabels,directionalTarget,dragFramePosition} from './placement-preview.js';
+import {placementLabels,directionalTarget,dragFrameScreen,insideDragFrame,dragDropReady} from './placement-preview.js';
 import {layoutFamily,buildDiagram,diagramSvg} from './diagram.js';
 import {dragHotspot,screenNodes,pickDropCard,dropDecision} from './interaction.js';
 import {createRandomSeed,generateRandomHorseSession,restoreRandomHorseSession} from './random-horse-session.js';
@@ -35,7 +35,7 @@ function openDialog(html,closeLabel='閉じる',kind='info'){dialogKind=kind;mod
 function closeDialog(){modal.close();lastTick=performance.now();}
 modal.addEventListener('close',()=>{lastTick=performance.now();if(state){renderCaption();if(selected)say(`${person(selected).name}を選択中。場の相手をタップするか、一覧から選べます。`);}});
 $('modal-close').addEventListener('click',closeDialog);
-function help(){openDialog(`<p class="eyebrow">HOW TO PLAY</p><h2>相手に置いて、関係を選ぶ。</h2><ol><li>手札をドラッグすると、相手の上に「親」、左右に「きょうだい」、下に「子」の点線枠が出ます。その位置で離すと配置を判定します。</li><li>場のカード上で離した場合や、名前一覧から相手を選んだ場合は、関係ボタンを1回タップして配置できます。</li><li>手札をタップ → 相手をタップ、でも同じ操作ができます。押しにくい相手は「相手を一覧から」で選べます。</li><li>置ける札がない状態は自動で防ぎます。困ったらヒントを確認できます。メニューから答えを見ることもできます。時間制限はありません。</li><li>●は実際の接続点、線の切れ目は非接続の交差。手札未選択で場のカードをタップすると関係線を強調します。</li><li>盤面をスワイプして移動。ピンチ、＋ / −で拡縮し、「全体」で見渡せます。</li></ol><p class="scope">${state?escape(state.stage.scope):'進行はこのブラウザへ自動保存されます。'}</p>`);}
+function help(){openDialog(`<p class="eyebrow">HOW TO PLAY</p><h2>相手に置いて、関係を選ぶ。</h2><ol><li>手札をドラッグすると、相手の上に「親」、左右に「きょうだい」、下に「子」の点線枠が出ます。点線枠に位置マーカーを重ね、少し止めてから離すと配置できます。枠の外で離した場合は関係を選びます。</li><li>場のカード上で離した場合や、名前一覧から相手を選んだ場合は、関係ボタンを1回タップして配置できます。</li><li>手札をタップ → 相手をタップ、でも同じ操作ができます。押しにくい相手は「相手を一覧から」で選べます。</li><li>置ける札がない状態は自動で防ぎます。困ったらヒントを確認できます。メニューから答えを見ることもできます。時間制限はありません。</li><li>●は実際の接続点、線の切れ目は非接続の交差。手札未選択で場のカードをタップすると関係線を強調します。</li><li>盤面をスワイプして移動。ピンチ、＋ / −で拡縮し、「全体」で見渡せます。</li></ol><p class="scope">${state?escape(state.stage.scope):'進行はこのブラウザへ自動保存されます。'}</p>`);}
 $('help-button').addEventListener('click',help);
 function showSources(){const list=state?[state.stage]:stages;openDialog(`<p class="eyebrow">ABOUT THE FAMILY TREES</p><h2>題材・出典</h2>${list.map(stage=>`<h3>${stage.title}</h3><p>${stage.description}</p><p class="scope">${stage.scope}</p><ul>${[...new Map([...stage.sources,...stage.people.map(p=>p.source)].map(s=>[s.url,s])).values()].map(s=>`<li><a href="${escape(s.url)}" target="_blank" rel="noopener noreferrer">${escape(s.label)}</a></li>`).join('')}</ul>`).join('')}<p class="scope">関係情報をもとに作成した選抜ステージです。人物・馬の肖像や写真は転載していません。</p>`);}
 $('sources-button').addEventListener('click',showSources);
@@ -132,35 +132,44 @@ board.addEventListener('keydown',e=>{if(e.target!==board)return;const delta={Arr
 function paintTarget(){for(const node of $('nodes').querySelectorAll('[data-node]'))node.classList.toggle('targeted',node.dataset.node===(hoverAnchor||targetAnchor));$('drag-ghost').classList.toggle('over-card',!!hoverAnchor);}
 function clearTargets(){targetAnchor=null;hoverAnchor=null;paintTarget();if(state)renderCaption();}
 function renderCaption(){
- $('board-caption').textContent=dragPlacement?`${person(dragPlacement.anchorId).name}の${relationName(dragPlacement.relation)} · ${camera.scale<.55?'離すと名前一覧':'離すと配置'}`:hoverAnchor?`${person(hoverAnchor).name}へドロップ → 関係を選ぶ`:state.complete?(state.gaveUp?'答えの系譜 · スワイプと拡縮で見渡せます':'完成した系譜 · スワイプと拡縮で見渡せます'):selected?`${person(selected).name}の相手をタップ、またはカードへドロップ`:'手札を相手のカードへドロップ';
+ $('board-caption').textContent=dragPlacement?`${person(dragPlacement.anchorId).name}の${relationName(dragPlacement.relation)} · ${camera.scale<.55?'離すと名前一覧':dragDropReady(dragPlacement,performance.now())?'離して配置':'点線枠に重ね、少し止めて離す'}`:hoverAnchor?`${person(hoverAnchor).name}へドロップ → 関係を選ぶ`:state.complete?(state.gaveUp?'答えの系譜 · スワイプと拡縮で見渡せます':'完成した系譜 · スワイプと拡縮で見渡せます'):selected?`${person(selected).name}の相手をタップ、またはカードへドロップ`:'手札を相手のカードへドロップ';
 }
 function availableRelations(){return isHorseStage(state.stage)?['parent','child','sibling']:['parent','child','spouse','sibling'];}
 function relationName(type){return isHorseStage(state.stage)?({parent:'父・母',child:'産駒',sibling:'きょうだい'}[type]):relationLabels[type];}
 function clearDragPreview(){
  dragPlacement=null;
  const frame=$('drag-preview');
- if(frame){frame.hidden=true;frame.textContent='';}
+ if(frame){
+  frame.hidden=true;frame.textContent='';
+  frame.classList.remove('over-slot','armed');
+ }
 }
 function updateDragPreview(point){
- const frame=$('drag-preview');
- const hit=directionalTarget(point,screenNodes(state.positions,camera),dragPlacement);
- dragPlacement=hit;
- if(!frame)return;
- if(!hit){frame.hidden=true;frame.textContent='';return;}
- const pos=dragFramePosition(state.positions,hit.anchorId,hit.relation,hit.side);
- if(!pos){frame.hidden=true;frame.textContent='';return;}
- // The completed layout may extend beyond today's viewport. Keep the dotted
- // directional guide visible even when the intended grid slot is off-screen.
- const insetX=38*camera.scale+6,insetY=53*camera.scale+6;
- const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
- const sx=clamp(pos.x*camera.scale+camera.x,insetX,Math.max(insetX,board.clientWidth-insetX));
- const sy=clamp(pos.y*camera.scale+camera.y,insetY,Math.max(insetY,board.clientHeight-insetY));
- frame.hidden=false;
- frame.style.left=`${(sx-camera.x)/camera.scale}px`;
- frame.style.top=`${(sy-camera.y)/camera.scale}px`;
- frame.style.borderWidth=`${Math.max(3,2.5/Math.max(camera.scale,.18))}px`;
- frame.dataset.relation=hit.relation;
- frame.textContent=placementLabels[hit.relation].arrow;
+ const overlay=$('drag-preview');
+ const nodes=screenNodes(state.positions,camera),prior=dragPlacement;
+ // Once the pointer reaches a previously displayed frame, retain the same
+ // target; otherwise the quadrant algorithm can flip at the slot boundary.
+ const hoveringPrior=prior?.frame&&insideDragFrame(point,prior.frame);
+ const hit=hoveringPrior?prior:directionalTarget(point,nodes,prior);
+ const node=nodes.find(n=>n.id===hit?.anchorId);
+ const frame=hit&&node?dragFrameScreen(node,hit.relation,hit.side,
+  {width:board.clientWidth,height:board.clientHeight},nodes):null;
+ if(!overlay)return;
+ if(!hit||!frame){clearDragPreview();return;}
+ const overSlot=insideDragFrame(point,frame),now=performance.now();
+ const same=prior&&prior.anchorId===hit.anchorId&&
+  prior.relation===hit.relation&&prior.side===hit.side&&prior.overSlot&&overSlot&&
+  Math.abs(prior.frame.x-frame.x)<2&&Math.abs(prior.frame.y-frame.y)<2;
+ dragPlacement={anchorId:hit.anchorId,relation:hit.relation,side:hit.side,
+  frame,overSlot,enteredAt:same?prior.enteredAt:now};
+ const ready=dragDropReady(dragPlacement,now)&&camera.scale>=.55;
+ overlay.hidden=false;
+ overlay.style.left=`${frame.x}px`;
+ overlay.style.top=`${frame.y}px`;
+ overlay.dataset.relation=hit.relation;
+ overlay.classList.toggle('over-slot',overSlot);
+ overlay.classList.toggle('armed',ready);
+ overlay.innerHTML=`<span>${placementLabels[hit.relation].arrow}</span><small>${placementLabels[hit.relation].label}</small>`;
 }
 function chooseRelations(id){
  if(!selected||!state.hand.includes(selected)||!state.placed.includes(id))return;
@@ -217,10 +226,10 @@ window.addEventListener('pointermove',e=>{
  if(pointers.size===2){const oldMid={x:(old[0].x+old[1].x)/2,y:(old[0].y+old[1].y)/2},mid={x:(next[0].x+next[1].x)/2,y:(next[0].y+next[1].y)/2},d1=Math.hypot(old[0].x-old[1].x,old[0].y-old[1].y),d2=Math.hypot(next[0].x-next[1].x,next[0].y-next[1].y),r=board.getBoundingClientRect();if(d1>2)zoomAt(d2/d1,oldMid.x-r.left,oldMid.y-r.top);camera.x+=mid.x-oldMid.x;camera.y+=mid.y-oldMid.y;updateTransform();if(pan)pan.moved=true;
  }else if(pan&&pan.id===e.pointerId){if(Math.hypot(e.clientX-pan.startX,e.clientY-pan.startY)>5)pan.moved=true;if(pan.moved){camera.x+=e.clientX-pan.x;camera.y+=e.clientY-pan.y;clearTargets();updateTransform();}pan.x=e.clientX;pan.y=e.clientY;}
 });
-function autoPan(){if(!drag?.active)return;const hotspot=dragHotspot(drag.x,drag.y),p=pointOnBoard(hotspot.x,hotspot.y);if(p.inside){const dx=p.x<28?3:p.x>board.clientWidth-28?-3:0,dy=p.y<34?3:p.y>board.clientHeight-34?-3:0;if(dx||dy){camera.x+=dx;camera.y+=dy;updateTransform();hoverAt(hotspot.x,hotspot.y);}}frame=requestAnimationFrame(autoPan);}
+function autoPan(){if(!drag?.active)return;const hotspot=dragHotspot(drag.x,drag.y),p=pointOnBoard(hotspot.x,hotspot.y);if(p.inside){if(!dragPlacement?.overSlot){const dx=p.x<28?3:p.x>board.clientWidth-28?-3:0,dy=p.y<34?3:p.y>board.clientHeight-34?-3:0;if(dx||dy){camera.x+=dx;camera.y+=dy;updateTransform();}}hoverAt(hotspot.x,hotspot.y);}frame=requestAnimationFrame(autoPan);}
 function cancelDrag(){if(frame)cancelAnimationFrame(frame);frame=null;if(drag){try{if($('app').hasPointerCapture(drag.pointerId))$('app').releasePointerCapture(drag.pointerId);}catch{}}drag=null;hoverAnchor=null;clearDragPreview();$('drag-ghost').hidden=true;$('drag-ghost').classList.remove('in-board');document.body.classList.remove('drag-active');$('hand').querySelectorAll('.dragging').forEach(b=>b.classList.remove('dragging'));paintTarget();if(state)renderCaption();}
 window.addEventListener('pointerup',e=>{
- if(drag&&e.pointerId===drag.pointerId){const active=drag.active,hotspot=dragHotspot(e.clientX,e.clientY),point=pointOnBoard(hotspot.x,hotspot.y);if(active)hoverAt(hotspot.x,hotspot.y);const directed=active&&camera.scale>=.55?dragPlacement:null;const decision=dropDecision({active,inside:point.inside,anchor:camera.scale<.55?null:hoverAnchor,card:selected});cancelDrag();if(directed&&decision.type==='relation'){targetAnchor=directed.anchorId;attempt(directed.relation);}else if(decision.type==='relation')chooseRelations(decision.anchor);else if(decision.type==='choose-anchor')chooseAnchor();else if(selected)say(`${person(selected).name}を選択中。場の相手をタップしてください。`);return;}
+ if(drag&&e.pointerId===drag.pointerId){const active=drag.active,hotspot=dragHotspot(e.clientX,e.clientY),point=pointOnBoard(hotspot.x,hotspot.y);if(active)hoverAt(hotspot.x,hotspot.y);const directed=active&&camera.scale>=.55&&dragDropReady(dragPlacement,performance.now())?dragPlacement:null;const decision=dropDecision({active,inside:point.inside,anchor:camera.scale<.55?null:hoverAnchor,card:selected});cancelDrag();if(directed&&decision.type==='relation'){targetAnchor=directed.anchorId;attempt(directed.relation);}else if(decision.type==='relation')chooseRelations(decision.anchor);else if(decision.type==='choose-anchor')chooseAnchor();else if(selected)say(`${person(selected).name}を選択中。場の相手をタップしてください。`);return;}
  if(!pointers.has(e.pointerId))return;pointers.delete(e.pointerId);if(pan&&pan.id===e.pointerId&&!pan.moved){if(selected){const point=pointOnBoard(e.clientX,e.clientY),id=pan.node||pickDropCard(point,screenNodes(state.positions,camera));if(id)chooseRelations(id);else say('場のカードをタップするか「相手を一覧から」で選んでください。');}else if(pan.node)focusLines(pan.node);}
  if(pointers.size===1){const [id,p]=[...pointers.entries()][0];pan={id,x:p.x,y:p.y,startX:p.x,startY:p.y,moved:true};}else pan=null;
 });
