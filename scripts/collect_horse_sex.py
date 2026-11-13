@@ -68,7 +68,7 @@ def main():
         print(f'Checked {min(i+40,len(ids))}/{len(ids)}, confirmed {len(sexes)}',flush=True)
         time.sleep(.3)
     if not sexes:
-        raise RuntimeError('No Wikidata P21 records: refusing to replace static sex map')
+        print('No explicit P21 claims; retaining only father/mother-role inference in the game.',flush=True)
     args.output_source.parent.mkdir(parents=True,exist_ok=True)
     args.output_module.parent.mkdir(parents=True,exist_ok=True)
     source={'retrievedUtc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
