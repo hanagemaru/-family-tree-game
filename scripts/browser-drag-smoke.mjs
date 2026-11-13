@@ -76,6 +76,7 @@ try{
   console.log('BROWSER_ARM_STATUS',name,JSON.stringify(status));
   assert.equal(status.classes.includes('armed'),true,
    name+' held frame should arm');
+  await page.screenshot({path:`artifacts/browser-drag/${name}-armed.png`,fullPage:true});
   await page.mouse.up();
   assert.equal(await count(),2,name+' held frame should place');
   assert.equal(await page.locator('#modal').evaluate(e=>e.open),false);
