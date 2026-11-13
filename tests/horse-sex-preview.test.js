@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {horseSex,horseSexLabel,pedigreeSex} from '../src/horse-sex.js';
 import {placementLabels,directionalTarget,dragFramePosition,dragFrameScreen,insideDragFrame,dragDropReady,DROP_SLOT_HOLD_MS} from '../src/placement-preview.js';
-import {STEP_X,STEP_Y} from '../src/core.js';
+import {STEP_X,STEP_Y,fitCamera,CARD_W,CARD_H} from '../src/core.js';
 
 const snapshot=JSON.parse(readFileSync(new URL('../data/horse-pedigree.v1.json',import.meta.url),'utf8'));
 
@@ -85,4 +85,19 @@ test('near edges or overlapping another card, direct placement is disabled',()=>
  assert.equal(dragFrameScreen(anchor,'parent',null,viewport,[anchor,obstruction]),null);
  assert.ok(dragFrameScreen(anchor,'child',null,viewport,[anchor,obstruction]));
  assert.equal(dragFrameScreen(anchor,'spouse',null,viewport,[anchor]),null);
+});
+
+test('initial mobile viewport 235-300px tall keeps top and bottom drop frames visible',()=>{
+ for(const height of [235,245,260,278,300]){
+  const positions={anchor:{x:0,y:0}};
+  const camera=fitCamera(positions,360,height);
+  const anchor={id:'anchor',x:camera.x,y:camera.y,
+   width:CARD_W*camera.scale,height:CARD_H*camera.scale};
+  for(const relation of ['parent','child']){
+   const slot=dragFrameScreen(anchor,relation,null,{width:360,height},[anchor]);
+   assert.ok(slot,`height ${height}, relation ${relation}, zoom ${camera.scale}`);
+   assert.ok(slot.y-slot.height/2>=4);
+   assert.ok(slot.y+slot.height/2<=height-4);
+  }
+ }
 });
