@@ -17,3 +17,23 @@ jobs:
       - run: python3 -m unittest discover -s tests -p 'test_*.py'
       - run: npm test
       - run: npm run build
+
+  browser-gestures:
+    # Run a real browser review only on the feature branch, not on main.
+    if: github.ref_name == 'feature/horse-sex-drag-preview-20261113'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright@1.56.1
+      - run: npx playwright install --with-deps chromium webkit
+      - run: node scripts/browser-drag-smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-drag-mobile
+          path: artifacts/browser-drag/*.png
+          if-no-files-found: ignore
