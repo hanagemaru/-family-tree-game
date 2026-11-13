@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {horseSex,horseSexLabel,pedigreeSex} from '../src/horse-sex.js';
-import {placementLabels,directionalTarget,dragFramePosition} from '../src/placement-preview.js';
+import {placementLabels,directionalTarget,dragFramePosition,dragFrameScreen,insideDragFrame,dragDropReady,DROP_SLOT_HOLD_MS} from '../src/placement-preview.js';
 import {STEP_X,STEP_Y} from '../src/core.js';
 
 const snapshot=JSON.parse(readFileSync(new URL('../data/horse-pedigree.v1.json',import.meta.url),'utf8'));
@@ -56,4 +56,33 @@ test('corrected animal-sex Wikidata claims plus JRA/JBIS eliminate unknown sex f
  assert.equal(horseSex('Q140512508',snapshot),'gelding'); // Bold Brian: JRA
  assert.equal(horseSex('Q140512523',snapshot),'gelding'); // Erimo Maxim: JBIS
  assert.equal(horseSexLabel(horseSex('Q140512523',snapshot)),'セ');
+});
+
+test('only an exact clear dotted slot, not a broad direction, can arm a drop',()=>{
+ const node={id:'a',x:180,y:150,width:108,height:154};
+ const viewport={width:360,height:300};
+ const up=dragFrameScreen(node,'parent',null,viewport,[node]);
+ const down=dragFrameScreen(node,'child',null,viewport,[node]);
+ const left=dragFrameScreen(node,'sibling','left',viewport,[node]);
+ const right=dragFrameScreen(node,'sibling','right',viewport,[node]);
+ assert.ok(up&&down&&left&&right);
+ assert.ok(up.y<node.y&&down.y>node.y);
+ assert.ok(left.x<node.x&&right.x>node.x);
+ assert.equal(insideDragFrame({x:180,y:110,inside:true},up),false,'the broad upper quadrant is not the slot');
+ assert.equal(insideDragFrame({x:up.x,y:up.y,inside:true},up),true);
+ assert.equal(insideDragFrame({x:up.x,y:up.y,inside:false},up),false);
+ assert.equal(dragDropReady({overSlot:false,enteredAt:0},1000),false);
+ assert.equal(dragDropReady({overSlot:true,enteredAt:100},100+DROP_SLOT_HOLD_MS-1),false);
+ assert.equal(dragDropReady({overSlot:true,enteredAt:100},100+DROP_SLOT_HOLD_MS),true);
+});
+
+test('near edges or overlapping another card, direct placement is disabled',()=>{
+ const viewport={width:360,height:300};
+ const edge={id:'edge',x:180,y:49,width:108,height:154};
+ assert.equal(dragFrameScreen(edge,'parent',null,viewport,[edge]),null);
+ const anchor={id:'a',x:180,y:150,width:108,height:154};
+ const obstruction={id:'b',x:180,y:38,width:108,height:154};
+ assert.equal(dragFrameScreen(anchor,'parent',null,viewport,[anchor,obstruction]),null);
+ assert.ok(dragFrameScreen(anchor,'child',null,viewport,[anchor,obstruction]));
+ assert.equal(dragFrameScreen(anchor,'spouse',null,viewport,[anchor]),null);
 });
