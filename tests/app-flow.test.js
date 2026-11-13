@@ -173,12 +173,9 @@ test('drag-only dotted frame follows above, sideways and below directions withou
  app.window.fire('pointermove',{clientX:196,clientY:300});
  assert.equal(app.$('drag-preview').hidden,false);
  assert.equal(app.$('drag-preview').dataset.relation,'parent');
- // The empty frame must remain visible even though the normal parent slot
- // extends beyond the initially centered 300px-tall mobile board.
- const transform=app.$('world').style.transform.match(/[-0-9.]+/g);
- assert.ok(transform);
- const previewY=Number(app.$('drag-preview').style.top.slice(0,-2))*Number(transform[2])+Number(transform[1]);
- assert.ok(previewY>50&&previewY<250,`dotted frame should stay inside board: ${previewY}`);
+ // The frame is screen-sized and visible regardless of the board zoom.
+ const previewY=Number(app.$('drag-preview').style.top.slice(0,-2));
+ assert.ok(previewY>=27&&previewY<=273,`dotted frame should stay inside board: ${previewY}`);
  assert.equal(app.$('placed-count').textContent,'1');
  assert.equal(app.$('mistake-count').textContent,'0');
  app.window.fire('pointermove',{clientX:250,clientY:366});
@@ -191,16 +188,56 @@ test('drag-only dotted frame follows above, sideways and below directions withou
  assert.equal(app.$('placed-count').textContent,'1');
 });
 
-test('dropping in the child slot commits in one gesture; modal selection remains one tap',async t=>{
+test('casually releasing anywhere in the child quadrant does not place a card',async t=>{
  const app=await setup(t);
  const hand=app.$('hand').querySelector('[data-card="iemitsu"]');
  hand.fire('pointerdown',{clientX:100,clientY:620});
  app.window.fire('pointermove',{clientX:196,clientY:420});
  assert.equal(app.$('drag-preview').dataset.relation,'child');
+ assert.equal(app.$('drag-preview').classList.contains('armed'),false);
  app.window.fire('pointerup',{clientX:196,clientY:420});
+ assert.equal(app.$('modal').open,true,'an ordinary release still requires a deliberate relation selection');
+ assert.equal(app.$('placed-count').textContent,'1');
+ assert.equal(app.$('mistake-count').textContent,'0');
+ assert.equal(app.$('drag-preview').hidden,true);
+ commitRelation(app,'child');
+ assert.equal(app.$('placed-count').textContent,'2');
+});
+
+test('only a stable release INSIDE the outlined slot can place directly',async t=>{
+ const app=await setup(t);
+ const hand=app.$('hand').querySelector('[data-card="iemitsu"]');
+ hand.fire('pointerdown',{clientX:100,clientY:620});
+ app.window.fire('pointermove',{clientX:196,clientY:420});
+ assert.equal(app.$('drag-preview').dataset.relation,'child');
+ const rect=app.$('board').getBoundingClientRect();
+ const x=rect.left+Number(app.$('drag-preview').style.left.slice(0,-2));
+ const y=rect.top+Number(app.$('drag-preview').style.top.slice(0,-2))+36;
+ app.window.fire('pointermove',{clientX:x,clientY:y});
+ assert.equal(app.$('drag-preview').classList.contains('over-slot'),true);
+ assert.equal(app.$('drag-preview').classList.contains('armed'),false);
+ app.advance(300);
+ app.window.fire('pointermove',{clientX:x,clientY:y});
+ assert.equal(app.$('drag-preview').classList.contains('armed'),true);
+ app.window.fire('pointerup',{clientX:x,clientY:y});
  assert.equal(app.$('modal').open,false);
  assert.equal(app.$('placed-count').textContent,'2');
  assert.equal(app.$('drag-preview').hidden,true);
+ assert.equal(app.$('mistake-count').textContent,'0');
+});
+
+test('reaching the precise slot but immediately releasing still requires a deliberate choice',async t=>{
+ const app=await setup(t);
+ const hand=app.$('hand').querySelector('[data-card="iemitsu"]');
+ hand.fire('pointerdown',{clientX:100,clientY:620});
+ app.window.fire('pointermove',{clientX:196,clientY:420});
+ const rect=app.$('board').getBoundingClientRect();
+ const x=rect.left+Number(app.$('drag-preview').style.left.slice(0,-2));
+ const y=rect.top+Number(app.$('drag-preview').style.top.slice(0,-2))+36;
+ app.window.fire('pointermove',{clientX:x,clientY:y});
+ app.window.fire('pointerup',{clientX:x,clientY:y});
+ assert.equal(app.$('modal').open,true);
+ assert.equal(app.$('placed-count').textContent,'1');
  assert.equal(app.$('mistake-count').textContent,'0');
 });
 
