@@ -15,7 +15,9 @@ import urllib.request
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 API='https://www.wikidata.org/w/api.php'
-VALUES={'Q6581097':'male','Q6581072':'female'}
+# Wikidata reserves Q44148 / Q43445 for animal/plant sexes.
+# Human-specific Q6581097 / Q6581072 are accepted only if present.
+VALUES={'Q44148':'male','Q43445':'female','Q6581097':'male','Q6581072':'female'}
 
 def request_claims(ids):
     params=urllib.parse.urlencode({'action':'wbgetentities','ids':'|'.join(ids),'props':'claims','format':'json'})
