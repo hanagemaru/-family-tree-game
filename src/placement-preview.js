@@ -23,7 +23,7 @@ export function directionalTarget(point,nodes,previous=null){
  // An unambiguous axis is required. On the center of a card, retain the
  // conventional opponent-picker workflow instead of guessing a relationship.
  const nx=Math.abs(dx)/reachX,ny=Math.abs(dy)/reachY;
- if(Math.max(nx,ny)<.22)return null;
+ if(Math.max(nx,ny)<.38||Math.abs(nx-ny)<.13)return null;
  const vertical=ny>nx;
  return {
   anchorId:node.id,
@@ -46,4 +46,39 @@ export function dragFramePosition(positions,anchorId,relation,side='left'){
   }
  }
  return {x,y};
+}
+
+// The outlined slot is a deliberate drop target, not the entire directional
+// area around a card. Coordinates are in SCREEN pixels, independent of zoom.
+export const DROP_SLOT_W=56,DROP_SLOT_H=54,DROP_SLOT_HOLD_MS=250;
+export function dragFrameScreen(node,relation,side,viewport,nodes=[]){
+ if(!node||!['parent','child','sibling'].includes(relation))return null;
+ const gap=8,halfW=DROP_SLOT_W/2,halfH=DROP_SLOT_H/2;
+ const x=relation==='sibling'
+  ?node.x+(side==='right'?1:-1)*(node.width/2+halfW+gap):node.x;
+ const y=relation==='parent'?node.y-(node.height/2+halfH+gap):
+   relation==='child'?node.y+(node.height/2+halfH+gap):node.y;
+ const margin=8;
+ // Never clamp to the opposite side of a parent: that would misrepresent its
+ // relationship. If the slot is not visible, use the explicit picker.
+ if(x-halfW<margin||y-halfH<margin||x+halfW>viewport.width-margin||
+    y+halfH>viewport.height-margin)return null;
+ // A slot overlapping a different placed card cannot be chosen reliably.
+ for(const other of nodes){
+  if(other.id===node.id)continue;
+  if(Math.abs(x-other.x)<halfW+other.width/2+4&&
+     Math.abs(y-other.y)<halfH+other.height/2+4)return null;
+ }
+ return {x,y,width:DROP_SLOT_W,height:DROP_SLOT_H};
+}
+
+export function insideDragFrame(point,frame){
+ return !!frame&&point.inside&&
+   Math.abs(point.x-frame.x)<=frame.width*.42&&
+   Math.abs(point.y-frame.y)<=frame.height*.42;
+}
+
+export function dragDropReady(current,now,minHold=DROP_SLOT_HOLD_MS){
+ return !!current?.overSlot&&Number.isFinite(current.enteredAt)&&
+  now-current.enteredAt>=minHold;
 }
