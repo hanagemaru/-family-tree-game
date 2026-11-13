@@ -141,7 +141,7 @@ function clearDragPreview(){
  const frame=$('drag-preview');
  if(frame){
   frame.hidden=true;frame.textContent='';
-  frame.classList.remove('over-slot','armed');
+  frame.classList.remove('over-slot','armed','disabled');
  }
 }
 function updateDragPreview(point){
@@ -169,6 +169,7 @@ function updateDragPreview(point){
  overlay.dataset.relation=hit.relation;
  overlay.classList.toggle('over-slot',overSlot);
  overlay.classList.toggle('armed',ready);
+ overlay.classList.toggle('disabled',camera.scale<.55);
  overlay.innerHTML=`<span>${placementLabels[hit.relation].arrow}</span><small>${placementLabels[hit.relation].label}</small>`;
 }
 function chooseRelations(id){
