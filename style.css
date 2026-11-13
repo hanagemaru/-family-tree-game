@@ -280,3 +280,26 @@ body.playing .placement-dialog .anchor-choice{font-size:15px}
 }
 #drag-preview[hidden]{display:none!important}
 #board .person-node.targeted{outline:3px solid #efda9c;outline-offset:5px}
+
+/* Exact drop target. The dotted frame never means "automatically correct".
+   It becomes a placement target only after the marker is held INSIDE it. */
+#board #drag-preview{
+ position:absolute;left:0;top:0;z-index:30;
+ margin:-27px 0 0 -28px;width:56px;height:54px;
+ border:3px dashed #f2d489;border-radius:9px;
+ box-shadow:0 0 0 2px #162f3588,inset 0 0 0 1px #fbe9ba;
+ background:#e5c98617;pointer-events:none;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;
+ gap:2px;transform:none;color:#f8e7b5;
+}
+#board #drag-preview span{font:700 20px/1 system-ui,sans-serif}
+#board #drag-preview small{font:700 10px/1.2 system-ui,sans-serif;color:inherit}
+#board #drag-preview.over-slot{
+ background:#efd9972b;border-color:#fff3c2;
+ box-shadow:0 0 0 3px #355d4a,0 0 14px #f8e7b578;
+}
+#board #drag-preview.armed{
+ background:#d5eba48c;border:4px solid #f7ffe0;
+ box-shadow:0 0 0 3px #23573c,0 0 18px #d8f3aabc;
+ color:#173f34;text-shadow:none;
+}
