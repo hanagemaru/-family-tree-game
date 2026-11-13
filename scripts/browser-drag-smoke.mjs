@@ -79,6 +79,19 @@ try{
   await page.mouse.up();
   assert.equal(await count(),2,name+' held frame should place');
   assert.equal(await page.locator('#modal').evaluate(e=>e.open),false);
+  // The board uses a 300ms CSS pan transition. Checking immediately after
+  // mouseup would capture an in-between frame, particularly in WebKit.
+  await page.waitForTimeout(480);
+  const view=await page.evaluate(()=>{
+   const b=document.querySelector('#board').getBoundingClientRect();
+   const c=document.querySelector('[data-node="iemitsu"]').getBoundingClientRect();
+   const overlap=Math.max(0,Math.min(b.right,c.right)-Math.max(b.left,c.left))*
+    Math.max(0,Math.min(b.bottom,c.bottom)-Math.max(b.top,c.top));
+   return {ratio:overlap/(c.width*c.height),card:{top:c.top,bottom:c.bottom},
+    board:{top:b.top,bottom:b.bottom},zoom:document.querySelector('#world').style.transform};
+  });
+  console.log('BROWSER_PLACEMENT_VISIBILITY',name,JSON.stringify(view));
+  assert.ok(view.ratio>.78,name+' placed child must be mostly visible after the pan');
   await page.screenshot({path:`artifacts/browser-drag/${name}-placed.png`,fullPage:true});
   assert.equal(errors.length,0,name+' page errors: '+errors.join('; '));
   console.log('BROWSER_GESTURES_PASS',name,'casual=no-placement, instant=no-placement, held=placed');
