@@ -1,5 +1,7 @@
 import {stages,stageById} from './data.js';
 import {relationLabels,newGame,place,pack,restore,formatTime,fitCamera,revealCamera} from './core.js';
+import {horseSex,horseSexLabel} from './horse-sex.js';
+import {placementLabels,previewPosition} from './placement-preview.js';
 import {layoutFamily,buildDiagram,diagramSvg} from './diagram.js';
 import {dragHotspot,screenNodes,pickDropCard,dropDecision} from './interaction.js';
 import {createRandomSeed,generateRandomHorseSession,restoreRandomHorseSession} from './random-horse-session.js';
@@ -10,10 +12,10 @@ const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 let records={sessions:{},best:{}};
 try{const parsed=JSON.parse(localStorage.getItem(storageKey));if(parsed&&typeof parsed==='object')records={sessions:parsed.sessions||{},best:parsed.best||{},randomHorse:parsed.randomHorse||null};}catch{}
 let horseSnapshot=null,randomHorse=null,randomHorseError='';
-let state=null,selected=null,camera={x:0,y:0,scale:1},targetAnchor=null,hoverAnchor=null,drag=null,pan=null,frame=null,lastTick=performance.now(),lastSaved=0,diagram=null,lineFocus=null,lastLineDiagram=null,lastLineScale=null,lastLineFocus=null,dialogKind='info';
+let state=null,selected=null,camera={x:0,y:0,scale:1},targetAnchor=null,hoverAnchor=null,drag=null,pan=null,frame=null,lastTick=performance.now(),lastSaved=0,diagram=null,lineFocus=null,lastLineDiagram=null,lastLineScale=null,lastLineFocus=null,dialogKind='info',pendingRelation=null;
 const board=$('board'),modal=$('modal'),pointers=new Map();
 const person=id=>state.stage.people.find(p=>p.id===id);
-const isHorseStage=stage=>stage?.category==='競走馬';
+const isHorseStage=stage=>stage?.id==='thoroughbred'||stage?.category==='競走馬'||stage?.category==='競走馬の血統';
 const isRandomHorseStage=stage=>stage?.id?.startsWith('horse-generated:');
 const hintCount=()=>Object.values(state.hints).reduce((sum,n)=>sum+n,0);
 const newStageGame=stage=>isRandomHorseStage(stage)?newGame(stage,seededRandom(`deck:${records.randomHorse?.seed||''}`)):newGame(stage);
@@ -67,16 +69,18 @@ function renderSelection(){
  $('choose-anchor-button').disabled=!selected||state.complete;$('clear-selection-button').disabled=!selected;
 }
 function renderBoard(newId){
- $('nodes').innerHTML=state.placed.map(id=>{const p=person(id),position=state.positions[id];return `<button class="person-node table-card ${isHorseStage(state.stage)?'horse':''} ${id===state.stage.anchor?'anchor':''} ${id===newId?'new-card':''}" data-node="${id}" aria-pressed="false" style="left:${position.x}px;top:${position.y}px" aria-label="${escape(p.name)}${id===state.stage.anchor?'、起点のカード':''}">${cardFace(id)}</button>`;}).join('');
+ $('nodes').innerHTML=state.placed.map(id=>{const p=person(id),position=state.positions[id];return `<button class="person-node table-card ${isHorseStage(state.stage)?'horse':''} ${id===state.stage.anchor?'anchor':''} ${id===newId?'new-card':''}" data-node="${id}" aria-pressed="false" style="left:${position.x}px;top:${position.y}px" aria-label="${escape(p.name)}${id===state.stage.anchor?'、起点のカード':''}">${cardFace(id)}</button>`;}).join('')+placementPreviewCard();
  diagram=buildDiagram(state);renderLines();
  updateTransform();
 }
-function renderLines(){if(!diagram||(diagram===lastLineDiagram&&camera.scale===lastLineScale&&lineFocus===lastLineFocus))return;$('edges').innerHTML=diagramSvg(diagram,{scale:camera.scale,focus:lineFocus});lastLineDiagram=diagram;lastLineScale=camera.scale;lastLineFocus=lineFocus;}
+function renderLines(){if(!diagram||(diagram===lastLineDiagram&&camera.scale===lastLineScale&&lineFocus===lastLineFocus))return;$('edges').innerHTML=diagramSvg(diagram,{scale:camera.scale,focus:lineFocus})+placementPreviewWire();lastLineDiagram=diagram;lastLineScale=camera.scale;lastLineFocus=lineFocus;}
 function focusLines(id){lineFocus=lineFocus===id?null:id;renderLines();for(const node of $('nodes').querySelectorAll('[data-node]')){node.classList.toggle('line-focused',node.dataset.node===lineFocus);node.setAttribute('aria-pressed',String(node.dataset.node===lineFocus));}say(lineFocus?`${person(lineFocus).name}に直接つながる関係を強調しています。もう一度タップで解除。`:'関係線の強調を解除しました。');}
 function cardFace(id){
  const p=person(id),horse=isHorseStage(state.stage),number=state.stage.people.findIndex(p=>p.id===id)+1;
+ const sex=horse?horseSexLabel(p.sex||horseSex(id)):null;
+ const sexMarkup=horse?`<span class="card-sex" aria-label="性別：${sex}">${sex}</span>`:'';
  const art=horse?'<path d="M34 115C34 91 45 70 61 57L47 50L55 21L67 32L83 19L85 43C103 50 115 68 103 81L86 71L72 85L82 115Z"/><path d="M39 109C22 86 31 62 43 51L48 65L43 90Z" opacity=".5"/>':'<path d="M38 65L22 45L37 49L42 31L54 38L65 22L76 38L88 31L93 49L108 45L92 65Z"/><path d="M47 66H84L79 91L66 102L52 91Z"/><path d="M26 121L35 100L50 94L65 108L81 94L99 101L108 121Z"/><path d="M59 42L65 34L71 42L65 53Z" fill="#f0d69a"/>';
- return `<span class="card-corner" aria-hidden="true">${String(number).padStart(2,'0')}<i>${horse?'血統':'歴史'}</i></span><span class="card-art" aria-hidden="true"><span class="card-orbit"></span><svg viewBox="0 0 130 135">${art}</svg><span class="card-seal">${horse?'名馬':'徳川'}</span></span><span class="card-name">${escape(p.name)}</span><small>${horse?'THOROUGHBRED COLLECTION':'TOKUGAWA COLLECTION'}</small>`;
+ return `<span class="card-corner" aria-hidden="true">${String(number).padStart(2,'0')}<i>${horse?'血統':'歴史'}</i></span>${sexMarkup}<span class="card-art" aria-hidden="true"><span class="card-orbit"></span><svg viewBox="0 0 130 135">${art}</svg><span class="card-seal">${horse?'名馬':'徳川'}</span></span><span class="card-name">${escape(p.name)}</span><small>${horse?'THOROUGHBRED COLLECTION':'TOKUGAWA COLLECTION'}</small>`;
 }
 function renderHand(){
  $('hand').innerHTML=state.hand.map((id,index)=>`<button class="hand-card ${isHorseStage(state.stage)?'horse':''} ${id===selected?'selected':''}" style="--slot:${index};--tint:${(state.stage.people.findIndex(p=>p.id===id)*19)%70}deg" data-card="${id}" aria-pressed="${id===selected}" aria-label="${escape(person(id).name)}。ドラッグするか、選択して場のカードをタップ">${cardFace(id)}</button>`).join('');
@@ -91,7 +95,7 @@ function animateDraw(beforeHand){
  const reduce=window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
  if(!reduce)card.animate([{transform:`translate(${dx}px,${dy}px) scale(.6) rotate(-12deg)`,opacity:.15},{transform:'translate(0,0) scale(1) rotate(0deg)',opacity:1}],{duration:420,easing:'cubic-bezier(.16,.8,.22,1)'});
 }
-function selectCard(id){selected=id;lineFocus=null;renderLines();for(const node of $('nodes').querySelectorAll('[data-node]')){node.classList.remove('line-focused');node.setAttribute('aria-pressed','false');}clearTargets();for(const button of $('hand').querySelectorAll('[data-card]')){const active=button.dataset.card===id;button.classList.toggle('selected',active);button.setAttribute('aria-pressed',String(active));}renderHint();renderStats();say(`${person(id).name}を選択中。場の相手を選んでください。`);}
+function selectCard(id){clearPlacementPreview();selected=id;lineFocus=null;renderLines();for(const node of $('nodes').querySelectorAll('[data-node]')){node.classList.remove('line-focused');node.setAttribute('aria-pressed','false');}clearTargets();for(const button of $('hand').querySelectorAll('[data-card]')){const active=button.dataset.card===id;button.classList.toggle('selected',active);button.setAttribute('aria-pressed',String(active));}renderHint();renderStats();say(`${person(id).name}を選択中。場の相手を選んでください。`);}
 function renderHint(){
  const box=$('hint-box');box.hidden=true;if(!selected)return;
  const level=state.hints[selected]||0;if(!level)return;
@@ -134,17 +138,21 @@ function availableRelations(){return isHorseStage(state.stage)?['parent','child'
 function relationName(type){return isHorseStage(state.stage)?({parent:'父・母',child:'産駒',sibling:'きょうだい'}[type]):relationLabels[type];}
 function chooseRelations(id){
  if(!selected||!state.hand.includes(selected)||!state.placed.includes(id))return;
- targetAnchor=id;hoverAnchor=null;paintTarget();
- openDialog(`<p class="eyebrow">関係を選択</p><h2 class="compact-relation-title">${escape(person(selected).name)}<span> は </span>${escape(person(id).name)}<span> の…</span></h2><div class="relation-choices">${availableRelations().map(type=>`<button class="relation-choice" data-place-relation="${type}">${relationName(type)}</button>`).join('')}</div><p id="placement-error" class="placement-error" role="alert"></p><button class="text-button" data-action="change-anchor">相手を変える</button>`,'キャンセル','relation');
+ clearPlacementPreview();targetAnchor=id;hoverAnchor=null;paintTarget();
+ const choices=availableRelations().map(type=>{
+  const spec=placementLabels[type];
+  return `<button class="relation-choice" data-place-relation="${type}" aria-pressed="false"><span class="relation-arrow" aria-hidden="true">${spec.arrow}</span><span class="relation-text">${spec.label}</span><small>${escape(spec.detail)}</small></button>`;
+ }).join('');
+ openDialog(`<p class="eyebrow">配置する位置を選ぶ</p><h2 class="compact-relation-title">${escape(person(selected).name)}<span> は </span>${escape(person(id).name)}<span> の…</span></h2><div class="relation-choices ${isHorseStage(state.stage)?'three-choice':''}">${choices}</div><p id="relation-preview-info" class="relation-preview-info" aria-live="polite">上・横・下を選ぶと、盤面に仮配置を表示します。</p><p id="placement-error" class="placement-error" role="alert"></p><button class="text-button" data-action="change-anchor">相手を変える</button>`,'キャンセル','relation');
 }
 function chooseAnchor(){
- if(!selected)return;say(`${person(selected).name}の相手を選んでください。`);
+ if(!selected)return;clearPlacementPreview();say(`${person(selected).name}の相手を選んでください。`);
  openDialog(`<p class="eyebrow">場のカードを選ぶ</p><h2>${escape(person(selected).name)}の相手</h2><p>このあと、相手との関係を選びます。</p><div class="anchor-choices">${state.placed.map(id=>`<button class="anchor-choice" data-pick-anchor="${id}">${escape(person(id).name)}</button>`).join('')}</div>`,'戻る（選択札は保持）','anchor');
 }
 $('choose-anchor-button').addEventListener('click',chooseAnchor);
 $('clear-selection-button').addEventListener('click',()=>{selected=null;clearTargets();renderHand();renderHint();renderStats();say('選択を解除しました。');});
 modal.addEventListener('click',e=>{
- const choice=e.target.closest('[data-place-relation]');if(choice&&!choice.disabled){attempt(choice.dataset.placeRelation);return;}
+ const choice=e.target.closest('[data-place-relation]');if(choice&&!choice.disabled){const relation=choice.dataset.placeRelation;if(pendingRelation===relation)attempt(relation);else showPlacementPreview(relation);return;}
  const anchor=e.target.closest('[data-pick-anchor]');if(anchor){chooseRelations(anchor.dataset.pickAnchor);return;}
  if(e.target.closest('[data-action="change-anchor"]'))chooseAnchor();
 });
@@ -155,8 +163,8 @@ function hoverAt(clientX,clientY){
 }
 function attempt(relation){
  if(!selected||!targetAnchor)return;const id=selected,anchor=targetAnchor,p=person(id),a=person(anchor),beforeHand=[...state.hand],outcome=place(state,id,anchor,relation);
- if(!outcome.ok){if(outcome.reason==='relation'){const message=`${p.name}は${a.name}の「${relationName(relation)}」ではなさそうです。`;say(message,true);if($('placement-error'))$('placement-error').textContent=message;const button=$('modal-content').querySelector(`[data-place-relation="${relation}"]`);if(button)button.disabled=true;}renderStats();persist();return;}
- const oldAnchor=state.positions[anchor];state.positions=layoutFamily(state);camera.x+=(oldAnchor.x-state.positions[anchor].x)*camera.scale;camera.y+=(oldAnchor.y-state.positions[anchor].y)*camera.scale;lineFocus=null;
+ if(!outcome.ok){clearPlacementPreview();if(outcome.reason==='relation'){const message=`${p.name}は${a.name}の「${relationName(relation)}」ではなさそうです。`;say(message,true);if($('placement-error'))$('placement-error').textContent=message;const button=$('modal-content').querySelector(`[data-place-relation="${relation}"]`);if(button)button.disabled=true;}renderStats();persist();return;}
+ clearPlacementPreview();const oldAnchor=state.positions[anchor];state.positions=layoutFamily(state);camera.x+=(oldAnchor.x-state.positions[anchor].x)*camera.scale;camera.y+=(oldAnchor.y-state.positions[anchor].y)*camera.scale;lineFocus=null;
  selected=null;closeDialog();clearTargets();renderBoard(id);renderHand();animateDraw(beforeHand);renderStats();renderHint();camera=revealCamera(camera,state.positions[id],board.clientWidth,board.clientHeight);updateTransform(true);say(`${p.name}が、${a.name}の${relationName(relation)}としてつながりました。`);persist();
  if(state.complete){records.best[state.stage.id]={elapsed:state.elapsed,mistakes:state.mistakes,hints:hintCount()};persist();results();}
 }
