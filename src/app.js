@@ -161,6 +161,17 @@ function showPlacementPreview(relation){
  if(!selected||!targetAnchor||!placementLabels[relation])return;
  pendingRelation=relation;
  renderBoard();
+ const preview=placementPreviewData();
+ if(preview&&board.clientWidth>0&&board.clientHeight>0){
+  camera=revealCamera(camera,preview.point,board.clientWidth,board.clientHeight);
+  updateTransform();
+ }
+ const mini=$('relation-mini');
+ if(mini){
+  mini.hidden=false;
+  mini.className=`relation-mini ${relation==='parent'?'mini-parent':relation==='child'?'mini-child':'mini-side'}`;
+  mini.innerHTML=`<span class="mini-card mini-candidate">${escape(person(selected).name)}</span><span class="mini-link" aria-hidden="true"></span><span class="mini-card mini-anchor">${escape(person(targetAnchor).name)}</span>`;
+ }
  for(const button of $('modal-content').querySelectorAll('[data-place-relation]')){
   const active=button.dataset.placeRelation===relation;
   button.classList.toggle('preview-selected',active);
@@ -177,7 +188,7 @@ function chooseRelations(id){
   const spec=placementLabels[type];
   return `<button class="relation-choice" data-place-relation="${type}" aria-pressed="false"><span class="relation-arrow" aria-hidden="true">${spec.arrow}</span><span class="relation-text">${spec.label}</span><small>${escape(spec.detail)}</small></button>`;
  }).join('');
- openDialog(`<p class="eyebrow">配置する位置を選ぶ</p><h2 class="compact-relation-title">${escape(person(selected).name)}<span> は </span>${escape(person(id).name)}<span> の…</span></h2><div class="relation-choices ${isHorseStage(state.stage)?'three-choice':''}">${choices}</div><p id="relation-preview-info" class="relation-preview-info" aria-live="polite">上・横・下を選ぶと、盤面に仮配置を表示します。</p><p id="placement-error" class="placement-error" role="alert"></p><button class="text-button" data-action="change-anchor">相手を変える</button>`,'キャンセル','relation');
+ openDialog(`<p class="eyebrow">配置する位置を選ぶ</p><h2 class="compact-relation-title">${escape(person(selected).name)}<span> は </span>${escape(person(id).name)}<span> の…</span></h2><div class="relation-choices ${isHorseStage(state.stage)?'three-choice':''}">${choices}</div><div id="relation-mini" class="relation-mini" hidden aria-hidden="true"></div><p id="relation-preview-info" class="relation-preview-info" aria-live="polite">上・横・下を選ぶと、盤面に仮配置を表示します。</p><p id="placement-error" class="placement-error" role="alert"></p><button class="text-button" data-action="change-anchor">相手を変える</button>`,'キャンセル','relation');
 }
 function chooseAnchor(){
  if(!selected)return;clearPlacementPreview();say(`${person(selected).name}の相手を選んでください。`);
