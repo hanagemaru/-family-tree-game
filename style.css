@@ -271,7 +271,7 @@ body.playing .placement-dialog .anchor-choice{font-size:15px}
    The 19px marker and preview frame are entirely independent of the relation modal. */
 #drag-preview{
  position:absolute;pointer-events:none;z-index:15;
- width:108px;height:154px;margin:-77px 0 0 -54px;
+ width:76px;height:106px;margin:-53px 0 0 -38px;
  display:flex;align-items:center;justify-content:center;
  border:4px dashed #f7de95;border-radius:10px;
  background:#dfc47b23;color:#f8e7b5;
