@@ -7,7 +7,7 @@ function fixture(){const state=newGame(stages[0]);state.hand=['ieyasu','go','iem
 async function setup(t){const app=await loadApp(fixture());t.after(()=>app.restore());app.$('stage-list').querySelector('[data-start="tokugawa"]').click();return app;}
 function select(app,id='iemitsu'){app.$('hand').querySelector(`[data-card="${id}"]`).click({detail:0});}
 function target(app,id='hidetada'){app.$('nodes').querySelector(`[data-node="${id}"]`).click({detail:0});}
-function commitRelation(app,relation){const button=app.$('modal-content').querySelector(`[data-place-relation="${relation}"]`);assert.ok(button);button.click();assert.equal(button.getAttribute('aria-pressed'),'true');button.click();}
+function commitRelation(app,relation){const button=app.$('modal-content').querySelector(`[data-place-relation="${relation}"]`);assert.ok(button);button.click();}
 test('actual app: tap hand and opponent, then choose a relation and complete placement',async t=>{
  const app=await setup(t);select(app);assert.match(app.$('selection-summary').textContent,/家光/);target(app);assert.equal(app.$('modal').open,true);assert.equal(app.$('modal-content').querySelectorAll('[data-place-relation]').length,4);assert.match(app.$('modal-content').textContent,/家光.*秀忠/s);commitRelation(app,'child');assert.equal(app.$('modal').open,false);assert.ok(app.$('nodes').querySelector('[data-node="iemitsu"]'));assert.equal(app.$('placed-count').textContent,'2');
 });
@@ -15,7 +15,7 @@ test('actual app: cancel keeps the chosen hand card and offers a reliable oppone
  const app=await setup(t);select(app);target(app);app.$('modal-close').click();assert.match(app.$('selection-summary').textContent,/家光/);assert.equal(app.$('choose-anchor-button').disabled,false);app.$('choose-anchor-button').click();app.$('modal-content').querySelector('[data-pick-anchor="hidetada"]').click();assert.ok(app.$('modal-content').querySelector('[data-place-relation="child"]'));
 });
 test('actual app: wrong relation reports the error, preserves selection and allows correction',async t=>{
- const app=await setup(t);select(app);target(app);const wrong=app.$('modal-content').querySelector('[data-place-relation="parent"]');wrong.click();assert.equal(app.$('mistake-count').textContent,'0');assert.ok(app.$('nodes').querySelector('.placement-preview-card'));wrong.click();assert.equal(app.$('modal').open,true);assert.equal(app.$('mistake-count').textContent,'1');assert.ok(app.$('placement-error').textContent.length);wrong.click();assert.equal(app.$('mistake-count').textContent,'1');commitRelation(app,'child');assert.equal(app.$('placed-count').textContent,'2');
+ const app=await setup(t);select(app);target(app);const wrong=app.$('modal-content').querySelector('[data-place-relation="parent"]');wrong.click();assert.equal(app.$('modal').open,true);assert.equal(app.$('mistake-count').textContent,'1');assert.ok(app.$('placement-error').textContent.length);wrong.click();assert.equal(app.$('mistake-count').textContent,'1');commitRelation(app,'child');assert.equal(app.$('placed-count').textContent,'2');
 });
 test('actual app: blur and return during relation selection must not lose the opponent',async t=>{
  const app=await setup(t);select(app);target(app);app.window.fire('blur');commitRelation(app,'child');assert.equal(app.$('placed-count').textContent,'2');
@@ -166,24 +166,36 @@ test('horse card sex labels are shown in both the hand and the field',async t=>{
  assert.ok(['牡','牝','不明'].includes(hand.querySelector('.card-sex').textContent));
 });
 
-test('relation preview is provisional: changing relation redraws the ghost and cancel clears it',async t=>{
- const app=await setup(t);select(app);target(app);
- const parent=app.$('modal-content').querySelector('[data-place-relation="parent"]');
- parent.click();
- assert.ok(app.$('nodes').querySelector('.placement-preview-card'));
- assert.ok(app.$('edges').querySelector('.placement-preview-wire'));
+test('drag-only dotted frame follows above, sideways and below directions without committing',async t=>{
+ const app=await setup(t);
+ const hand=app.$('hand').querySelector('[data-card="iemitsu"]');
+ hand.fire('pointerdown',{clientX:100,clientY:620});
+ app.window.fire('pointermove',{clientX:196,clientY:300});
+ assert.equal(app.$('drag-preview').hidden,false);
+ assert.equal(app.$('drag-preview').dataset.relation,'parent');
  assert.equal(app.$('placed-count').textContent,'1');
  assert.equal(app.$('mistake-count').textContent,'0');
- const parentY=app.$('nodes').querySelector('.placement-preview-card').style.top;
- const child=app.$('modal-content').querySelector('[data-place-relation="child"]');
- child.click();
- assert.notEqual(app.$('nodes').querySelector('.placement-preview-card').style.top,parentY);
- assert.equal(parent.getAttribute('aria-pressed'),'false');
- assert.equal(child.getAttribute('aria-pressed'),'true');
- app.$('modal-close').click();
- assert.equal(app.$('nodes').querySelector('.placement-preview-card'),null);
- assert.equal(app.$('edges').querySelector('.placement-preview-wire'),null);
+ app.window.fire('pointermove',{clientX:250,clientY:366});
+ assert.equal(app.$('drag-preview').dataset.relation,'sibling');
+ app.window.fire('pointermove',{clientX:196,clientY:420});
+ assert.equal(app.$('drag-preview').dataset.relation,'child');
  assert.equal(app.$('placed-count').textContent,'1');
+ app.window.fire('pointercancel');
+ assert.equal(app.$('drag-preview').hidden,true);
+ assert.equal(app.$('placed-count').textContent,'1');
+});
+
+test('dropping in the child slot commits in one gesture; modal selection remains one tap',async t=>{
+ const app=await setup(t);
+ const hand=app.$('hand').querySelector('[data-card="iemitsu"]');
+ hand.fire('pointerdown',{clientX:100,clientY:620});
+ app.window.fire('pointermove',{clientX:196,clientY:420});
+ assert.equal(app.$('drag-preview').dataset.relation,'child');
+ app.window.fire('pointerup',{clientX:196,clientY:420});
+ assert.equal(app.$('modal').open,false);
+ assert.equal(app.$('placed-count').textContent,'2');
+ assert.equal(app.$('drag-preview').hidden,true);
+ assert.equal(app.$('mistake-count').textContent,'0');
 });
 
 test('dragging at low zoom uses a small dot and opens an unambiguous name picker',async t=>{
