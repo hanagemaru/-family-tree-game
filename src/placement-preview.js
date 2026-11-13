@@ -15,7 +15,7 @@ export function directionalTarget(point,nodes,previous=null){
   const dx=point.x-node.x,dy=point.y-node.y;
   const reachX=Math.max(42,node.width/2+38),reachY=Math.max(45,node.height/2+39);
   if(Math.abs(dx)>reachX||Math.abs(dy)>reachY)continue;
-  const score=(dx/reachX)**2+(dy/reachY)**2-(previous?.anchorId===node.id?.12:0);
+  const score=(dx/reachX)**2+(dy/reachY)**2-(previous?.anchorId===node.id?0.12:0);
   if(!best||score<best.score)best={node,dx,dy,score,reachX,reachY};
  }
  if(!best)return null;
