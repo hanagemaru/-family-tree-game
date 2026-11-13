@@ -303,3 +303,10 @@ body.playing .placement-dialog .anchor-choice{font-size:15px}
  box-shadow:0 0 0 3px #23573c,0 0 18px #d8f3aabc;
  color:#173f34;text-shadow:none;
 }
+
+/* A low-zoom preview is only a visual guide. Releasing opens the name picker. */
+#board #drag-preview.disabled{
+ opacity:.62;border-color:#b5c0b4;background:#9aaba122;color:#d1d8ca;
+ box-shadow:0 0 0 2px #18332d66;
+}
+#board #drag-preview.disabled.armed{border-style:dashed}
