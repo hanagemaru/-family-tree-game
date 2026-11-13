@@ -66,7 +66,15 @@ try{
   slot=await dragToChild();
   await page.mouse.move(slot.x,slot.y+36,{steps:1});
   await page.waitForTimeout(350);
-  assert.equal(await page.locator('#drag-preview').evaluate(e=>e.classList.contains('armed')),true,
+  // WebKit can throttle an rAF without pointer movement. A stationary
+  // finger release must still arm on the final event's current timestamp.
+  await page.mouse.move(slot.x+1,slot.y+36,{steps:1});
+  const status=await page.locator('#drag-preview').evaluate(e=>({
+   hidden:e.hidden,classes:e.className,rect:(()=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};})(),
+   now:performance.now()
+  }));
+  console.log('BROWSER_ARM_STATUS',name,JSON.stringify(status));
+  assert.equal(status.classes.includes('armed'),true,
    name+' held frame should arm');
   await page.mouse.up();
   assert.equal(await count(),2,name+' held frame should place');
