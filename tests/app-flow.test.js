@@ -253,3 +253,46 @@ test('dragging at low zoom uses a small dot and opens an unambiguous name picker
  assert.ok(app.$('modal-content').querySelector('[data-pick-anchor="hidetada"]'));
  assert.match(app.$('modal-content').textContent,/縮小/);
 });
+
+test('arming a slot is cancelled by leaving it; a quick re-entry cannot auto-place',async t=>{
+ const app=await setup(t),hand=app.$('hand').querySelector('[data-card="iemitsu"]');
+ hand.fire('pointerdown',{clientX:100,clientY:620});
+ app.window.fire('pointermove',{clientX:196,clientY:420});
+ const rect=app.$('board').getBoundingClientRect();
+ const x=rect.left+Number(app.$('drag-preview').style.left.slice(0,-2));
+ const y=rect.top+Number(app.$('drag-preview').style.top.slice(0,-2))+36;
+ app.window.fire('pointermove',{clientX:x,clientY:y});
+ app.advance(300);
+ app.window.fire('pointermove',{clientX:x,clientY:y});
+ assert.equal(app.$('drag-preview').classList.contains('armed'),true);
+ app.window.fire('pointermove',{clientX:196,clientY:420});
+ assert.equal(app.$('drag-preview').classList.contains('armed'),false);
+ app.window.fire('pointermove',{clientX:x,clientY:y});
+ assert.equal(app.$('drag-preview').classList.contains('armed'),false);
+ app.window.fire('pointerup',{clientX:x,clientY:y});
+ assert.equal(app.$('placed-count').textContent,'1');
+ assert.equal(app.$('modal').open,true);
+});
+
+test('holding a dotted slot at low zoom remains non-actionable and opens opponent list',async t=>{
+ const app=await setup(t);
+ for(let i=0;i<5;i++)app.$('zoom-out').click();
+ const hand=app.$('hand').querySelector('[data-card="iemitsu"]');
+ hand.fire('pointerdown',{clientX:100,clientY:620});
+ app.window.fire('pointermove',{clientX:196,clientY:420});
+ const outline=app.$('drag-preview');
+ if(!outline.hidden){
+  assert.equal(outline.classList.contains('disabled'),true);
+  const rect=app.$('board').getBoundingClientRect();
+  const x=rect.left+Number(outline.style.left.slice(0,-2));
+  const y=rect.top+Number(outline.style.top.slice(0,-2))+36;
+  app.window.fire('pointermove',{clientX:x,clientY:y});
+  app.advance(300);
+  app.window.fire('pointermove',{clientX:x,clientY:y});
+  assert.equal(outline.classList.contains('armed'),false);
+  app.window.fire('pointerup',{clientX:x,clientY:y});
+ }else app.window.fire('pointerup',{clientX:196,clientY:420});
+ assert.equal(app.$('placed-count').textContent,'1');
+ assert.equal(app.$('modal').open,true);
+ assert.ok(app.$('modal-content').querySelector('[data-pick-anchor="hidetada"]'));
+});
