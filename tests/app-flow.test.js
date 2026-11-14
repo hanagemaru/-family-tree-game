@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {loadApp} from './dom-harness.js';import {newGame,pack,relations} from '../src/core.js';import {stages} from '../src/data.js';
+import {loadApp} from './dom-harness.js';import {newGame,pack,relations,fitCamera} from '../src/core.js';import {stages} from '../src/data.js';
 import {readFileSync} from 'node:fs';import {restoreRandomHorseSession} from '../src/random-horse-session.js';
 import {findPlayablePlacement} from '../src/game-assistance.js';
 const horseSnapshot=JSON.parse(readFileSync(new URL('../data/horse-pedigree.v1.json',import.meta.url),'utf8'));
@@ -317,4 +317,35 @@ test('holding a dotted slot at low zoom does not auto-place but retains a clear 
  assert.equal(app.$('placed-count').textContent,'1');
  assert.equal(app.$('modal').open,true);
  assert.ok(app.$('modal-content').querySelector('[data-place-relation="child"]'));
+});
+
+test('successful placement fits the entire currently placed pedigree, not just the new card',async t=>{
+ const app=await setup(t);
+ select(app);target(app);commitRelation(app,'child');
+ const saved=app.storage().sessions.tokugawa;
+ const expected=fitCamera(saved.positions,app.$('board').clientWidth,app.$('board').clientHeight);
+ const transform=app.$('world').style.transform;
+ const values=transform.match(/[-+]?[0-9]*\.?[0-9]+/g)?.map(Number);
+ assert.ok(values&&values.length>=3,transform);
+ for(let i=0;i<3;i++)assert.ok(Math.abs(values[i]-[expected.x,expected.y,expected.scale][i])<.001,
+  'the full pedigree fit must update after every placed card: '+transform);
+});
+
+test('future-connected hand cards can consume both hints without being auto-selected away',async t=>{
+ const app=await loadApp(fixture());t.after(()=>app.restore());
+ app.$('stage-list').querySelector('[data-random-start]').click();
+ let candidate=app.$('hand').querySelector('[data-card]');
+ const stage=app.storage().randomHorse;
+ assert.ok(stage);
+ // Every hand card can reveal at least its first clue. Keep its selection stable.
+ const id=candidate.dataset.card;
+ candidate.click({detail:0});
+ app.$('hint-button').click();
+ assert.equal(app.$('hint-box').hidden,false);
+ assert.match(app.$('hint-box').textContent,/ヒント 1/);
+ assert.match(app.$('selection-summary').textContent,/.+/);
+ app.$('hint-button').click();
+ assert.match(app.$('hint-box').textContent,/ヒント 2/);
+ assert.equal(app.$('hint-button').hidden,true);
+ assert.equal(app.$('hand').querySelector('[data-card].selected').dataset.card,id);
 });
