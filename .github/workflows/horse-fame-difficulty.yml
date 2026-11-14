@@ -1,0 +1,62 @@
+name: Horse fame and difficulty research
+on:
+  push:
+    branches: ['feature/horse-fame-difficulty-20261115']
+    paths:
+      - '.github/workflows/horse-fame-difficulty.yml'
+      - 'scripts/collect_horse_fame.py'
+      - 'scripts/benchmark-horse-difficulty.mjs'
+      - 'src/horse-fame.js'
+      - 'src/random-horse-stage.js'
+      - 'src/random-horse-session.js'
+      - 'tests/horse-fame-difficulty.test.js'
+      - 'tests/test_horse_fame.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  collect-and-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Regression tests (offline, including previous saves)
+        run: |
+          python3 -m unittest discover -s tests -p 'test_*.py'
+          npm test
+          npm run build
+      - name: Download audited source scores (Wikimedia and JRA)
+        run: |
+          mkdir -p artifacts
+          python3 scripts/collect_horse_fame.py \
+            --end-month 2026-10 \
+            --workers 3 \
+            --output data/horse-fame-2026-10.v1.json
+          cp data/horse-fame-2026-10.v1.json artifacts/
+      - name: Freeze this period's scores on this feature branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/horse-fame-2026-10.v1.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'data: freeze 2025-11 to 2026-10 horse fame source snapshot'
+            git push origin HEAD:feature/horse-fame-difficulty-20261115
+          fi
+      - name: Benchmark 1000 questions for EACH difficulty (real replay)
+        run: |
+          node scripts/benchmark-horse-difficulty.mjs \
+            --runs=1000 --attempts=96 \
+            --fame=data/horse-fame-2026-10.v1.json \
+            --output=artifacts/horse-difficulty-benchmark.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: horse-fame-and-three-difficulty-benchmark
+          path: artifacts/
+          if-no-files-found: warn
