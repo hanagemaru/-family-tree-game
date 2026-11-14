@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {stages} from '../src/data.js';
+import {generateRandomHorseSession,restoreRandomHorseSession} from '../src/random-horse-session.js';
 import {pack,restore,relations,newGame} from '../src/core.js';
 import {prepareHorseGraph,generateRandomHorseStage,replayHorseStage,seededRandom,HORSE_GENERATOR_VERSION,LEGACY_HORSE_GENERATOR_VERSION} from '../src/random-horse-stage.js';
 const snapshot=JSON.parse(readFileSync(new URL('../data/horse-pedigree.v1.json',import.meta.url),'utf8'));
@@ -72,4 +73,15 @@ test('legacy v1 seeded stages remain generatable with the old version identifier
  const again=generateRandomHorseStage(snapshot,{seed,version:LEGACY_HORSE_GENERATOR_VERSION,attempts:24});
  assert.deepEqual(old,again);
  assert.ok(old.stage.id.includes(':horse-stage-v1:'));
+});
+
+test('previously saved v1 random puzzles restore byte-for-byte after the v2 upgrade',()=>{
+ const original=generateRandomHorseSession(snapshot,'legacy-user-seed',{version:LEGACY_HORSE_GENERATOR_VERSION});
+ const restored=restoreRandomHorseSession(snapshot,original.descriptor);
+ assert.ok(restored);
+ assert.deepEqual(restored.stage,original.stage);
+ assert.deepEqual(restored.descriptor,original.descriptor);
+ const updated=generateRandomHorseSession(snapshot,'legacy-user-seed');
+ assert.equal(updated.descriptor.generatorVersion,'horse-stage-v2');
+ assert.notEqual(updated.descriptor.stageId,original.descriptor.stageId);
 });
