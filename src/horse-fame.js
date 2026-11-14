@@ -82,3 +82,35 @@ export function assessHorseDifficulty(graph,selected,fame,difficulty) {
   difficultyTargetMet:below===0&&above===0&&missingHighEdges===0,
  };
 }
+
+/**
+ * Simplified beginner mode (v4). Restrict cards to the top 15% of the
+ * *same frozen* familiarity ranking, rather than the former top 35% bucket.
+ * Exposes the stricter 7%-tier counts for empirical review; no manual fame claims.
+ */
+export const EASY_V4_POOL_SHARE=.15;
+export const EASY_V4_ICONIC_SHARE=.07;
+
+export function assessEasyV4Selection(graph,selected,fame){
+ const maxRank=Math.ceil(fame.byId.size*EASY_V4_POOL_SHARE);
+ const iconicRank=Math.ceil(fame.byId.size*EASY_V4_ICONIC_SHARE);
+ const chosen=new Set(selected),iconic=new Set(selected.filter(id=>fame.byId.get(id).rank<=iconicRank));
+ const recognizable=selected.filter(id=>fame.byId.get(id).rank<=maxRank).length;
+ const meanFameRank=selected.reduce((sum,id)=>sum+fame.byId.get(id).rank,0)/selected.length;
+ let iconicParentEdges=0,highParentEdges=0;
+ for(const id of selected){
+  for(const parent of graph.parentSets.get(id)||[]){
+   if(chosen.has(parent))highParentEdges++;
+   if(iconic.has(id)&&iconic.has(parent))iconicParentEdges++;
+  }
+ }
+ const iconicCount=iconic.size;
+ return {
+  difficulty:'easy',highCount:recognizable,mediumCount:0,lowCount:selected.length-recognizable,
+  highParentEdges,iconicCount,iconicParentEdges,
+  recognizableCount:recognizable,meanFameRank:Math.round(meanFameRank*100)/100,
+  missingPageviews:selected.filter(id=>!fame.byId.get(id).viewsObserved).length,
+  difficultyFit:80+iconicCount*2.5+iconicParentEdges*2-Math.round(meanFameRank)/14,
+  difficultyTargetMet:recognizable===selected.length,
+ };
+}
