@@ -4,9 +4,9 @@ import {readFileSync} from 'node:fs';
 import {verifiedParentNames,verifiedDamName} from '../src/horse-parent-evidence.js';
 const snapshot=JSON.parse(readFileSync(new URL('../data/horse-pedigree.v1.json',import.meta.url),'utf8'));
 
-test('supplemental JBIS dam facts match a unique QID, Japanese name, and birth year',()=>{
+test('Wikimedia mother-name facts match a unique QID, horse name, year and cited revision',()=>{
  const records=Object.entries(verifiedParentNames);
- assert.equal(records.length,22);
+ assert.equal(records.length,550);
  const byId=new Map(snapshot.horses.map(h=>[h.id,h]));
  for(const [id,record] of records){
   assert.match(id,/^Q[1-9]\d+$/);
@@ -16,7 +16,9 @@ test('supplemental JBIS dam facts match a unique QID, Japanese name, and birth y
   assert.equal(record.year,horse.birthYear);
   assert.equal(horse.dam,null,'do not overwrite known dam');
   assert.ok(record.dam?.length>1);
-  assert.ok(record.url.startsWith('https://www.jbis.or.jp/horse/'));
+  assert.ok(record.url.startsWith('https://ja.wikipedia.org/wiki/'));
+  assert.ok(Number.isInteger(record.revision)&&record.revision>0);
+  assert.equal(record.wiki,'ja');
   assert.deepEqual(verifiedDamName(horse),{name:record.dam,source:record.url});
  }
 });
