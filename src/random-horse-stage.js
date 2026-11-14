@@ -111,9 +111,15 @@ function toStage(snapshot,graph,selection,seed){
  const {selected,gens}=selection,minimum=Math.min(...gens.values());
  const people=selected.map(id=>{
   const h=graph.named.get(id),parents=[h.sire,h.dam].filter(Boolean);
-  const direct=parents.map(id=>graph.all.get(id)?.name||id).join('・');
+  const readableName=parentId=>{
+   const parent=graph.all.get(parentId);
+   return parent?.named&&typeof parent.name==='string'&&!/^Q[1-9]\d*$/.test(parent.name)?parent.name:null;
+  };
+  const sireName=h.sire?readableName(h.sire):null,damName=h.dam?readableName(h.dam):null;
+  const summary=sireName?`父は${sireName}。`:damName?`母は${damName}。`:'父母の馬名は未取得です。';
+  const detail=`父：${h.sire?sireName||'馬名未取得':'データなし'}／母：${h.dam?damName||'馬名未取得':'データなし'}`;
   return {id,name:h.name,short:h.name,generation:gens.get(id)-minimum,parents,spouses:[],
-   clues:['Wikidataに登録された競走馬。',direct?`登録上の父・母：${direct}`:'父・母の登録情報がありません。'],
+   clues:[summary,detail],
    source:{label:`Wikidata: ${h.name}`,url:h.source}};
  });
  const stage={id:`horse-generated:${snapshot.version}:${HORSE_GENERATOR_VERSION}:${String(seed)}`,title:'競走馬の血統（自動生成）',category:'競走馬',tag:'父母・産駒・きょうだい',symbol:'馬',anchor:selected[0],people,

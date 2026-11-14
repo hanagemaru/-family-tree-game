@@ -25,14 +25,15 @@ class Element{
 }
 let run=0;
 export async function loadApp(saved){
- const originals=new Map(['document','window','localStorage','ResizeObserver','requestAnimationFrame','cancelAnimationFrame','setInterval','performance'].map(key=>[key,Object.getOwnPropertyDescriptor(globalThis,key)]));
+ const originals=new Map(['document','window','localStorage','ResizeObserver','requestAnimationFrame','cancelAnimationFrame','setInterval','performance','fetch'].map(key=>[key,Object.getOwnPropertyDescriptor(globalThis,key)]));
  const env={now:0,timers:[]},root=new Element('document',env);root.innerHTML=readFileSync(new URL('../index.html',import.meta.url),'utf8');
  const document=root;document.getElementById=id=>root.querySelector('#'+id);document.body=root.querySelector('body');document.hidden=false;
  const window=new Element('window',env);window.scrollTo=()=>{};
  const values=new Map(saved?[['family-tree-game:v1',JSON.stringify(saved)]]:[]);
- const globals={document,window,localStorage:{getItem:key=>values.get(key)||null,setItem:(key,value)=>values.set(key,value)},ResizeObserver:class{observe(){}},requestAnimationFrame:()=>1,cancelAnimationFrame:()=>{},setInterval:fn=>{env.timers.push(fn);return env.timers.length;},performance:{now:()=>env.now}};
+ const globals={document,window,localStorage:{getItem:key=>values.get(key)||null,setItem:(key,value)=>values.set(key,value)},ResizeObserver:class{observe(){}},requestAnimationFrame:()=>1,cancelAnimationFrame:()=>{},setInterval:fn=>{env.timers.push(fn);return env.timers.length;},performance:{now:()=>env.now},fetch:async()=>({ok:true,json:async()=>JSON.parse(readFileSync(new URL('../data/horse-pedigree.v1.json',import.meta.url),'utf8'))})};
  for(const [key,value] of Object.entries(globals))Object.defineProperty(globalThis,key,{value,writable:true,configurable:true});
  await import(`../src/app.js?dom-test=${++run}`);
+ await Promise.resolve();await Promise.resolve();
  const $=id=>document.getElementById(id);
  return {$,window,document,storage:()=>JSON.parse(values.get('family-tree-game:v1')),advance(ms){env.now+=ms;env.timers.forEach(fn=>fn());},restore(){for(const [key,descriptor] of originals)if(descriptor)Object.defineProperty(globalThis,key,descriptor);else delete globalThis[key];}};
 }
