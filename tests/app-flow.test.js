@@ -3,6 +3,8 @@ import {loadApp} from './dom-harness.js';import {newGame,pack,relations,fitCamer
 import {readFileSync} from 'node:fs';import {restoreRandomHorseSession} from '../src/random-horse-session.js';
 import {findPlayablePlacement} from '../src/game-assistance.js';
 const horseSnapshot=JSON.parse(readFileSync(new URL('../data/horse-pedigree.v1.json',import.meta.url),'utf8'));
+const fameSnapshot=JSON.parse(readFileSync(new URL('../data/horse-fame-2026-10.v1.json',import.meta.url),'utf8'));
+const difficultyDescriptor=saved=>saved.randomHorseByDifficulty[saved.randomDifficulty||'normal'];
 function fixture(){const state=newGame(stages[0]);state.hand=['ieyasu','go','iemitsu','tadanaga','sen'];state.deck=['yoshinao','yorinobu','yorifusa'];return {sessions:{tokugawa:pack(state)},best:{}};}
 async function setup(t){const app=await loadApp(fixture());t.after(()=>app.restore());app.$('stage-list').querySelector('[data-start="tokugawa"]').click();return app;}
 function select(app,id='iemitsu'){app.$('hand').querySelector(`[data-card="${id}"]`).click({detail:0});}
@@ -106,15 +108,15 @@ test('random horse mode saves and restores the exact generated question, then re
  let saved;
  try{
   const button=first.$('stage-list').querySelector('[data-random-start]');assert.equal(button.disabled,false);button.click();
-  saved=structuredClone(first.storage());assert.equal(saved.randomHorse.cardIds.length,18);assert.ok(saved.sessions[saved.randomHorse.stageId]);
-  assert.match(first.$('stage-title').textContent,/自動生成/);
+  saved=structuredClone(first.storage());assert.equal(difficultyDescriptor(saved).cardIds.length,18);assert.ok(saved.sessions[difficultyDescriptor(saved).stageId]);
+  assert.match(first.$('stage-title').textContent,/中級/);
  }finally{first.restore();}
  const resumed=await loadApp(saved);t.after(()=>resumed.restore());
  resumed.$('stage-list').querySelector('[data-random-start]').click();
- const before=structuredClone(resumed.storage().randomHorse);assert.deepEqual(resumed.storage().sessions[before.stageId],saved.sessions[before.stageId]);
+ const before=structuredClone(difficultyDescriptor(resumed.storage()));assert.deepEqual(resumed.storage().sessions[before.stageId],saved.sessions[before.stageId]);
  resumed.$('menu-button').click();resumed.$('modal-content').querySelector('[data-action="random-retry-confirm"]').click();resumed.$('modal-content').querySelector('[data-action="random-retry"]').click();
- const after=resumed.storage().randomHorse;assert.notEqual(after.seed,before.seed);assert.equal(after.cardIds.length,18);assert.ok(resumed.storage().sessions[after.stageId]);
- const stage=restoreRandomHorseSession(horseSnapshot,after).stage;let turns=0;
+ const after=difficultyDescriptor(resumed.storage());assert.notEqual(after.seed,before.seed);assert.equal(after.cardIds.length,18);assert.ok(resumed.storage().sessions[after.stageId]);
+ const stage=restoreRandomHorseSession(horseSnapshot,after,{fameSnapshot}).stage;let turns=0;
  while(turns++<30){const session=resumed.storage().sessions[after.stageId];if(session.complete)break;const byId=id=>stage.people.find(person=>person.id===id);const move=session.hand.flatMap(card=>session.placed.flatMap(anchor=>relations(byId(card),byId(anchor)).map(relation=>({card,anchor,relation}))))[0];
   assert.ok(move,'random UI should always offer a legal move');select(resumed,move.card);target(resumed,move.anchor);commitRelation(resumed,move.relation);
  }
@@ -124,8 +126,8 @@ test('random horse mode saves and restores the exact generated question, then re
 test('random horse hints identify a visible counterpart and the correct relationship',async t=>{
  const app=await loadApp(fixture());t.after(()=>app.restore());
  app.$('stage-list').querySelector('[data-random-start]').click();
- const saved=app.storage(),descriptor=saved.randomHorse;
- const stage=restoreRandomHorseSession(horseSnapshot,descriptor).stage;
+ const saved=app.storage(),descriptor=difficultyDescriptor(saved);
+ const stage=restoreRandomHorseSession(horseSnapshot,descriptor,{fameSnapshot}).stage;
  const session={...saved.sessions[descriptor.stageId],stage},move=findPlayablePlacement(session);
  assert.ok(move);
  const anchor=stage.people.find(person=>person.id===move.anchorId);
@@ -146,7 +148,7 @@ test('random horse hints identify a visible counterpart and the correct relation
 test('answer reveal is always available, saves the diagram and never grants a win',async t=>{
  const app=await loadApp(fixture());t.after(()=>app.restore());
  app.$('stage-list').querySelector('[data-random-start]').click();
- const descriptor=app.storage().randomHorse;
+ const descriptor=difficultyDescriptor(app.storage());
  app.$('menu-button').click();
  assert.ok(app.$('modal-content').querySelector('[data-action="give-up-confirm"]'));
  app.$('modal-content').querySelector('[data-action="give-up-confirm"]').click();
@@ -335,7 +337,7 @@ test('future-connected hand cards can consume both hints without being auto-sele
  const app=await loadApp(fixture());t.after(()=>app.restore());
  app.$('stage-list').querySelector('[data-random-start]').click();
  let candidate=app.$('hand').querySelector('[data-card]');
- const stage=app.storage().randomHorse;
+ const stage=difficultyDescriptor(app.storage());
  assert.ok(stage);
  // Every hand card can reveal at least its first clue. Keep its selection stable.
  const id=candidate.dataset.card;
