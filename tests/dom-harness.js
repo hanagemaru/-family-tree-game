@@ -30,7 +30,7 @@ export async function loadApp(saved){
  const document=root;document.getElementById=id=>root.querySelector('#'+id);document.body=root.querySelector('body');document.hidden=false;
  const window=new Element('window',env);window.scrollTo=()=>{};
  const values=new Map(saved?[['family-tree-game:v1',JSON.stringify(saved)]]:[]);
- const globals={document,window,localStorage:{getItem:key=>values.get(key)||null,setItem:(key,value)=>values.set(key,value)},ResizeObserver:class{observe(){}},requestAnimationFrame:()=>1,cancelAnimationFrame:()=>{},setInterval:fn=>{env.timers.push(fn);return env.timers.length;},performance:{now:()=>env.now},fetch:async()=>({ok:true,json:async()=>JSON.parse(readFileSync(new URL('../data/horse-pedigree.v1.json',import.meta.url),'utf8'))})};
+ const globals={document,window,localStorage:{getItem:key=>values.get(key)||null,setItem:(key,value)=>values.set(key,value)},ResizeObserver:class{observe(){}},requestAnimationFrame:()=>1,cancelAnimationFrame:()=>{},setInterval:fn=>{env.timers.push(fn);return env.timers.length;},performance:{now:()=>env.now},fetch:async path=>({ok:true,json:async()=>JSON.parse(readFileSync(new URL(path.includes('horse-fame')?'../data/horse-fame-2026-10.v1.json':'../data/horse-pedigree.v1.json',import.meta.url),'utf8'))})};
  for(const [key,value] of Object.entries(globals))Object.defineProperty(globalThis,key,{value,writable:true,configurable:true});
  await import(`../src/app.js?dom-test=${++run}`);
  await Promise.resolve();await Promise.resolve();

@@ -1,0 +1,26 @@
+name: Easy beginner fame benchmark
+on:
+  push:
+    branches: ['feature/horse-fame-difficulty-20261115']
+    paths: ['.github/workflows/horse-easier-beginner.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Compare beginner v3 vs v4 across 100 seeds
+        run: |
+          node scripts/benchmark-easier-beginner.mjs --runs=100 --output=artifacts/horse-easy-v4-benchmark.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: easier-beginner-100-seed-benchmark
+          path: artifacts/horse-easy-v4-benchmark.json
+          if-no-files-found: warn

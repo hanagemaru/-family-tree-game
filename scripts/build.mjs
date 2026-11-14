@@ -4,4 +4,5 @@ await mkdir('dist');
 await mkdir('dist/data');
 for(const path of ['index.html','style.css','sports-card.css','src','favicon.svg']) await cp(path,`dist/${path}`,{recursive:true});
 await cp('data/horse-pedigree.v1.json','dist/data/horse-pedigree.v1.json');
+await cp('data/horse-fame-2026-10.v1.json','dist/data/horse-fame-2026-10.v1.json');
 console.log('Built static game in dist/');
