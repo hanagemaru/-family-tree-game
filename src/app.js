@@ -157,9 +157,7 @@ function renderHint(){
 }
 function revealHint(){
  if(!selected){say('ヒントを見るカードを、手札から選んでください。');return;}
- if(isRandomHorseStage(state.stage)&&!findCorrectPlacement(state,selected)){
-  say('この馬はまだ盤面につながりません。ほかの手札を選んでください。');return;
- }
+
  state.hints[selected]=Math.min(2,(state.hints[selected]||0)+1);
  renderHint();renderStats();persist();
 }
@@ -247,7 +245,7 @@ function attempt(relation){
  if(!selected||!targetAnchor)return;const id=selected,anchor=targetAnchor,p=person(id),a=person(anchor),beforeHand=[...state.hand],outcome=place(state,id,anchor,relation);
  if(!outcome.ok){if(outcome.reason==='relation'){if(!modal.open)chooseRelations(anchor);const message=`${p.name}は${a.name}の「${relationName(relation)}」ではなさそうです。`;say(message,true);if($('placement-error'))$('placement-error').textContent=message;const button=$('modal-content').querySelector(`[data-place-relation="${relation}"]`);if(button)button.disabled=true;}renderStats();persist();return;}
  clearDragPreview();const oldAnchor=state.positions[anchor];state.positions=layoutFamily(state);camera.x+=(oldAnchor.x-state.positions[anchor].x)*camera.scale;camera.y+=(oldAnchor.y-state.positions[anchor].y)*camera.scale;lineFocus=null;
- selected=null;closeDialog();clearTargets();renderBoard(id);renderHand();animateDraw(beforeHand);renderStats();renderHint();camera=revealCamera(camera,state.positions[id],board.clientWidth,board.clientHeight);updateTransform(true);say(`${p.name}が、${a.name}の${relationName(relation)}としてつながりました。`);persist();
+ selected=null;closeDialog();clearTargets();renderBoard(id);renderHand();animateDraw(beforeHand);renderStats();renderHint();fit(true);say(`${p.name}が、${a.name}の${relationName(relation)}としてつながりました。`);persist();
  if(state.complete){records.best[state.stage.id]={elapsed:state.elapsed,mistakes:state.mistakes,hints:hintCount()};persist();results();}
 }
 function showAnswer(){
