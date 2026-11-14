@@ -26,7 +26,7 @@ class HorseFameTests(unittest.TestCase):
             "Q2": {"project": None, "article": None, "sitelinks": 0},
         }
         with patch.object(fame, "wikidata_sitelinks", return_value=links), \
-                patch.object(fame, "views_for", return_value=1234) as pageviews:
+                patch.object(fame, "views_for", side_effect=lambda item, start, end: 1234 if item["project"] else None) as pageviews:
             result = fame.collect(pedigree, "2026-10", workers=1)
         self.assertEqual(result["period"], {"from": "2025-11-01", "through": "2026-10-31"})
         self.assertEqual(result["coverage"]["named"], 2)
@@ -36,7 +36,7 @@ class HorseFameTests(unittest.TestCase):
         self.assertEqual(result["horses"][1]["views12m"], None)
         self.assertTrue(result["horses"][0]["jraHall"])
         self.assertEqual(result["horses"][1]["articleUrl"], None)
-        pageviews.assert_called_once()
+        self.assertEqual(pageviews.call_count, 2)
 
 
 if __name__ == "__main__":
