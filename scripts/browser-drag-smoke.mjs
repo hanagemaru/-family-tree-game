@@ -28,7 +28,22 @@ try{
   await page.addInitScript(data=>localStorage.setItem('family-tree-game:v1',JSON.stringify(data)),
    {sessions:{tokugawa:pack(game)},best:{}});
   await page.goto('http://127.0.0.1:5177/',{waitUntil:'networkidle'});
-  await page.locator('[data-start="tokugawa"]').click();
+  assert.match(await page.title(),/^競走馬血統ならべ/);
+  assert.equal(await page.locator('#stage-list .stage-card').count(),2,name+' shows two horse modes only');
+  assert.equal(await page.locator('[data-start="tokugawa"]').count(),0,name+' history mode must not be public');
+  assert.ok(await page.locator('[data-random-start]').count(),name+' random horse CTA');
+  assert.ok(await page.locator('[data-start="thoroughbred"]').count(),name+' fixed horse CTA');
+  await page.screenshot({path:`artifacts/browser-drag/${name}-release-home.png`,fullPage:true});
+  console.log('BROWSER_RELEASE_HOME_PASS',name);
+  // The Tokugawa stage remains in the source for a future app. Legacy
+  // gesture regression tests open it using an in-memory test-only button
+  // that never exists on the public landing page.
+  await page.evaluate(()=>{
+   const button=document.createElement('button');
+   button.dataset.start='tokugawa';
+   document.querySelector('#stage-list').append(button);
+   button.click();
+  });
   const count=async()=>Number(await page.locator('#placed-count').textContent());
   const dragToChild=async()=>{
    const handRect=await get(page,'[data-card="iemitsu"]');
