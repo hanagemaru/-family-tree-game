@@ -57,18 +57,32 @@ def chunks(items, n):
 
 
 def wikidata_sitelinks(horses):
+    """Verify Japanese article identity via its own Wikibase QID page property.
+
+    This avoids Wikidata's 429 response to a bulk query. Candidate Wikipedia
+    titles may be ambiguous, but ONLY a pageprop matching the exact QID is
+    accepted. No name-only match is ever admitted.
+    """
+    by_id={h["id"]:h for h in horses}
+    choices=[]
+    for h in horses:
+        for title in (h["name"],h["name"]+" (競走馬)",h["name"]+" (日本の競走馬)"):
+            choices.append(title)
     result={}
-    for batch in chunks(horses,45):
-        payload=api("www.wikidata.org",{
-            "action":"wbgetentities","ids":"|".join(h["id"] for h in batch),
-            "props":"sitelinks","format":"json"
-        },"Wikidata sitelinks")
-        for qid,entity in payload.get("entities",{}).items():
-            if "missing" in entity: continue
-            sites=entity.get("sitelinks",{})
-            result[qid]={lang:sites[f"{lang}wiki"]["title"]
-                for lang in ("ja","en") if f"{lang}wiki" in sites}
-        time.sleep(.22)
+    for index,batch in enumerate(chunks(list(dict.fromkeys(choices)),25)):
+        payload=api("ja.wikipedia.org",{
+            "action":"query","prop":"pageprops","ppprop":"wikibase_item",
+            "titles":"|".join(batch),"redirects":"1",
+            "format":"json","formatversion":"2"
+        },"Japanese Wikipedia identity")
+        for page in payload.get("query",{}).get("pages",[]):
+            qid=page.get("pageprops",{}).get("wikibase_item")
+            if qid in by_id and "missing" not in page:
+                result[qid]={"ja":page["title"]}
+        if (index+1)%10==0:
+            print("IDENTITIES",min(len(choices),(index+1)*25),"/",len(choices),
+                  "identified",len(result),flush=True)
+        time.sleep(.47)
     return result
 
 
@@ -178,7 +192,7 @@ def main():
     missing=all_missing if args.limit<=0 else all_missing[:args.limit]
     counts=Counter()
     sitelinks=wikidata_sitelinks(missing)
-    print("Wikidata sitelinks:",len(sitelinks),"for",len(missing),"missing dams",flush=True)
+    print("Wikimedia QID-linked articles:",len(sitelinks),"for",len(missing),"missing dams",flush=True)
     verified={}
     for lang in ("ja","en"):
         wanted=[(h["id"],sitelinks[h["id"]][lang]) for h in missing
