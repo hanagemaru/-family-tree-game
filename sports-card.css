@@ -1,0 +1,329 @@
+/*
+ * Sports-card / card-puzzle visual refresh.
+ * Restrained hobby game graphics: flat ink, clear numbers, print-like
+ * illustration panels. No premium metallic motifs or generated portraits.
+ * Main gameplay only; the historical and horse stages share these controls.
+ */
+body.playing #game-screen {
+ --sport-ink:#172C41;
+ --sport-ink-soft:#39536A;
+ --sport-paper:#F6F8F9;
+ --sport-accent:#E77848;
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",sans-serif;
+}
+body.playing #game-screen .game-heading {
+ background:#172A3D;
+ border-bottom:1px solid #304459;
+ padding:8px 16px 6px;
+ flex-basis:50px;
+}
+body.playing #game-screen .game-heading h1 {
+ color:#F5F7F9;
+ font-family:inherit;font-size:16px;font-weight:850;
+ letter-spacing:-.035em;
+}
+body.playing #game-screen .game-heading:before{
+ content:"";height:26px;width:5px;flex:0 0 5px;
+ margin-right:7px;background:#F48B5B;
+ transform:skewX(-12deg);
+}
+body.playing #game-screen #menu-button {
+ border:1px solid #54687B;border-radius:9px;
+ background:#213A51;color:#F3F6F8;
+ height:36px;width:36px;min-height:36px;
+}
+body.playing #game-screen .stats {
+ background:#172A3D;flex-basis:29px;
+ padding:0 17px 5px;color:#CAD8E3;
+ font-size:12px;font-weight:700;
+}
+body.playing #game-screen .stats b {
+ color:#FFFFFF;font-weight:900;
+ font-size:17px;letter-spacing:-.03em;
+}
+body.playing #game-screen .stats>span:nth-child(2) b{color:#FFAE8F}
+body.playing #game-screen .progress{
+ flex-basis:4px;height:4px;background:#304A60;
+}
+body.playing #game-screen #progress-fill{background:#F48B5B}
+body.playing #game-screen .play-layout{
+ background:#273C52;
+ box-shadow:none;
+}
+body.playing #game-screen .play-layout:before {
+ z-index:0;
+ background:linear-gradient(180deg,#D4E0E909,transparent 44%);
+}
+body.playing #game-screen .play-area{z-index:1}
+body.playing #game-screen .board-paper{
+ opacity:.36;
+ background-image:linear-gradient(#D5E0E90C 1px,transparent 1px),
+ linear-gradient(90deg,#D5E0E90C 1px,transparent 1px);
+ background-size:26px 26px;
+}
+body.playing #game-screen #edges path{
+ stroke:#D1DFEA;stroke-width:2;
+}
+body.playing #game-screen #edges .spouse{stroke:#B5C6D5;stroke-width:2}
+body.playing #game-screen #edges .sibling{stroke:#B5C6D5}
+body.playing #game-screen #board .board-tools{
+ bottom:9px;right:12px;background:#15293AD9;
+ border:1px solid #526980;
+ border-radius:10px;box-shadow:0 3px 0 #101F2B42;
+ backdrop-filter:none;
+}
+body.playing #game-screen #board .board-tools .icon-button,
+body.playing #game-screen #board .board-tools .text-button{
+ color:#E8F2FA;font-weight:800;font-size:13px;
+}
+body.playing #game-screen .hand-section{
+ width:100%;max-width:730px;
+ padding:8px 14px max(9px,env(safe-area-inset-bottom));
+ background:linear-gradient(180deg,#172B41,#152639);
+ border-top:3px solid #F48B5B;
+ isolation:isolate;
+}
+body.playing #game-screen .hand-track{gap:5px}
+body.playing #game-screen .hand{padding:14px 0 4px}
+body.playing #game-screen .stock-pile{flex-basis:48px;width:48px;padding-bottom:10px}
+body.playing #game-screen .stock-cards{width:38px;height:58px;filter:none}
+body.playing #game-screen .stock-sheet{
+ width:36px;height:53px;border:2px solid #6D90AA;
+ border-radius:5px;
+ background:#31516A;
+ box-shadow:none;
+}
+body.playing #game-screen .stock-top:before{
+ transform:none;inset:7px;border:1px solid #A9C0CF;
+ border-radius:3px;background:linear-gradient(140deg,transparent 47%,#6D90AA 47% 53%,transparent 53%);
+}
+body.playing #game-screen .stock-emblem{color:#DDE7EC;font-size:19px}
+body.playing #game-screen .stock-count{color:#B5C5D4;font-size:10px}
+body.playing #game-screen .hand-footer{min-height:24px;margin:0;padding:0}
+body.playing #game-screen .hand-footer>span{
+ color:#B5C6D5;font-weight:750;font-size:11px;
+}
+body.playing #game-screen .hand-count{font-variant-numeric:tabular-nums}
+
+/* One color coding system for hand, field and floating drag card. */
+body.playing #game-screen .hand-card,
+body.playing #game-screen #board .table-card,
+#drag-ghost {
+ --sport-card:#59758B;
+ --sport-pale:#D8E5EE;
+ --sport-shadow:#2E465B;
+}
+body.playing #game-screen .hand-card.sex-male,
+body.playing #game-screen #board .table-card.sex-male,
+#drag-ghost.sex-male{--sport-card:#2E68AE;--sport-pale:#CBE0F3;--sport-shadow:#244E7D}
+body.playing #game-screen .hand-card.sex-female,
+body.playing #game-screen #board .table-card.sex-female,
+#drag-ghost.sex-female{--sport-card:#B45276;--sport-pale:#F0D7E2;--sport-shadow:#85465C}
+body.playing #game-screen .hand-card.sex-gelding,
+body.playing #game-screen #board .table-card.sex-gelding,
+#drag-ghost.sex-gelding{--sport-card:#278975;--sport-pale:#D5EEE4;--sport-shadow:#206755}
+body.playing #game-screen .hand-card.sex-unknown,
+body.playing #game-screen #board .table-card.sex-unknown,
+#drag-ghost.sex-unknown{--sport-card:#667788;--sport-pale:#D9DFE6;--sport-shadow:#455360}
+
+/* Matte printed trading cards. Thick accent rail, no foil/no shine. */
+body.playing #game-screen .hand-card,
+body.playing #game-screen .hand-card.horse,
+body.playing #game-screen #board .table-card,
+body.playing #game-screen #board .table-card.horse{
+ color:var(--sport-ink)!important;
+ background:#F6F8F9!important;
+ border:2px solid var(--sport-card)!important;
+ border-bottom-width:5px!important;
+ border-radius:9px!important;
+ box-shadow:0 3px 0 var(--sport-shadow),0 7px 12px #0D213146!important;
+ text-shadow:none!important;
+}
+body.playing #game-screen .hand-card{
+ flex-basis:22.5%;width:22.5%;
+ padding:5px 4px 5px;
+ transform:translateY(calc((var(--slot) - 2)*(var(--slot) - 2)*1px))
+ rotate(calc((var(--slot) - 2)*1.5deg));
+}
+body.playing #game-screen .hand-card:before,
+body.playing #game-screen .hand-card:after,
+body.playing #game-screen #board .table-card:before,
+body.playing #game-screen #board .table-card:after{
+ display:none!important;content:none!important;
+}
+body.playing #game-screen .hand-card .card-corner,
+body.playing #game-screen #board .table-card .card-corner{
+ z-index:4;left:6px;top:6px;
+ font-family:Impact,"Arial Narrow",system-ui,sans-serif;
+ font-size:11px;font-weight:850;letter-spacing:0;
+ color:var(--sport-card);
+ text-shadow:none;
+}
+body.playing #game-screen .hand-card .card-sex,
+body.playing #game-screen #board .table-card .card-sex{
+ top:3px;right:4px;z-index:4;
+ background:var(--sport-card)!important;color:#FFFFFF!important;
+ border:0!important;
+ min-width:24px;min-height:22px;padding:2px 4px;
+ font-size:12px;font-weight:900;border-radius:4px;
+ box-shadow:none;letter-spacing:0;
+}
+body.playing #game-screen .hand-card .card-art,
+body.playing #game-screen #board .table-card .card-art{
+ inset:28px 5px 41px;
+ border-radius:4px 4px 2px 2px;overflow:hidden;
+ background:
+ linear-gradient(150deg,transparent 0 40%,#FFFFFF9E 40% 43%,transparent 43% 49%,#FFFFFF55 49% 51%,transparent 51%),
+ linear-gradient(145deg,var(--sport-pale),#F1F5F7 68%);
+}
+body.playing #game-screen .hand-card .card-track-lines,
+body.playing #game-screen #board .table-card .card-track-lines{
+ position:absolute;inset:auto -10px 0 -12px;height:11px;
+ background:repeating-linear-gradient(115deg,var(--sport-card) 0 11px,transparent 11px 19px);
+ opacity:.9;
+ transform:skewY(-7deg);z-index:2;
+}
+body.playing #game-screen .hand-card .card-art svg,
+body.playing #game-screen #board .table-card .card-art svg,
+body.playing #game-screen .hand-card.horse .card-art svg,
+body.playing #game-screen #board .table-card.horse .card-art svg{
+ width:100%;height:105%;z-index:1;
+ fill:var(--sport-card)!important;
+ transform:translate(5px,5px) rotate(-5deg);
+ filter:none!important;opacity:.93;
+}
+body.playing #game-screen .hand-card .card-name,
+body.playing #game-screen #board .table-card .card-name,
+body.playing #game-screen .hand-card.horse .card-name,
+body.playing #game-screen #board .table-card.horse .card-name{
+ position:relative;z-index:3;
+ width:100%;min-height:30px;margin:0;
+ display:grid;place-items:center;
+ padding:5px 1px 1px;
+ border-top:2px solid var(--sport-card);
+ background:transparent!important;
+ box-shadow:none!important;
+ color:#15283D!important;text-shadow:none!important;
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif!important;
+ font-size:11px;font-weight:850;line-height:1.19;
+ letter-spacing:-.06em;word-break:normal;overflow-wrap:anywhere;
+ text-align:center;
+}
+body.playing #game-screen .hand-card.horse .card-name{
+ font-size:clamp(9px,2.5vw,12px);
+ min-height:31px;word-break:normal;
+}
+body.playing #game-screen .hand-card small,
+body.playing #game-screen #board .table-card small{
+ position:relative;display:none!important;
+}
+body.playing #game-screen #board .table-card{
+ padding:6px 5px 7px;
+}
+body.playing #game-screen #board .table-card .card-art{
+ inset:25px 6px 43px;
+}
+body.playing #game-screen #board .table-card .card-name{
+ min-height:38px;font-size:12px;line-height:1.16;
+}
+body.playing #game-screen #board .table-card.anchor{
+ outline:2px solid #99B9CB;outline-offset:2px;
+}
+body.playing #game-screen #board .table-card.targeted{
+ outline:3px solid #F7BC67;outline-offset:4px;
+}
+body.playing #game-screen #board .table-card.line-focused{
+ outline:2px solid #9FC9D8;outline-offset:3px;
+}
+body.playing #game-screen #board.overview .table-card .card-name{
+ font-size:14px;line-height:1.12;min-height:43px;
+ background:#F6F8F9!important;
+}
+body.playing #game-screen .hand-card.selected,
+body.playing #game-screen .hand-card.horse.selected{
+ z-index:9;
+ transform:translateY(-19px) rotate(0);
+ box-shadow:0 0 0 3px #F4C274,0 4px 0 var(--sport-shadow),0 12px 18px #0B223A88!important;
+}
+body.playing #game-screen .hand-card:hover:not(.selected){
+ transform:translateY(-7px) rotate(0);
+}
+body.playing #game-screen .hand-card.dragging{opacity:.28}
+body.playing #game-screen .hand-card.selected:after{display:none!important}
+body.playing #game-screen .hand-card .card-art{inset:25px 5px 35px}
+body.playing #game-screen #drag-ghost{
+ color:var(--sport-ink);border-color:var(--sport-card);
+ background:#F6F8F9;box-shadow:0 4px 12px #10203166;
+}
+body.playing #game-screen #drag-ghost.in-board{
+ background:#EF9A5C;border-color:#FCE5C0;
+}
+/* Hint belongs to the selected card, not the footer. The button is a
+ * separate accessible control, not nested inside the draggable card. */
+body.playing #game-screen .card-hint-button{
+ position:absolute;z-index:20;
+ display:flex;align-items:center;justify-content:center;gap:4px;
+ min-width:92px;min-height:44px;
+ padding:6px 11px;border:2px solid #1B3348;border-radius:9px;
+ background:#F8D777;color:#172D3E;
+ font-size:12px;font-weight:850;white-space:nowrap;
+ box-shadow:0 3px 0 #A68737,0 7px 13px #0A20365E;
+ touch-action:manipulation;
+}
+body.playing #game-screen .card-hint-button svg{
+ width:18px;height:18px;flex:none;
+}
+body.playing #game-screen .card-hint-button::after{
+ content:"";position:absolute;right:22px;bottom:-7px;
+ width:10px;height:10px;background:#F8D777;
+ border-right:2px solid #1B3348;border-bottom:2px solid #1B3348;
+ transform:rotate(45deg);pointer-events:none;
+}
+body.playing #game-screen .card-hint-button:active{
+ transform:translateY(2px);box-shadow:0 1px 0 #A68737;
+}
+body.playing #game-screen .hand-section .hint-box{
+ position:absolute;z-index:19;
+ bottom:calc(100% + 6px);right:auto;
+ width:calc(100% - 28px);max-width:320px;
+ margin:0;padding:11px 14px;
+ border:1px solid #A4B6C4;border-left:5px solid #E4A747;
+ border-radius:8px;
+ background:#F6F8F9;color:#1C3349;
+ box-shadow:0 5px 16px #122C3F65;
+ font-size:12px;line-height:1.65;
+}
+body.playing #game-screen .hand-section .hint-box small{
+ color:#52677B;
+}
+/* Directional slot feedback remains functional without glitter/glow. */
+body.playing #game-screen #board #drag-preview{
+ border-color:#BBD9E5;background:#2A4B61A8;
+ box-shadow:0 1px 0 #132B3A;color:#F2F6F8;
+}
+body.playing #game-screen #board #drag-preview.over-slot{
+ border-color:#FAD77C;background:#405A67;
+ box-shadow:0 0 0 2px #D1B269A8;
+}
+body.playing #game-screen #board #drag-preview.armed{
+ border-color:#D5FFAA;background:#E0F5C7;
+ color:#193648;box-shadow:0 0 0 2px #80B98E;
+}
+body.playing #game-screen .status{
+ background:#1B344C;border:1px solid #6C859A;color:#F4F8FA;
+ box-shadow:0 5px 14px #15293C77;
+}
+body.playing .placement-dialog .relation-choice,
+body.playing #game-screen .button {
+ border-radius:9px;
+}
+@media(min-width:721px){
+ body.playing #game-screen .game-heading{padding-inline:30px}
+ body.playing #game-screen .hand-section{padding-inline:30px}
+ body.playing #game-screen .hand-card .card-art{inset:28px 8px 46px}
+ body.playing #game-screen .hand-card.horse .card-name{font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){
+ body.playing #game-screen .hand-card,
+ body.playing #game-screen #board .table-card{transition:none!important}
+}
