@@ -6,7 +6,7 @@ const snapshot=JSON.parse(readFileSync(new URL('../data/horse-pedigree.v1.json',
 
 test('supplemental JBIS dam facts match a unique QID, Japanese name, and birth year',()=>{
  const records=Object.entries(verifiedParentNames);
- assert.equal(records.length,15);
+ assert.equal(records.length,22);
  const byId=new Map(snapshot.horses.map(h=>[h.id,h]));
  for(const [id,record] of records){
   assert.match(id,/^Q[1-9]\d+$/);
