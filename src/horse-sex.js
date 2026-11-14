@@ -48,3 +48,5 @@ export function horseSex(id,snapshot){
  return fromWikidata||inferred||fixedSex[id]||null;
 }
 export function horseSexLabel(sex){return sex==='male'?'牡':sex==='female'?'牝':sex==='gelding'?'セ':'不明';}
+
+export function horseSexTone(sex){return sex==='male'?'sex-male':sex==='female'?'sex-female':sex==='gelding'?'sex-gelding':'sex-unknown';}
