@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {loadApp} from './dom-harness.js';
 import {newGame,pack} from '../src/core.js';
 import {generateRandomHorseSession} from '../src/random-horse-session.js';
-import {seededRandom,HORSE_GENERATOR_VERSION,FAME_HORSE_GENERATOR_VERSION} from '../src/random-horse-stage.js';
+import {seededRandom,HORSE_GENERATOR_VERSION,FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE_GENERATOR_VERSION} from '../src/random-horse-stage.js';
 
 const pedigree=JSON.parse(readFileSync(new URL('../data/horse-pedigree.v1.json',import.meta.url),'utf8'));
 const levels=['easy','normal','hard'];
@@ -22,7 +22,7 @@ test('difficulty selector starts all three versions and saves them independently
   app.$('stage-list').querySelector('[data-random-start]').click();
   const saved=app.storage(),descriptor=saved.randomHorseByDifficulty[level];
   assert.ok(descriptor,level);
-  assert.equal(descriptor.generatorVersion,FAME_HORSE_GENERATOR_VERSION);
+  assert.equal(descriptor.generatorVersion,level==='easy'?EASIER_HORSE_GENERATOR_VERSION:FAME_HORSE_GENERATOR_VERSION);
   assert.equal(descriptor.difficulty,level);
   assert.equal(descriptor.cardIds.length,18);
   assert.ok(saved.sessions[descriptor.stageId],level);
@@ -73,4 +73,23 @@ test('legacy v2 saved horse session remains resumeable after new difficulty UI',
  legacy.click();
  assert.equal(app.$('stage-title').textContent,old.stage.title);
  assert.deepEqual(app.storage().sessions[old.stage.id],save);
+});
+
+test('old v3 beginner save remains accessible after the beginner difficulty reduction',async t=>{
+ const fameSnapshot=JSON.parse(readFileSync(new URL('../data/horse-fame-2026-10.v1.json',import.meta.url),'utf8'));
+ const old=generateRandomHorseSession(pedigree,'early-easy-2026',{version:FAME_HORSE_GENERATOR_VERSION,difficulty:'easy',fameSnapshot});
+ const oldState=pack(newGame(old.stage,seededRandom('deck:early-easy-2026')));
+ const app=await loadApp({sessions:{[old.stage.id]:oldState},best:{},randomHorseByDifficulty:{easy:old.descriptor},randomDifficulty:'easy'});
+ t.after(()=>app.restore());
+ assert.ok(app.$('stage-list').querySelector('[data-old-easy-start]'));
+ app.$('stage-list').querySelector('[data-random-start]').click();
+ const saved=app.storage();
+ assert.equal(saved.randomHorseByDifficulty.easy.generatorVersion,EASIER_HORSE_GENERATOR_VERSION);
+ assert.deepEqual(saved.randomHorseLegacyEasy,old.descriptor);
+ assert.deepEqual(saved.sessions[old.stage.id],oldState);
+ app.$('menu-button').click();
+ app.$('modal-content').querySelector('[data-action="home"]').click();
+ app.$('stage-list').querySelector('[data-old-easy-start]').click();
+ assert.equal(app.$('stage-title').textContent,old.stage.title);
+ assert.deepEqual(app.storage().sessions[old.stage.id],oldState);
 });
