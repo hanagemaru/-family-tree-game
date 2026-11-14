@@ -251,11 +251,11 @@ body.playing #game-screen .hand-card:hover:not(.selected){
 body.playing #game-screen .hand-card.dragging{opacity:.28}
 body.playing #game-screen .hand-card.selected:after{display:none!important}
 body.playing #game-screen .hand-card .card-art{inset:25px 5px 35px}
-body.playing #game-screen #drag-ghost{
+#drag-ghost{
  color:var(--sport-ink);border-color:var(--sport-card);
  background:#F6F8F9;box-shadow:0 4px 12px #10203166;
 }
-body.playing #game-screen #drag-ghost.in-board{
+#drag-ghost.in-board{
  background:#EF9A5C;border-color:#FCE5C0;
 }
 /* Hint belongs to the selected card, not the footer. The button is a
