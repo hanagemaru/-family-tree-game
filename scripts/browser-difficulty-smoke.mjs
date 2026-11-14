@@ -37,7 +37,7 @@ try{
    assert.equal(await page.locator('#nodes [data-node]').count(),1);
    const descriptor=await page.evaluate(level=>JSON.parse(localStorage.getItem('family-tree-game:v1')).randomHorseByDifficulty[level],difficulty);
    assert.equal(descriptor.difficulty,difficulty);
-   assert.equal(descriptor.generatorVersion,'horse-stage-v3');
+   assert.equal(descriptor.generatorVersion,difficulty==='easy'?'horse-stage-v4':'horse-stage-v3');
    assert.equal(descriptor.cardIds.length,18);
    stages[difficulty]=descriptor.stageId;
    await page.screenshot({path:'artifacts/browser-difficulty/'+engine+'-'+difficulty+'.png',fullPage:true});
