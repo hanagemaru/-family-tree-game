@@ -347,5 +347,5 @@ test('future-connected hand cards can consume both hints without being auto-sele
  app.$('hint-button').click();
  assert.match(app.$('hint-box').textContent,/ヒント 2/);
  assert.equal(app.$('hint-button').hidden,true);
- assert.equal(app.$('hand').querySelector('[data-card].selected').dataset.card,id);
+ assert.equal(app.$('hand').querySelector(`[data-card="${id}"]`).classList.contains('selected'),true);
 });
