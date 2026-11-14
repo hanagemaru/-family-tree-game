@@ -129,14 +129,14 @@ function toStage(snapshot,graph,selection,seed,version){
   const damName=(h.dam?readableName(h.dam):null)||extra?.name||null;
   const summary=sireName?`父は${sireName}。`:damName?`母は${damName}。`:'父母の馬名は未取得です。';
   const detail=`父：${h.sire?sireName||'馬名未取得':'未収録'}／母：${damName||'未収録'}`;
-  const source=extra?{label:`JBIS／Wikidata: ${h.name}`,url:extra.source}:{label:`Wikidata: ${h.name}`,url:h.source};
+  const source=extra?{label:`Wikipedia（馬名・母馬名）: ${h.name}`,url:extra.source}:{label:`Wikidata: ${h.name}`,url:h.source};
   return {id,name:h.name,short:h.name,sex:horseSex(id,snapshot),generation:gens.get(id)-minimum,parents,spouses:[],
    clues:[summary,detail],
    source};
  });
  const stage={id:`horse-generated:${snapshot.version}:${version}:${String(seed)}`,title:'競走馬の血統（自動生成）',category:'競走馬',tag:'父母・産駒・きょうだい',symbol:'馬',anchor:selected[0],people,
   summary:'父・母と産駒の関係をたどる18枚。',description:'登録済みの親子関係からシード固定で抽出。',
-  scope:'Wikidataの血統記録を元に作成。確認済みの一部母馬名はJBISの情報で補完。未収録は血統不明を意味しません。',sources:[{label:'Wikidata（CC0）',url:'https://www.wikidata.org/'},{label:'JBISサーチ（母馬名の一部を照合）',url:'https://www.jbis.or.jp/'}]};
+  scope:'Wikidataの親子IDを元に生成。日本語Wikipediaの記事と馬IDを照合して母馬名を補完しました。未収録は血統不明を意味しません。',sources:[{label:'Wikidata（CC0）',url:'https://www.wikidata.org/'},{label:'日本語Wikipedia（CC BY-SA 4.0・記事ごとに著者履歴あり）',url:'https://ja.wikipedia.org/wiki/Wikipedia:%E8%91%97%E4%BD%9C%E6%A8%A9'}]};
  return stage;
 }
 
