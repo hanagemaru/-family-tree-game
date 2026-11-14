@@ -12,7 +12,7 @@ test('actual app: tap hand and opponent, then choose a relation and complete pla
  const app=await setup(t);select(app);assert.match(app.$('selection-summary').textContent,/家光/);target(app);assert.equal(app.$('modal').open,true);assert.equal(app.$('modal-content').querySelectorAll('[data-place-relation]').length,4);assert.match(app.$('modal-content').textContent,/家光.*秀忠/s);commitRelation(app,'child');assert.equal(app.$('modal').open,false);assert.ok(app.$('nodes').querySelector('[data-node="iemitsu"]'));assert.equal(app.$('placed-count').textContent,'2');
 });
 test('actual app: cancel keeps the chosen hand card and offers a reliable opponent list',async t=>{
- const app=await setup(t);select(app);target(app);app.$('modal-close').click();assert.match(app.$('selection-summary').textContent,/家光/);assert.equal(app.$('choose-anchor-button').disabled,false);app.$('choose-anchor-button').click();app.$('modal-content').querySelector('[data-pick-anchor="hidetada"]').click();assert.ok(app.$('modal-content').querySelector('[data-place-relation="child"]'));
+ const app=await setup(t);select(app);target(app);app.$('modal-close').click();assert.match(app.$('selection-summary').textContent,/家光/);app.$('menu-button').click();app.$('modal-content').querySelector('[data-action="anchor-list"]').click();app.$('modal-content').querySelector('[data-pick-anchor="hidetada"]').click();assert.ok(app.$('modal-content').querySelector('[data-place-relation="child"]'));
 });
 test('actual app: wrong relation reports the error, preserves selection and allows correction',async t=>{
  const app=await setup(t);select(app);target(app);const wrong=app.$('modal-content').querySelector('[data-place-relation="parent"]');wrong.click();assert.equal(app.$('modal').open,true);assert.equal(app.$('mistake-count').textContent,'1');assert.ok(app.$('placement-error').textContent.length);wrong.click();assert.equal(app.$('mistake-count').textContent,'1');commitRelation(app,'child');assert.equal(app.$('placed-count').textContent,'2');
@@ -26,24 +26,43 @@ test('actual app: thinking time in a placement sheet counts, menu reading does n
 test('actual app: drag onto a card releases capture before showing stable relation buttons',async t=>{
  const app=await setup(t),hand=app.$('hand').querySelector('[data-card="iemitsu"]');hand.fire('pointerdown',{clientX:100,clientY:620});app.window.fire('pointermove',{clientX:196,clientY:366});app.window.fire('pointerup',{clientX:196,clientY:366});assert.equal(app.$('modal').open,true);assert.ok(app.$('modal-content').querySelector('[data-place-relation="child"]'));assert.equal(app.$('app').hasPointerCapture(1),false);assert.equal(app.$('drag-ghost').hidden,true);
 });
-test('actual app: dropping over empty board opens an explicit opponent list',async t=>{
- const app=await setup(t),hand=app.$('hand').querySelector('[data-card="iemitsu"]');hand.fire('pointerdown',{clientX:100,clientY:620});app.window.fire('pointermove',{clientX:40,clientY:250});app.window.fire('pointerup',{clientX:40,clientY:250});assert.ok(app.$('modal-content').querySelector('[data-pick-anchor="hidetada"]'));assert.equal(app.$('modal').open,true);
+test('actual app: dropping on empty board does not force an opponent dialog',async t=>{
+ const app=await setup(t),hand=app.$('hand').querySelector('[data-card="iemitsu"]');hand.fire('pointerdown',{clientX:100,clientY:620});app.window.fire('pointermove',{clientX:40,clientY:250});app.window.fire('pointerup',{clientX:40,clientY:250});assert.equal(app.$('modal').open,false);assert.match(app.$('selection-summary').textContent,/家光/);
 });
 test('actual app: pointer cancellation clears the ghost but preserves an actionable selection',async t=>{
- const app=await setup(t),hand=app.$('hand').querySelector('[data-card="iemitsu"]');hand.fire('pointerdown',{clientX:100,clientY:620});app.window.fire('pointermove',{clientX:196,clientY:366});app.window.fire('pointercancel');assert.equal(app.$('drag-ghost').hidden,true);assert.equal(app.$('app').hasPointerCapture(1),false);assert.equal(app.$('choose-anchor-button').disabled,false);
+ const app=await setup(t),hand=app.$('hand').querySelector('[data-card="iemitsu"]');hand.fire('pointerdown',{clientX:100,clientY:620});app.window.fire('pointermove',{clientX:196,clientY:366});app.window.fire('pointercancel');assert.equal(app.$('drag-ghost').hidden,true);assert.equal(app.$('app').hasPointerCapture(1),false);assert.equal(app.$('hint-button').hidden,false);
 });
 test('actual app: panning with a hand card selected does not accidentally open a placement sheet',async t=>{
  const app=await setup(t);select(app);const node=app.$('nodes').querySelector('[data-node="hidetada"]');node.fire('pointerdown',{clientX:196,clientY:330});app.window.fire('pointermove',{clientX:240,clientY:350});app.window.fire('pointerup',{clientX:240,clientY:350});assert.equal(app.$('modal').open,false);assert.match(app.$('selection-summary').textContent,/家光/);
 });
-test('actual app: change opponent and explicit selection reset remain usable',async t=>{
- const app=await setup(t);select(app);target(app);app.$('modal-content').querySelector('[data-action="change-anchor"]').click();assert.ok(app.$('modal-content').querySelector('[data-pick-anchor="hidetada"]'));app.$('modal-close').click();app.$('clear-selection-button').click();assert.equal(app.$('choose-anchor-button').disabled,true);select(app,'go');target(app);commitRelation(app,'spouse');assert.ok(app.$('nodes').querySelector('[data-node="go"]'));
+test('actual app: same hand card toggles selection, then a new card can be placed',async t=>{
+ const app=await setup(t);
+ select(app);assert.match(app.$('selection-summary').textContent,/家光/);
+ assert.equal(app.$('hint-button').hidden,false);
+ select(app);assert.equal(app.$('selection-summary').textContent,'');
+ assert.equal(app.$('hint-button').hidden,true);
+ select(app,'go');target(app);commitRelation(app,'spouse');
+ assert.ok(app.$('nodes').querySelector('[data-node="go"]'));
+});
+test('actual app: board blank tap cancels selection but board pan does not',async t=>{
+ const app=await setup(t);select(app);
+ app.$('board').fire('pointerdown',{clientX:20,clientY:180});
+ app.window.fire('pointerup',{clientX:20,clientY:180});
+ assert.equal(app.$('selection-summary').textContent,'');
+ assert.equal(app.$('hint-button').hidden,true);
+ select(app);
+ const node=app.$('nodes').querySelector('[data-node="hidetada"]');
+ node.fire('pointerdown',{clientX:196,clientY:330});
+ app.window.fire('pointermove',{clientX:240,clientY:350});
+ app.window.fire('pointerup',{clientX:240,clientY:350});
+ assert.match(app.$('selection-summary').textContent,/家光/);
 });
 test('actual app: both themes can be completed through real hand, picker and relation handlers',async t=>{
  for(const stage of stages){
   const app=await loadApp({sessions:{[stage.id]:pack(newGame(stage))},best:{}});
   try{app.$('stage-list').querySelector(`[data-start="${stage.id}"]`).click();let turns=0;
    while(turns++<100){const state=app.storage().sessions[stage.id];if(state.complete)break;const byId=id=>stage.people.find(p=>p.id===id);const move=state.hand.flatMap(card=>state.placed.flatMap(anchor=>relations(byId(card),byId(anchor)).map(relation=>({card,anchor,relation}))))[0];
-    assert.ok(move,`${stage.id}: draw should always be playable`);select(app,move.card);app.$('choose-anchor-button').click();app.$('modal-content').querySelector(`[data-pick-anchor="${move.anchor}"]`).click();commitRelation(app,move.relation);
+    assert.ok(move,`${stage.id}: draw should always be playable`);select(app,move.card);target(app,move.anchor);commitRelation(app,move.relation);
    }
    assert.ok(app.storage().sessions[stage.id].complete);assert.equal(app.$('nodes').querySelectorAll('[data-node]').length,stage.people.length);assert.match(app.$('modal-content').textContent,/系譜が、つながった/);
   }finally{app.restore();}
@@ -97,7 +116,7 @@ test('random horse mode saves and restores the exact generated question, then re
  const after=resumed.storage().randomHorse;assert.notEqual(after.seed,before.seed);assert.equal(after.cardIds.length,18);assert.ok(resumed.storage().sessions[after.stageId]);
  const stage=restoreRandomHorseSession(horseSnapshot,after).stage;let turns=0;
  while(turns++<30){const session=resumed.storage().sessions[after.stageId];if(session.complete)break;const byId=id=>stage.people.find(person=>person.id===id);const move=session.hand.flatMap(card=>session.placed.flatMap(anchor=>relations(byId(card),byId(anchor)).map(relation=>({card,anchor,relation}))))[0];
-  assert.ok(move,'random UI should always offer a legal move');select(resumed,move.card);resumed.$('choose-anchor-button').click();resumed.$('modal-content').querySelector(`[data-pick-anchor="${move.anchor}"]`).click();commitRelation(resumed,move.relation);
+  assert.ok(move,'random UI should always offer a legal move');select(resumed,move.card);target(resumed,move.anchor);commitRelation(resumed,move.relation);
  }
  assert.equal(resumed.storage().sessions[after.stageId].complete,true);assert.equal(resumed.$('nodes').querySelectorAll('[data-node]').length,18);assert.match(resumed.$('modal-content').textContent,/系譜が、つながった/);
 });
@@ -114,11 +133,12 @@ test('random horse hints identify a visible counterpart and the correct relation
  app.$('hint-button').click();
  assert.ok(app.$('hint-box').textContent.includes(anchor.name));
  assert.doesNotMatch(app.$('hint-box').textContent,/Wikidata|Q[1-9]\\d+/);
- app.$('next-hint').click();
+ app.$('hint-button').click();
  assert.ok(app.$('hint-box').textContent.includes(anchor.name));
  assert.match(app.$('hint-box').textContent,/産駒|父または母|きょうだい/);
- app.$('hint-go-to-relation').click();
- assert.equal(app.$('modal').open,true);
+ assert.equal(app.$('modal').open,false);
+ assert.equal(app.$('hint-box').querySelectorAll('button').length,0);
+ target(app,move.anchorId);
  commitRelation(app,move.relation);
  assert.equal(app.$('placed-count').textContent,'2');
 });
@@ -142,13 +162,14 @@ test('answer reveal is always available, saves the diagram and never grants a wi
  assert.match(app.$('modal-content').textContent,/クリア記録には含まれません/);
 });
 
-test('fixed stage keeps its hints and offers an exit directly from hint two',async t=>{
+test('fixed stage keeps text-only hints and offers surrender in menu',async t=>{
  const app=await setup(t);
  select(app,'iemitsu');app.$('hint-button').click();
  assert.match(app.$('hint-box').textContent,/将軍/);
- app.$('next-hint').click();
- assert.ok(app.$('hint-give-up'));
- app.$('hint-give-up').click();
+ app.$('hint-button').click();
+ assert.equal(app.$('hint-box').querySelectorAll('button').length,0);
+ assert.equal(app.$('hint-button').hidden,true);
+ app.$('menu-button').click();app.$('modal-content').querySelector('[data-action="give-up-confirm"]').click();
  assert.match(app.$('modal-content').textContent,/答えを見て終了/);
  app.$('modal-content').querySelector('[data-action="give-up"]').click();
  assert.equal(app.storage().sessions.tokugawa.gaveUp,true);
@@ -241,7 +262,7 @@ test('reaching the precise slot but immediately releasing still requires a delib
  assert.equal(app.$('mistake-count').textContent,'0');
 });
 
-test('dragging at low zoom uses a small dot and opens an unambiguous name picker',async t=>{
+test('dragging at low zoom preserves an explicitly targeted opponent',async t=>{
  const app=await setup(t);
  for(let i=0;i<5;i++)app.$('zoom-out').click();
  const hand=app.$('hand').querySelector('[data-card="iemitsu"]');
@@ -250,8 +271,9 @@ test('dragging at low zoom uses a small dot and opens an unambiguous name picker
  assert.equal(app.$('drag-ghost').classList.contains('in-board'),true);
  app.window.fire('pointerup',{clientX:196,clientY:366});
  assert.equal(app.$('drag-ghost').classList.contains('in-board'),false);
- assert.ok(app.$('modal-content').querySelector('[data-pick-anchor="hidetada"]'));
- assert.match(app.$('modal-content').textContent,/縮小/);
+ assert.equal(app.$('modal').open,true);
+ assert.match(app.$('modal-content').textContent,/家光.*秀忠/s);
+ assert.ok(app.$('modal-content').querySelector('[data-place-relation="child"]'));
 });
 
 test('arming a slot is cancelled by leaving it; a quick re-entry cannot auto-place',async t=>{
@@ -274,7 +296,7 @@ test('arming a slot is cancelled by leaving it; a quick re-entry cannot auto-pla
  assert.equal(app.$('modal').open,true);
 });
 
-test('holding a dotted slot at low zoom remains non-actionable and opens opponent list',async t=>{
+test('holding a dotted slot at low zoom does not auto-place but retains a clear opponent',async t=>{
  const app=await setup(t);
  for(let i=0;i<5;i++)app.$('zoom-out').click();
  const hand=app.$('hand').querySelector('[data-card="iemitsu"]');
@@ -294,5 +316,5 @@ test('holding a dotted slot at low zoom remains non-actionable and opens opponen
  }else app.window.fire('pointerup',{clientX:196,clientY:420});
  assert.equal(app.$('placed-count').textContent,'1');
  assert.equal(app.$('modal').open,true);
- assert.ok(app.$('modal-content').querySelector('[data-pick-anchor="hidetada"]'));
+ assert.ok(app.$('modal-content').querySelector('[data-place-relation="child"]'));
 });

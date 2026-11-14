@@ -16,7 +16,7 @@
 </main>
 <main id="game-screen" hidden>
 <div class="game-heading"><div><p class="eyebrow" id="stage-category"></p><h1 id="stage-title"></h1></div><button id="menu-button" class="text-button" aria-label="メニュー">☰</button></div>
-<div class="stats"><span><b id="placed-count">1</b><span id="total-count"></span> 配置</span><span id="timer">0:00</span><span>ミス <b id="mistake-count">0</b></span><span>ヒント <b id="hint-count">0</b></span></div>
+<div class="stats"><span>配置 <b id="placed-count">1</b><span id="total-count"></span></span><span>ミス <b id="mistake-count">0</b></span><span class="secondary-stat" aria-hidden="true" id="timer">0:00</span><span class="secondary-stat" aria-hidden="true">ヒント <b id="hint-count">0</b></span></div>
 <div class="progress"><div id="progress-fill"></div></div>
 <div class="play-layout">
 <div class="play-area"><section id="board" aria-label="家系図の盤面。指で動かし、ピンチで拡大縮小できます。" tabindex="0">
@@ -28,7 +28,7 @@
 <div class="hand-track"><div class="stock-pile" id="stock-pile" aria-label="山札">
 <div class="stock-cards" aria-hidden="true"><span class="stock-sheet stock-bottom"></span><span class="stock-sheet stock-middle"></span><span class="stock-sheet stock-top"><span class="stock-emblem">✦</span></span></div><span class="stock-count" id="stock-count">残り 0</span>
 </div><div class="hand-group"><span class="hand-count" id="hand-count">5枚</span><div id="hand" class="hand"></div></div></div>
-<div class="hand-footer"><span id="selection-summary"></span><div><button class="text-button" id="choose-anchor-button" disabled>相手を一覧から</button><button class="text-button" id="hint-button">ヒント</button><button class="text-button" id="clear-selection-button" disabled>解除</button></div></div>
+<div class="hand-footer"><span id="selection-summary" role="status" aria-live="polite"></span><div><button class="text-button" id="hint-button" hidden>ヒント</button></div></div>
 <div id="hint-box" class="hint-box" hidden></div></section>
 <div id="status" class="status" role="status" aria-live="polite"></div>
 </div>

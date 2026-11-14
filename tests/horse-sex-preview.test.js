@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {horseSex,horseSexLabel,pedigreeSex} from '../src/horse-sex.js';
+import {horseSex,horseSexLabel,horseSexTone,pedigreeSex} from '../src/horse-sex.js';
 import {placementLabels,directionalTarget,dragFramePosition,dragFrameScreen,insideDragFrame,dragDropReady,DROP_SLOT_HOLD_MS} from '../src/placement-preview.js';
 import {STEP_X,STEP_Y,fitCamera,CARD_W,CARD_H} from '../src/core.js';
 
@@ -100,4 +100,11 @@ test('initial mobile viewport 235-300px tall keeps top and bottom drop frames vi
    assert.ok(slot.y+slot.height/2<=height-4);
   }
  }
+});
+
+test('horse sex tone has stable accessible classes for all known sex categories',()=>{
+ assert.equal(horseSexTone('male'),'sex-male');
+ assert.equal(horseSexTone('female'),'sex-female');
+ assert.equal(horseSexTone('gelding'),'sex-gelding');
+ assert.equal(horseSexTone(null),'sex-unknown');
 });

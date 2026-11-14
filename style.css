@@ -310,3 +310,69 @@ body.playing .placement-dialog .anchor-choice{font-size:15px}
  box-shadow:0 0 0 2px #18332d66;
 }
 #board #drag-preview.disabled.armed{border-style:dashed}
+
+
+/* Streamlined game controls: keep a single contextual action beside the
+   selected hand card; the rest of the board remains available for gestures. */
+body.playing #game-screen .stats{gap:8px;padding-right:17px}
+body.playing #game-screen .stats>span:nth-child(2){margin-left:auto}
+body.playing #game-screen .stats .secondary-stat{display:none}
+body.playing #game-screen #board-expand{display:none!important}
+body.playing #game-screen .hand-footer{min-height:34px;gap:10px}
+body.playing #game-screen .hand-footer>span{
+  color:#f6e9c9;font-size:12px;font-weight:600;
+  text-overflow:ellipsis;white-space:nowrap;
+}
+body.playing #game-screen #hint-button{
+ min-height:33px;padding:5px 14px;border-radius:18px;
+ background:#d9c491;border:1px solid #ead9ae;color:#284039;
+ font-size:12px;font-weight:700;
+}
+body.playing #game-screen #status:empty{display:none}
+body.playing #game-screen .hint-box{
+ padding:10px 12px;font-size:12px;line-height:1.6;
+ border-radius:10px;max-width:410px;
+}
+body.playing #game-screen .hint-box strong{font-weight:700}
+body.playing #game-screen .hint-box small{font-size:10px;opacity:.7}
+
+/* Horse cards share one unambiguous sex palette everywhere: hand and board.
+   Labels remain readable without relying on color vision alone. */
+body.playing #game-screen .hand-card.horse.sex-male,
+#board .table-card.horse.sex-male{
+ background:linear-gradient(145deg,#223B55,#3A5B79 52%,#172F46);
+}
+body.playing #game-screen .hand-card.horse.sex-female,
+#board .table-card.horse.sex-female{
+ background:linear-gradient(145deg,#543247,#81576A 52%,#4C293C);
+}
+body.playing #game-screen .hand-card.horse.sex-gelding,
+#board .table-card.horse.sex-gelding{
+ background:linear-gradient(145deg,#405044,#78856A 52%,#39463B);
+}
+body.playing #game-screen .hand-card.horse.sex-unknown,
+#board .table-card.horse.sex-unknown{
+ background:linear-gradient(145deg,#394B4D,#687576 52%,#303E41);
+}
+body.playing #game-screen .hand-card.horse.sex-female .card-art svg,
+#board .table-card.horse.sex-female .card-art svg{fill:#ECD3DF}
+body.playing #game-screen .hand-card.horse.sex-gelding .card-art svg,
+#board .table-card.horse.sex-gelding .card-art svg{fill:#E1E9D3}
+body.playing #game-screen .hand-card.horse.sex-male .card-art svg,
+#board .table-card.horse.sex-male .card-art svg{fill:#DCE9F7}
+body.playing #game-screen .hand-card.horse.sex-unknown .card-art svg,
+#board .table-card.horse.sex-unknown .card-art svg{fill:#E2E5E5}
+body.playing #game-screen .hand-card.horse .card-sex,
+#board .table-card.horse .card-sex{
+ border:1px solid #ffffff70;
+ background:#faf9f0;color:#233D43;text-shadow:none;
+}
+/* A strong selection elevation, with the horse's original sex color intact. */
+body.playing #game-screen .hand-card.horse.selected{
+ transform:translateY(-21px) rotate(0deg);
+ box-shadow:inset 0 0 0 1px #fff5c8,inset 0 0 0 3px #102C30,
+ 0 0 0 3px #f2d68d,0 0 20px #f7dca688,0 17px 17px #071d22bb;
+}
+
+/* Toast stays above the board, away from the zoom controls and hand. */
+body.playing #game-screen .status{top:14px;bottom:auto}
