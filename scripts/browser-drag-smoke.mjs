@@ -105,11 +105,28 @@ try{
   await handGo.click();
   assert.match(await page.locator('#selection-summary').textContent(),/お江|江|go/);
   assert.equal(await page.locator('#hint-button').evaluate(e=>e.hidden),false);
+  const hintPlacement=await page.evaluate(()=>{
+   const card=document.querySelector('[data-card="go"]').getBoundingClientRect();
+   const hint=document.querySelector('#hint-button').getBoundingClientRect();
+   return {cardTop:card.top,cardLeft:card.left,cardRight:card.right,
+    buttonBottom:hint.bottom,buttonLeft:hint.left,buttonRight:hint.right,
+    buttonWidth:hint.width,buttonHeight:hint.height};
+  });
+  assert.ok(hintPlacement.buttonHeight>=44&&hintPlacement.buttonWidth>=90,
+   name+' contextual hint must be touch-friendly');
+  assert.ok(Math.abs(hintPlacement.buttonBottom-hintPlacement.cardTop)<34,
+   name+' hint must sit close to the selected card');
+  assert.ok(hintPlacement.buttonRight>hintPlacement.cardLeft&&
+   hintPlacement.buttonLeft<hintPlacement.cardRight,
+   name+' hint must align with its card');
+  await page.screenshot({path:`artifacts/browser-drag/${name}-hint-near-card.png`,fullPage:true});
   await handGo.click();
   assert.equal(await page.locator('#selection-summary').textContent(),'');
   await handGo.click();
   await page.locator('#hint-button').click();
   assert.equal(await page.locator('#hint-box button').count(),0);
+  assert.equal(await page.locator('#hint-box').evaluate(e=>e.hidden),false);
+  await page.screenshot({path:`artifacts/browser-drag/${name}-hint-open.png`,fullPage:true});
   await page.locator('#board').click({position:{x:14,y:25}});
   assert.equal(await page.locator('#selection-summary').textContent(),'');
   console.log('BROWSER_UI_PASS',name,'toggle/deselect/hint-only');
@@ -122,18 +139,21 @@ try{
   assert.equal(await page.locator('[data-node="deep"]').getAttribute('class')
    .then(c=>c.includes('sex-male')),true);
   await page.screenshot({path:`artifacts/browser-drag/${name}-horse-hand.png`,fullPage:true});
+  assert.ok(await page.locator('#hand [data-card]').count()>=3,'hand cards must remain on screen');
+  await page.locator('#hand [data-card]').first().click();
+  await page.screenshot({path:`artifacts/browser-drag/${name}-horse-selected.png`,fullPage:true});
   await page.locator('#menu-button').click();
   await page.locator('[data-action="give-up-confirm"]').click();
   await page.locator('[data-action="give-up"]').click();
   const colors=await page.evaluate(()=>{
    const male=document.querySelector('#nodes .sex-male');
    const female=document.querySelector('#nodes .sex-female');
-   return {male:male&&getComputedStyle(male).backgroundImage,
-    female:female&&getComputedStyle(female).backgroundImage,
+   return {male:male&&getComputedStyle(male).borderTopColor,
+    female:female&&getComputedStyle(female).borderTopColor,
     femaleLabel:female?.querySelector('.card-sex')?.textContent};
   });
   assert.ok(colors.male&&colors.female&&colors.male!==colors.female,
-   name+' horse sex card backgrounds must differ');
+   name+' horse sex card accents must differ');
   assert.equal(colors.femaleLabel,'牝');
   assert.equal(errors.length,0,name+' page errors: '+errors.join('; '));
   console.log('BROWSER_COLORS_PASS',name,'male/female distinct');
