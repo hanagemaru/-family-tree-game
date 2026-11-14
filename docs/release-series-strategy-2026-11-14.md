@@ -21,7 +21,7 @@
 
 ## 名前・公開・デザインの未決定事項
 - 第1弾の正式名称は決定済み。各アプリの今後の公開URLは未決定。
-- 公開URLは `hanage.app` 配下を基本候補とするが、具体的なパスやサブドメインは未決定。
+- **現在の配信方針は `hanage.app` の同一オリジン配下の専用パス**。競走馬版のURL案は `https://hanage.app/games/horse-pedigree/play/`、紹介ページ案は `/games/horse-pedigree/`。正式承認と本番配信は未実施。
 - 競走馬の写真は著作権・ライセンス・作者表記・個体の識別を満たすものだけ採用し、それ以外は共通イラストで公開可能とする。
 - 正式公開前にスマホ実機動作、出典・ライセンス表示、ゲームの導線、配布用ビルド・ホスティングを確認する。
 
@@ -40,4 +40,11 @@
 - `feature/horse-pedigree-narabe-launch-20261114` で公開UIを競走馬だけに整理。
 - 画面表示はランダム18頭と固定24頭の2モード。徳川家のデータと内部テストは残す。
 - タイトル・説明・共有メタデータ、独自アイコン、Web App Manifestを更新。
-- 現在はリポジトリ上の実装とプレビューであり、本番Cloudflare PagesのURL設定と公開は未実施。
+- 現在はリポジトリ上の実装とプレビューであり、本番Cloudflare Workersの専用パスRouteやハブ紹介ページの公開は未実施。
+
+## 2026-11-14：URL/ホスティング方針の再確認
+- `hanagemaru/hanage-hub` の最新正本 `docs/PROJECT_STATUS.md` により、Puttが `https://hanage.app/games/putt/play/` に本番公開済みであることを確認。
+- **競走馬版も同じパス方式を踏襲**。従来提案された `keito.hanage.app` は撤回。ゲームは独立リポジトリと専用Workerに残し、ハブの `hanage.app` にパス単位で割り当てる。
+- 作品紹介とプレイ画面は分ける。紹介ページの「遊ぶ」はPuttと同様に別タブでゲームを開く。
+- URL名 `horse-pedigree` は提案中で未確定。本番Route、DNS、ハブの公開リンクにはまだ変更を加えない。
+- 根拠：[ハブの最新の本番進捗](https://github.com/hanagemaru/hanage-hub/blob/main/docs/PROJECT_STATUS.md)、[Putt公開PR #42](https://github.com/hanagemaru/hanage-hub/pull/42)。
