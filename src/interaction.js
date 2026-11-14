@@ -17,11 +17,6 @@ export function pickDropCard(point,nodes,currentId=null){
  if(owner&&contains(point,owner,12)&&(!best||best.id===owner.id||distance(best)+16>=distance(owner)))return owner.id;
  return best?.id||null;
 }
-export function dropDecision({active,inside,anchor,card}){
- if(!card)return {type:'cancel'};
- if(!active||!inside)return {type:'selected',card};
- return anchor?{type:'relation',card,anchor}:{type:'choose-anchor',card};
-}
 
 /** A card explicitly under the release point always wins over the loose
  * directional hover zones. An overlapping hit is ambiguous, never guessed. */
