@@ -1,0 +1,70 @@
+/* 競走馬血統ならべ: single-theme launch styling (home only). */
+#home-screen .intro{padding:33px 0;gap:28px}
+#home-screen .intro h1{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;font-size:clamp(28px,3.1vw,39px);line-height:1.45;letter-spacing:-.05em;font-weight:850;margin:10px 0 16px;color:#19344d}
+#home-screen .intro-copy>p:not(.eyebrow){font-size:13px;line-height:1.85;max-width:44ch}
+#home-screen .intro .eyebrow{font-size:11px;letter-spacing:.06em;font-weight:850;color:#bd5d3b}
+#home-screen .intro-features{gap:8px;margin-top:18px}
+#home-screen .intro-features span{padding:6px 9px;background:#eaf0f4;border-radius:5px;font-size:11px;color:#3e586e}
+#home-screen .intro-features span:before{color:#3077a7}
+#home-screen .intro-visual{height:284px;border:1px solid #bfd0dc;border-radius:13px;background:#dfe9f0;background-image:linear-gradient(#91a9be20 1px,transparent 1px),linear-gradient(90deg,#91a9be20 1px,transparent 1px);background-size:25px 25px}
+#home-screen .visual-label{color:#496d87;font-size:9px;font-weight:850;letter-spacing:.08em}
+#home-screen .intro-visual .demo-lines{stroke:#6489a7;stroke-width:2}
+#home-screen .intro-visual .demo-lines circle{fill:#3b709d}
+#home-screen .intro-visual .demo-card{background:#f8fbfd;color:#203b52;border:2px solid #a4bdcf;border-bottom:4px solid #3673a6;border-radius:8px;padding:8px 10px;gap:8px;max-width:49%;box-shadow:0 4px 0 #43688b25}
+#home-screen .intro-visual .demo-card small{font-size:9px;color:#53718b;margin-bottom:4px}
+#home-screen .intro-visual .demo-card strong{font-size:clamp(9px,1vw,12px);font-weight:850;letter-spacing:-.05em;color:#20384d}
+#home-screen .intro-visual .demo-avatar{width:28px;height:28px;flex:0 0 28px;font:850 11px/1 sans-serif;color:#fff;background:#2e68ae;border-radius:5px}
+#home-screen .demo-parent{top:55px}
+#home-screen .intro-visual .demo-child{left:10px;top:177px;transform:none;background:#f8fbfd;border-color:#a4bdcf;border-bottom-color:#3673a6}
+#home-screen .intro-visual .demo-child small{color:#53718b}
+#home-screen .intro-visual .demo-child .demo-avatar{background:#2e68ae;color:#fff}
+#home-screen .intro-visual .demo-next{right:10px;top:177px;border-style:solid;box-shadow:0 4px 0 #43688b25}
+#home-screen .intro-visual .demo-next strong{color:#20384d}
+#home-screen .intro-visual .demo-next .demo-avatar{color:#fff;background:#2e68ae}
+#home-screen .intro-visual .demo-check{color:#2f8a74}
+#home-screen .intro-visual .visual-foot{font-size:10px;color:#476984;bottom:12px}
+#home-screen .section-heading h2{font-size:21px;font-weight:850;letter-spacing:-.035em;color:#20394e}
+#home-screen .section-heading .eyebrow{font-size:10px;font-weight:850}
+#home-screen #stage-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+#home-screen .stage-card{border-radius:12px}
+#home-screen .random-theme .stage-art{background:#d7e7f3;color:#2b6799}
+#home-screen .random-theme .random-emblem{opacity:.19;font-weight:800}
+#home-screen .stage-card .stage-art{height:114px}
+#home-screen .stage-card .stage-content{padding:21px 23px}
+#home-screen .stage-card h3{font-size:20px;font-weight:850}
+#home-screen .stage-card .stage-bottom .button{min-height:44px;white-space:nowrap}
+#home-screen .stage-card p{font-size:12px;line-height:1.8}
+#home-screen .home-guide{padding:15px 20px;margin:22px 0}
+#home-screen .home-guide p{font-size:12px}
+body:not(.playing) .app-header .brand>span{font-size:18px;font-weight:850;letter-spacing:-.06em}
+body:not(.playing) .app-header .brand small{letter-spacing:.04em}
+body:not(.playing) .brand .brand-mark{background:transparent;padding:0}
+.app-header .brand-mark img{width:43px;height:43px;border-radius:10px;display:block}
+@media(max-width:720px){
+ #home-screen .intro{display:flex;flex-direction:column;gap:18px;padding:25px 0 18px}
+ #home-screen .intro h1{font-size:30px}
+ #home-screen .intro-visual{height:225px;width:100%}
+ #home-screen .intro-visual .demo-parent{top:36px}
+ #home-screen .intro-visual .demo-child,#home-screen .intro-visual .demo-next{top:134px}
+ #home-screen .intro-visual .demo-card{padding:7px 6px;gap:6px;max-width:49%}
+ #home-screen .intro-visual .demo-card strong{font-size:10px}
+ #home-screen .intro-visual .demo-avatar{width:24px;height:24px;flex-basis:24px;font-size:10px}
+ #home-screen .intro-visual:before{top:92px;height:10px;background:#6489a7}
+ #home-screen .intro-visual:after{top:102px;height:20px;border-color:#6489a7}
+ #home-screen .intro-visual .visual-label{top:11px;left:13px;right:13px}
+ #home-screen .intro-visual .visual-foot{bottom:7px}
+ #home-screen #stage-list{grid-template-columns:1fr;gap:12px}
+ #home-screen .stage-card .stage-art{height:88px}
+ #home-screen .stage-card .stage-content{padding:17px 18px}
+ #home-screen .stage-card h3{font-size:18px}
+ #home-screen .home-guide{margin:16px 0;flex-wrap:wrap}
+ #home-screen .save-note{margin-left:0;width:100%}
+ body:not(.playing) .app-header .brand>span{font-size:14px}
+ body:not(.playing) .app-header .brand small{font-size:7px}
+ body:not(.playing) .header-note{display:none}
+ .app-header .brand-mark img{width:37px;height:37px}
+}
+@media(max-width:360px){
+ #home-screen .intro-visual .demo-card strong{font-size:9px}
+ #home-screen .intro-visual .demo-card{padding:6px 4px}
+}
