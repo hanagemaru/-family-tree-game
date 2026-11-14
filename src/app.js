@@ -197,9 +197,7 @@ function updateDragPreview(point){
  overlay.classList.toggle('disabled',camera.scale<.55);
  overlay.innerHTML=`<span>${placementLabels[hit.relation].arrow}</span><small>${placementLabels[hit.relation].label}</small>`;
  if(ready&&!wasArmed){
-  say(`「${relationName(hit.relation)}」として配置します。指を離してください。`);
- }else if(overSlot&&!prior?.overSlot&&camera.scale>=.55){
-  say('点線枠の中で少し止めてください。');
+  say(`${relationName(hit.relation)}として配置できます。指を離してください。`);
  }
 }
 function chooseRelations(id){
