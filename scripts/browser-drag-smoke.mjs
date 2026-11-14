@@ -126,6 +126,13 @@ try{
   await page.locator('#hint-button').click();
   assert.equal(await page.locator('#hint-box button').count(),0);
   assert.equal(await page.locator('#hint-box').evaluate(e=>e.hidden),false);
+  const hintVisible=await page.evaluate(()=>{
+   const popup=document.querySelector('#hint-box');
+   const rect=popup.getBoundingClientRect();
+   const top=document.elementFromPoint(rect.left+rect.width/2,rect.top+rect.height/2);
+   return popup.contains(top)||popup===top;
+  });
+  assert.equal(hintVisible,true,name+' hint must not be hidden behind any board card or zoom control');
   await page.screenshot({path:`artifacts/browser-drag/${name}-hint-open.png`,fullPage:true});
   await page.locator('#board').click({position:{x:14,y:25}});
   assert.equal(await page.locator('#selection-summary').textContent(),'');
