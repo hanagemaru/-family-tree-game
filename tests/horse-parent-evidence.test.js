@@ -7,7 +7,7 @@ const snapshot=JSON.parse(readFileSync(new URL('../data/horse-pedigree.v1.json',
 
 test('Wikimedia mother-name facts match a unique QID, horse name, year and cited revision',()=>{
  const records=Object.entries(verifiedParentNames);
- assert.equal(records.length,550);
+ assert.equal(records.length,632);
  const byId=new Map(snapshot.horses.map(h=>[h.id,h]));
  for(const [id,record] of records){
   assert.match(id,/^Q[1-9]\d+$/);
@@ -15,7 +15,7 @@ test('Wikimedia mother-name facts match a unique QID, horse name, year and cited
   assert.ok(horse,'source QID '+id);
   assert.equal(record.name,horse.name);
   assert.equal(record.year,horse.birthYear);
-  assert.equal(horse.dam,null,'do not overwrite known dam');
+  if(horse.dam)assert.equal(byId.get(horse.dam)?.named,false,'supplement only unresolved mother QID labels');
   assert.ok(record.dam?.length>1);
   assert.ok(record.url.startsWith('https://ja.wikipedia.org/wiki/'));
   assert.ok(Number.isInteger(record.revision)&&record.revision>0);
@@ -32,10 +32,13 @@ test('do not infer a parent for a mismatched year, QID or name',()=>{
 
 test('all Wikipedia infobox facts agree with the frozen audit file and have author revision references',()=>{
  const audit=JSON.parse(readFileSync(new URL('../data/source/wikipedia-dam-evidence.v1.json',import.meta.url),'utf8'));
- assert.equal(audit.counts.sourceMissing,601);
- assert.equal(audit.counts.found,550);
- assert.equal(audit.counts.unresolved,51);
- assert.equal(Object.keys(audit.records).length,550);
+ assert.equal(audit.counts.sourceMissing,688);
+ assert.equal(audit.counts.withoutMotherQid,601);
+ assert.equal(audit.counts.withUnnamedMotherQid,87);
+ assert.equal(audit.counts.addedNamesForExistingQids,82);
+ assert.equal(audit.counts.found,632);
+ assert.equal(audit.counts.unresolved,56);
+ assert.equal(Object.keys(audit.records).length,632);
  for(const [id,claim] of Object.entries(audit.records)){
   const runtime=verifiedParentNames[id];
   assert.ok(runtime,'missing generated JS entry '+id);
