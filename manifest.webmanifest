@@ -1,0 +1,19 @@
+{
+  "name": "競走馬血統ならべ",
+  "short_name": "血統ならべ",
+  "description": "名馬の血統をカードでつなぐ無料ブラウザパズル",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f6f8",
+  "theme_color": "#17283c",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
