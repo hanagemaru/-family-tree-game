@@ -1,0 +1,32 @@
+name: Freeze horse sex metadata
+on:
+  push:
+    branches: ['feature/horse-sex-drag-preview-20261113']
+    paths:
+      - scripts/collect_horse_sex.py
+      - .github/workflows/collect-horse-sex.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/horse-sex-drag-preview-20261113
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python3 scripts/collect_horse_sex.py
+      - name: Commit frozen sex claims
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/source/wikidata-sex-2026-11-13.json src/horse-sex-data.js
+          if ! git diff --cached --quiet; then
+            git commit -m "data: freeze Wikidata horse sex claims"
+            git push origin HEAD:feature/horse-sex-drag-preview-20261113
+          fi

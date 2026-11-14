@@ -1,6 +1,7 @@
 /** Seeded 18-card horse stage factory. No changes to the two fixed stages/saves. */
 import {relations,newGame,place,fitCamera} from './core.js';
 import {layoutFamily,buildDiagram,renderGeometry} from './diagram.js';
+import {horseSex} from './horse-sex.js';
 
 export const HORSE_GENERATOR_VERSION='horse-stage-v1';
 const graphCache=new WeakMap();
@@ -118,7 +119,7 @@ function toStage(snapshot,graph,selection,seed){
   const sireName=h.sire?readableName(h.sire):null,damName=h.dam?readableName(h.dam):null;
   const summary=sireName?`父は${sireName}。`:damName?`母は${damName}。`:'父母の馬名は未取得です。';
   const detail=`父：${h.sire?sireName||'馬名未取得':'データなし'}／母：${h.dam?damName||'馬名未取得':'データなし'}`;
-  return {id,name:h.name,short:h.name,generation:gens.get(id)-minimum,parents,spouses:[],
+  return {id,name:h.name,short:h.name,sex:horseSex(id,snapshot),generation:gens.get(id)-minimum,parents,spouses:[],
    clues:[summary,detail],
    source:{label:`Wikidata: ${h.name}`,url:h.source}};
  });

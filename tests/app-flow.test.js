@@ -7,17 +7,18 @@ function fixture(){const state=newGame(stages[0]);state.hand=['ieyasu','go','iem
 async function setup(t){const app=await loadApp(fixture());t.after(()=>app.restore());app.$('stage-list').querySelector('[data-start="tokugawa"]').click();return app;}
 function select(app,id='iemitsu'){app.$('hand').querySelector(`[data-card="${id}"]`).click({detail:0});}
 function target(app,id='hidetada'){app.$('nodes').querySelector(`[data-node="${id}"]`).click({detail:0});}
+function commitRelation(app,relation){const button=app.$('modal-content').querySelector(`[data-place-relation="${relation}"]`);assert.ok(button);button.click();}
 test('actual app: tap hand and opponent, then choose a relation and complete placement',async t=>{
- const app=await setup(t);select(app);assert.match(app.$('selection-summary').textContent,/家光/);target(app);assert.equal(app.$('modal').open,true);assert.equal(app.$('modal-content').querySelectorAll('[data-place-relation]').length,4);assert.match(app.$('modal-content').textContent,/家光.*秀忠/s);app.$('modal-content').querySelector('[data-place-relation="child"]').click();assert.equal(app.$('modal').open,false);assert.ok(app.$('nodes').querySelector('[data-node="iemitsu"]'));assert.equal(app.$('placed-count').textContent,'2');
+ const app=await setup(t);select(app);assert.match(app.$('selection-summary').textContent,/家光/);target(app);assert.equal(app.$('modal').open,true);assert.equal(app.$('modal-content').querySelectorAll('[data-place-relation]').length,4);assert.match(app.$('modal-content').textContent,/家光.*秀忠/s);commitRelation(app,'child');assert.equal(app.$('modal').open,false);assert.ok(app.$('nodes').querySelector('[data-node="iemitsu"]'));assert.equal(app.$('placed-count').textContent,'2');
 });
 test('actual app: cancel keeps the chosen hand card and offers a reliable opponent list',async t=>{
  const app=await setup(t);select(app);target(app);app.$('modal-close').click();assert.match(app.$('selection-summary').textContent,/家光/);assert.equal(app.$('choose-anchor-button').disabled,false);app.$('choose-anchor-button').click();app.$('modal-content').querySelector('[data-pick-anchor="hidetada"]').click();assert.ok(app.$('modal-content').querySelector('[data-place-relation="child"]'));
 });
 test('actual app: wrong relation reports the error, preserves selection and allows correction',async t=>{
- const app=await setup(t);select(app);target(app);const wrong=app.$('modal-content').querySelector('[data-place-relation="parent"]');wrong.click();assert.equal(app.$('modal').open,true);assert.equal(app.$('mistake-count').textContent,'1');assert.ok(app.$('placement-error').textContent.length);wrong.click();assert.equal(app.$('mistake-count').textContent,'1');app.$('modal-content').querySelector('[data-place-relation="child"]').click();assert.equal(app.$('placed-count').textContent,'2');
+ const app=await setup(t);select(app);target(app);const wrong=app.$('modal-content').querySelector('[data-place-relation="parent"]');wrong.click();assert.equal(app.$('modal').open,true);assert.equal(app.$('mistake-count').textContent,'1');assert.ok(app.$('placement-error').textContent.length);wrong.click();assert.equal(app.$('mistake-count').textContent,'1');commitRelation(app,'child');assert.equal(app.$('placed-count').textContent,'2');
 });
 test('actual app: blur and return during relation selection must not lose the opponent',async t=>{
- const app=await setup(t);select(app);target(app);app.window.fire('blur');app.$('modal-content').querySelector('[data-place-relation="child"]').click();assert.equal(app.$('placed-count').textContent,'2');
+ const app=await setup(t);select(app);target(app);app.window.fire('blur');commitRelation(app,'child');assert.equal(app.$('placed-count').textContent,'2');
 });
 test('actual app: thinking time in a placement sheet counts, menu reading does not',async t=>{
  const app=await setup(t);select(app);target(app);app.advance(1000);assert.equal(app.$('timer').textContent,'0:01');app.$('modal-close').click();app.$('menu-button').click();app.advance(1000);assert.equal(app.$('timer').textContent,'0:01');
@@ -35,14 +36,14 @@ test('actual app: panning with a hand card selected does not accidentally open a
  const app=await setup(t);select(app);const node=app.$('nodes').querySelector('[data-node="hidetada"]');node.fire('pointerdown',{clientX:196,clientY:330});app.window.fire('pointermove',{clientX:240,clientY:350});app.window.fire('pointerup',{clientX:240,clientY:350});assert.equal(app.$('modal').open,false);assert.match(app.$('selection-summary').textContent,/家光/);
 });
 test('actual app: change opponent and explicit selection reset remain usable',async t=>{
- const app=await setup(t);select(app);target(app);app.$('modal-content').querySelector('[data-action="change-anchor"]').click();assert.ok(app.$('modal-content').querySelector('[data-pick-anchor="hidetada"]'));app.$('modal-close').click();app.$('clear-selection-button').click();assert.equal(app.$('choose-anchor-button').disabled,true);select(app,'go');target(app);app.$('modal-content').querySelector('[data-place-relation="spouse"]').click();assert.ok(app.$('nodes').querySelector('[data-node="go"]'));
+ const app=await setup(t);select(app);target(app);app.$('modal-content').querySelector('[data-action="change-anchor"]').click();assert.ok(app.$('modal-content').querySelector('[data-pick-anchor="hidetada"]'));app.$('modal-close').click();app.$('clear-selection-button').click();assert.equal(app.$('choose-anchor-button').disabled,true);select(app,'go');target(app);commitRelation(app,'spouse');assert.ok(app.$('nodes').querySelector('[data-node="go"]'));
 });
 test('actual app: both themes can be completed through real hand, picker and relation handlers',async t=>{
  for(const stage of stages){
   const app=await loadApp({sessions:{[stage.id]:pack(newGame(stage))},best:{}});
   try{app.$('stage-list').querySelector(`[data-start="${stage.id}"]`).click();let turns=0;
    while(turns++<100){const state=app.storage().sessions[stage.id];if(state.complete)break;const byId=id=>stage.people.find(p=>p.id===id);const move=state.hand.flatMap(card=>state.placed.flatMap(anchor=>relations(byId(card),byId(anchor)).map(relation=>({card,anchor,relation}))))[0];
-    assert.ok(move,`${stage.id}: draw should always be playable`);select(app,move.card);app.$('choose-anchor-button').click();app.$('modal-content').querySelector(`[data-pick-anchor="${move.anchor}"]`).click();app.$('modal-content').querySelector(`[data-place-relation="${move.relation}"]`).click();
+    assert.ok(move,`${stage.id}: draw should always be playable`);select(app,move.card);app.$('choose-anchor-button').click();app.$('modal-content').querySelector(`[data-pick-anchor="${move.anchor}"]`).click();commitRelation(app,move.relation);
    }
    assert.ok(app.storage().sessions[stage.id].complete);assert.equal(app.$('nodes').querySelectorAll('[data-node]').length,stage.people.length);assert.match(app.$('modal-content').textContent,/系譜が、つながった/);
   }finally{app.restore();}
@@ -96,7 +97,7 @@ test('random horse mode saves and restores the exact generated question, then re
  const after=resumed.storage().randomHorse;assert.notEqual(after.seed,before.seed);assert.equal(after.cardIds.length,18);assert.ok(resumed.storage().sessions[after.stageId]);
  const stage=restoreRandomHorseSession(horseSnapshot,after).stage;let turns=0;
  while(turns++<30){const session=resumed.storage().sessions[after.stageId];if(session.complete)break;const byId=id=>stage.people.find(person=>person.id===id);const move=session.hand.flatMap(card=>session.placed.flatMap(anchor=>relations(byId(card),byId(anchor)).map(relation=>({card,anchor,relation}))))[0];
-  assert.ok(move,'random UI should always offer a legal move');select(resumed,move.card);resumed.$('choose-anchor-button').click();resumed.$('modal-content').querySelector(`[data-pick-anchor="${move.anchor}"]`).click();resumed.$('modal-content').querySelector(`[data-place-relation="${move.relation}"]`).click();
+  assert.ok(move,'random UI should always offer a legal move');select(resumed,move.card);resumed.$('choose-anchor-button').click();resumed.$('modal-content').querySelector(`[data-pick-anchor="${move.anchor}"]`).click();commitRelation(resumed,move.relation);
  }
  assert.equal(resumed.storage().sessions[after.stageId].complete,true);assert.equal(resumed.$('nodes').querySelectorAll('[data-node]').length,18);assert.match(resumed.$('modal-content').textContent,/系譜が、つながった/);
 });
@@ -118,7 +119,7 @@ test('random horse hints identify a visible counterpart and the correct relation
  assert.match(app.$('hint-box').textContent,/産駒|父または母|きょうだい/);
  app.$('hint-go-to-relation').click();
  assert.equal(app.$('modal').open,true);
- app.$('modal-content').querySelector(`[data-place-relation="${move.relation}"]`).click();
+ commitRelation(app,move.relation);
  assert.equal(app.$('placed-count').textContent,'2');
 });
 
@@ -153,4 +154,145 @@ test('fixed stage keeps its hints and offers an exit directly from hint two',asy
  assert.equal(app.storage().sessions.tokugawa.gaveUp,true);
  assert.equal(app.storage().best.tokugawa,undefined);
  assert.equal(app.$('placed-count').textContent,'18');
+});
+
+test('horse card sex labels are shown in both the hand and the field',async t=>{
+ const app=await loadApp(fixture());t.after(()=>app.restore());
+ app.$('stage-list').querySelector('[data-start="thoroughbred"]').click();
+ const anchor=app.$('nodes').querySelector('[data-node="deep"]');
+ assert.equal(anchor.querySelector('.card-sex').textContent,'牡');
+ const hand=app.$('hand').querySelector('[data-card]');
+ assert.ok(hand.querySelector('.card-sex'));
+ assert.ok(['牡','牝','不明'].includes(hand.querySelector('.card-sex').textContent));
+});
+
+test('drag-only dotted frame follows above, sideways and below directions without committing',async t=>{
+ const app=await setup(t);
+ const hand=app.$('hand').querySelector('[data-card="iemitsu"]');
+ hand.fire('pointerdown',{clientX:100,clientY:620});
+ app.window.fire('pointermove',{clientX:196,clientY:300});
+ assert.equal(app.$('drag-preview').hidden,false);
+ assert.equal(app.$('drag-preview').dataset.relation,'parent');
+ // The frame is screen-sized and visible regardless of the board zoom.
+ const previewY=Number(app.$('drag-preview').style.top.slice(0,-2));
+ assert.ok(previewY>=27&&previewY<=273,`dotted frame should stay inside board: ${previewY}`);
+ assert.equal(app.$('placed-count').textContent,'1');
+ assert.equal(app.$('mistake-count').textContent,'0');
+ app.window.fire('pointermove',{clientX:250,clientY:366});
+ assert.equal(app.$('drag-preview').dataset.relation,'sibling');
+ app.window.fire('pointermove',{clientX:196,clientY:420});
+ assert.equal(app.$('drag-preview').dataset.relation,'child');
+ assert.equal(app.$('placed-count').textContent,'1');
+ app.window.fire('pointercancel');
+ assert.equal(app.$('drag-preview').hidden,true);
+ assert.equal(app.$('placed-count').textContent,'1');
+});
+
+test('casually releasing anywhere in the child quadrant does not place a card',async t=>{
+ const app=await setup(t);
+ const hand=app.$('hand').querySelector('[data-card="iemitsu"]');
+ hand.fire('pointerdown',{clientX:100,clientY:620});
+ app.window.fire('pointermove',{clientX:196,clientY:420});
+ assert.equal(app.$('drag-preview').dataset.relation,'child');
+ assert.equal(app.$('drag-preview').classList.contains('armed'),false);
+ app.window.fire('pointerup',{clientX:196,clientY:420});
+ assert.equal(app.$('modal').open,true,'an ordinary release still requires a deliberate relation selection');
+ assert.equal(app.$('placed-count').textContent,'1');
+ assert.equal(app.$('mistake-count').textContent,'0');
+ assert.equal(app.$('drag-preview').hidden,true);
+ commitRelation(app,'child');
+ assert.equal(app.$('placed-count').textContent,'2');
+});
+
+test('only a stable release INSIDE the outlined slot can place directly',async t=>{
+ const app=await setup(t);
+ const hand=app.$('hand').querySelector('[data-card="iemitsu"]');
+ hand.fire('pointerdown',{clientX:100,clientY:620});
+ app.window.fire('pointermove',{clientX:196,clientY:420});
+ assert.equal(app.$('drag-preview').dataset.relation,'child');
+ const rect=app.$('board').getBoundingClientRect();
+ const x=rect.left+Number(app.$('drag-preview').style.left.slice(0,-2));
+ const y=rect.top+Number(app.$('drag-preview').style.top.slice(0,-2))+36;
+ app.window.fire('pointermove',{clientX:x,clientY:y});
+ assert.equal(app.$('drag-preview').classList.contains('over-slot'),true);
+ assert.equal(app.$('drag-preview').classList.contains('armed'),false);
+ app.advance(300);
+ app.window.fire('pointermove',{clientX:x,clientY:y});
+ assert.equal(app.$('drag-preview').classList.contains('armed'),true);
+ app.window.fire('pointerup',{clientX:x,clientY:y});
+ assert.equal(app.$('modal').open,false);
+ assert.equal(app.$('placed-count').textContent,'2');
+ assert.equal(app.$('drag-preview').hidden,true);
+ assert.equal(app.$('mistake-count').textContent,'0');
+});
+
+test('reaching the precise slot but immediately releasing still requires a deliberate choice',async t=>{
+ const app=await setup(t);
+ const hand=app.$('hand').querySelector('[data-card="iemitsu"]');
+ hand.fire('pointerdown',{clientX:100,clientY:620});
+ app.window.fire('pointermove',{clientX:196,clientY:420});
+ const rect=app.$('board').getBoundingClientRect();
+ const x=rect.left+Number(app.$('drag-preview').style.left.slice(0,-2));
+ const y=rect.top+Number(app.$('drag-preview').style.top.slice(0,-2))+36;
+ app.window.fire('pointermove',{clientX:x,clientY:y});
+ app.window.fire('pointerup',{clientX:x,clientY:y});
+ assert.equal(app.$('modal').open,true);
+ assert.equal(app.$('placed-count').textContent,'1');
+ assert.equal(app.$('mistake-count').textContent,'0');
+});
+
+test('dragging at low zoom uses a small dot and opens an unambiguous name picker',async t=>{
+ const app=await setup(t);
+ for(let i=0;i<5;i++)app.$('zoom-out').click();
+ const hand=app.$('hand').querySelector('[data-card="iemitsu"]');
+ hand.fire('pointerdown',{clientX:100,clientY:620});
+ app.window.fire('pointermove',{clientX:196,clientY:366});
+ assert.equal(app.$('drag-ghost').classList.contains('in-board'),true);
+ app.window.fire('pointerup',{clientX:196,clientY:366});
+ assert.equal(app.$('drag-ghost').classList.contains('in-board'),false);
+ assert.ok(app.$('modal-content').querySelector('[data-pick-anchor="hidetada"]'));
+ assert.match(app.$('modal-content').textContent,/縮小/);
+});
+
+test('arming a slot is cancelled by leaving it; a quick re-entry cannot auto-place',async t=>{
+ const app=await setup(t),hand=app.$('hand').querySelector('[data-card="iemitsu"]');
+ hand.fire('pointerdown',{clientX:100,clientY:620});
+ app.window.fire('pointermove',{clientX:196,clientY:420});
+ const rect=app.$('board').getBoundingClientRect();
+ const x=rect.left+Number(app.$('drag-preview').style.left.slice(0,-2));
+ const y=rect.top+Number(app.$('drag-preview').style.top.slice(0,-2))+36;
+ app.window.fire('pointermove',{clientX:x,clientY:y});
+ app.advance(300);
+ app.window.fire('pointermove',{clientX:x,clientY:y});
+ assert.equal(app.$('drag-preview').classList.contains('armed'),true);
+ app.window.fire('pointermove',{clientX:196,clientY:420});
+ assert.equal(app.$('drag-preview').classList.contains('armed'),false);
+ app.window.fire('pointermove',{clientX:x,clientY:y});
+ assert.equal(app.$('drag-preview').classList.contains('armed'),false);
+ app.window.fire('pointerup',{clientX:x,clientY:y});
+ assert.equal(app.$('placed-count').textContent,'1');
+ assert.equal(app.$('modal').open,true);
+});
+
+test('holding a dotted slot at low zoom remains non-actionable and opens opponent list',async t=>{
+ const app=await setup(t);
+ for(let i=0;i<5;i++)app.$('zoom-out').click();
+ const hand=app.$('hand').querySelector('[data-card="iemitsu"]');
+ hand.fire('pointerdown',{clientX:100,clientY:620});
+ app.window.fire('pointermove',{clientX:196,clientY:420});
+ const outline=app.$('drag-preview');
+ if(!outline.hidden){
+  assert.equal(outline.classList.contains('disabled'),true);
+  const rect=app.$('board').getBoundingClientRect();
+  const x=rect.left+Number(outline.style.left.slice(0,-2));
+  const y=rect.top+Number(outline.style.top.slice(0,-2))+36;
+  app.window.fire('pointermove',{clientX:x,clientY:y});
+  app.advance(300);
+  app.window.fire('pointermove',{clientX:x,clientY:y});
+  assert.equal(outline.classList.contains('armed'),false);
+  app.window.fire('pointerup',{clientX:x,clientY:y});
+ }else app.window.fire('pointerup',{clientX:196,clientY:420});
+ assert.equal(app.$('placed-count').textContent,'1');
+ assert.equal(app.$('modal').open,true);
+ assert.ok(app.$('modal-content').querySelector('[data-pick-anchor="hidetada"]'));
 });
