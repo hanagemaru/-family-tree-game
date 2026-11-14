@@ -393,3 +393,15 @@ body:not(.playing) .brand>span{
 #home-screen .stage-card .tag{
  background:#E7EEF4;color:#396B93;border-radius:4px;font-weight:750;
 }
+
+/* Keep the clue readable above field cards and zoom controls; the selected
+   hand stays in front only while playing, without shifting the board. */
+body.playing #game-screen .hand-section{z-index:10}
+body.playing #game-screen .hand-section .hint-box{z-index:25}
+body.playing #game-screen .hand-card .card-name,
+body.playing #game-screen #board .table-card .card-name{
+ text-wrap:balance;line-break:strict;
+}
+body.playing #game-screen #board .table-card.horse .card-name{
+ font-size:10px;letter-spacing:-.075em;
+}
