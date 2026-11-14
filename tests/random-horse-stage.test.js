@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {stages} from '../src/data.js';
 import {pack,restore,relations,newGame} from '../src/core.js';
-import {prepareHorseGraph,generateRandomHorseStage,replayHorseStage,seededRandom} from '../src/random-horse-stage.js';
+import {prepareHorseGraph,generateRandomHorseStage,replayHorseStage,seededRandom,HORSE_GENERATOR_VERSION,LEGACY_HORSE_GENERATOR_VERSION} from '../src/random-horse-stage.js';
 const snapshot=JSON.parse(readFileSync(new URL('../data/horse-pedigree.v1.json',import.meta.url),'utf8'));
 const graph=prepareHorseGraph(snapshot);
 
@@ -48,4 +48,28 @@ test('Legacy fixed stages and session restoration are unchanged',()=>{
 test('Malformed data / unavailable components fail explicitly',()=>{
  assert.throws(()=>prepareHorseGraph({version:'v',horses:[{id:'Q1',name:'A',named:true},{id:'Q1',name:'B',named:true}]}),/Duplicate/);
  assert.throws(()=>generateRandomHorseStage({version:'tiny',horses:[{id:'Q1',name:'A',named:true,sire:null,dam:null}],roots:{}},{seed:1}),/insufficient_connected_named_records/);
+});
+
+test('v2 new 18-card games contain strong parent-child paths, not unresolved dotted siblings',()=>{
+ assert.equal(HORSE_GENERATOR_VERSION,'horse-stage-v2');
+ for(let seed=1;seed<=100;seed++){
+  const {stage,metrics}=generateRandomHorseStage(snapshot,{seed,attempts:48});
+  assert.equal(metrics.dottedSiblingLinks,0,'seed '+seed);
+  assert.ok(metrics.parentEdges>=stage.people.length-1,'seed '+seed);
+  const selected=new Set(stage.people.map(p=>p.id));
+  for(const a of stage.people)for(const b of stage.people){
+   if(a.id>=b.id)continue;
+   const shared=a.parents.filter(id=>b.parents.includes(id));
+   if(shared.length)assert.ok(shared.some(id=>selected.has(id)),
+    'common parent must be included for '+a.name+' and '+b.name+', seed '+seed);
+  }
+ }
+});
+
+test('legacy v1 seeded stages remain generatable with the old version identifier',()=>{
+ const seed='old-device-2026';
+ const old=generateRandomHorseStage(snapshot,{seed,version:LEGACY_HORSE_GENERATOR_VERSION,attempts:24});
+ const again=generateRandomHorseStage(snapshot,{seed,version:LEGACY_HORSE_GENERATOR_VERSION,attempts:24});
+ assert.deepEqual(old,again);
+ assert.ok(old.stage.id.includes(':horse-stage-v1:'));
 });
