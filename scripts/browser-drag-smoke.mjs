@@ -96,6 +96,48 @@ try{
   await page.screenshot({path:`artifacts/browser-drag/${name}-placed.png`,fullPage:true});
   assert.equal(errors.length,0,name+' page errors: '+errors.join('; '));
   console.log('BROWSER_GESTURES_PASS',name,'casual=no-placement, instant=no-placement, held=placed');
+
+  // Independent UX checks: no redundant buttons, keyboard/touch selection
+  // toggles, text-only hints and an empty-board tap to deselect.
+  assert.equal(await page.locator('#clear-selection-button').count(),0);
+  assert.equal(await page.locator('#choose-anchor-button').count(),0);
+  const handGo=page.locator('[data-card="go"]');
+  await handGo.click();
+  assert.match(await page.locator('#selection-summary').textContent(),/お江|江|go/);
+  assert.equal(await page.locator('#hint-button').evaluate(e=>e.hidden),false);
+  await handGo.click();
+  assert.equal(await page.locator('#selection-summary').textContent(),'');
+  await handGo.click();
+  await page.locator('#hint-button').click();
+  assert.equal(await page.locator('#hint-box button').count(),0);
+  await page.locator('#board').click({position:{x:14,y:25}});
+  assert.equal(await page.locator('#selection-summary').textContent(),'');
+  console.log('BROWSER_UI_PASS',name,'toggle/deselect/hint-only');
+
+  // Real horse cards must have visibly different body colors as well as sex
+  // labels. The palette must work for cards on the board, not only in hand.
+  await page.locator('#menu-button').click();
+  await page.locator('[data-action="home"]').click();
+  await page.locator('[data-start="thoroughbred"]').click();
+  assert.equal(await page.locator('[data-node="deep"]').getAttribute('class')
+   .then(c=>c.includes('sex-male')),true);
+  await page.screenshot({path:`artifacts/browser-drag/${name}-horse-hand.png`,fullPage:true});
+  await page.locator('#menu-button').click();
+  await page.locator('[data-action="give-up-confirm"]').click();
+  await page.locator('[data-action="give-up"]').click();
+  const colors=await page.evaluate(()=>{
+   const male=document.querySelector('#nodes .sex-male');
+   const female=document.querySelector('#nodes .sex-female');
+   return {male:male&&getComputedStyle(male).backgroundImage,
+    female:female&&getComputedStyle(female).backgroundImage,
+    femaleLabel:female?.querySelector('.card-sex')?.textContent};
+  });
+  assert.ok(colors.male&&colors.female&&colors.male!==colors.female,
+   name+' horse sex card backgrounds must differ');
+  assert.equal(colors.femaleLabel,'牝');
+  assert.equal(errors.length,0,name+' page errors: '+errors.join('; '));
+  console.log('BROWSER_COLORS_PASS',name,'male/female distinct');
+
   await page.close();await browser.close();browser=null;
  }
 }finally{
