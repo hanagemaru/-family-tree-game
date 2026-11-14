@@ -260,26 +260,26 @@ body.playing #game-screen .hand-card .card-art{inset:25px 5px 35px}
 }
 /* Hint belongs to the selected card, not the footer. The button is a
  * separate accessible control, not nested inside the draggable card. */
-body.playing #game-screen .card-hint-button{
+body.playing #game-screen #hint-button.card-hint-button{
  position:absolute;z-index:20;
  display:flex;align-items:center;justify-content:center;gap:4px;
- min-width:92px;min-height:44px;
+ width:92px;min-width:92px;height:44px;min-height:44px;
  padding:6px 11px;border:2px solid #1B3348;border-radius:9px;
  background:#F8D777;color:#172D3E;
  font-size:12px;font-weight:850;white-space:nowrap;
  box-shadow:0 3px 0 #A68737,0 7px 13px #0A20365E;
  touch-action:manipulation;
 }
-body.playing #game-screen .card-hint-button svg{
+body.playing #game-screen #hint-button.card-hint-button svg{
  width:18px;height:18px;flex:none;
 }
-body.playing #game-screen .card-hint-button::after{
+body.playing #game-screen #hint-button.card-hint-button::after{
  content:"";position:absolute;right:22px;bottom:-7px;
  width:10px;height:10px;background:#F8D777;
  border-right:2px solid #1B3348;border-bottom:2px solid #1B3348;
  transform:rotate(45deg);pointer-events:none;
 }
-body.playing #game-screen .card-hint-button:active{
+body.playing #game-screen #hint-button.card-hint-button:active{
  transform:translateY(2px);box-shadow:0 1px 0 #A68737;
 }
 body.playing #game-screen .hand-section .hint-box{
@@ -326,4 +326,26 @@ body.playing #game-screen .button {
 @media(prefers-reduced-motion:reduce){
  body.playing #game-screen .hand-card,
  body.playing #game-screen #board .table-card{transition:none!important}
+}
+
+/* Dialogs also use the sport UI; neutral panels, not parchment or gold. */
+body.playing dialog.placement-dialog{
+ border:1px solid #AFC4D3;border-radius:14px;
+ background:#F1F5F7;color:#1B3248;
+ box-shadow:0 16px 36px #1425386E;
+}
+body.playing dialog.placement-dialog .relation-choice{
+ background:#FFFFFF;border:2px solid #B4C7D5;
+ border-radius:10px;color:#203B54;
+ box-shadow:0 3px 0 #91A6B64D;
+ font-weight:800;
+}
+body.playing dialog.placement-dialog .relation-choice .relation-arrow{color:#3979AA}
+body.playing dialog.placement-dialog .relation-choice:active{
+ background:#DCEAF3;border-color:#4786B0;transform:translateY(2px);
+ box-shadow:0 1px 0 #91A6B6;
+}
+body.playing dialog.placement-dialog .relation-choice small{color:#577084}
+body.playing dialog.placement-dialog #modal-close{
+ background:#DDE6EC;color:#253B4E;border-radius:8px;
 }
