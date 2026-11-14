@@ -149,6 +149,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 1989
   },
+  "Q109260598": {
+    "dam": "ヒカルアマランサス",
+    "name": "ホウオウアマゾン",
+    "revision": 110624029,
+    "title": "ホウオウアマゾン",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%9B%E3%82%A6%E3%82%AA%E3%82%A6%E3%82%A2%E3%83%9E%E3%82%BE%E3%83%B3",
+    "wiki": "ja",
+    "year": 2018
+  },
   "Q109260604": {
     "dam": "リュズキナ",
     "name": "レッドジェネシス",
@@ -365,6 +374,24 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2019
   },
+  "Q111472810": {
+    "dam": "キストゥヘヴン",
+    "name": "タイムトゥヘヴン",
+    "revision": 110423474,
+    "title": "タイムトゥヘヴン",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%BF%E3%82%A4%E3%83%A0%E3%83%88%E3%82%A5%E3%83%98%E3%83%B4%E3%83%B3",
+    "wiki": "ja",
+    "year": 2018
+  },
+  "Q111628714": {
+    "dam": "レキシールー",
+    "name": "ダノンスコーピオン",
+    "revision": 111507833,
+    "title": "ダノンスコーピオン",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%80%E3%83%8E%E3%83%B3%E3%82%B9%E3%82%B3%E3%83%BC%E3%83%94%E3%82%AA%E3%83%B3",
+    "wiki": "ja",
+    "year": 2019
+  },
   "Q111632202": {
     "dam": "ブランシェリー",
     "name": "シャトーブランシュ",
@@ -391,6 +418,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%83%97%E3%83%A9%E3%83%80%E3%83%AA%E3%82%A2",
     "wiki": "ja",
     "year": 2019
+  },
+  "Q111797753": {
+    "dam": "クラフティワイフ",
+    "name": "ブリリアントベリー",
+    "revision": 110568423,
+    "title": "ブリリアントベリー",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%96%E3%83%AA%E3%83%AA%E3%82%A2%E3%83%B3%E3%83%88%E3%83%99%E3%83%AA%E3%83%BC",
+    "wiki": "ja",
+    "year": 1990
   },
   "Q111931932": {
     "dam": "ローザブランカ",
@@ -455,6 +491,24 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 1993
   },
+  "Q11283075": {
+    "dam": "イコマエイカン",
+    "name": "アグネスレディー",
+    "revision": 111756651,
+    "title": "アグネスレディー",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%82%B0%E3%83%8D%E3%82%B9%E3%83%AC%E3%83%87%E3%82%A3%E3%83%BC",
+    "wiki": "ja",
+    "year": 1976
+  },
+  "Q11283590": {
+    "dam": "リリーオブザナイル",
+    "name": "アスワン",
+    "revision": 111517862,
+    "title": "アスワン (競走馬)",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%82%B9%E3%83%AF%E3%83%B3_%28%E7%AB%B6%E8%B5%B0%E9%A6%AC%29",
+    "wiki": "ja",
+    "year": 1979
+  },
   "Q11283903": {
     "dam": "ダジルミージョリエ",
     "name": "アッミラーレ",
@@ -481,6 +535,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%89%E3%83%9E%E3%82%A4%E3%83%A4%E3%82%B5%E3%83%B3%E3%83%87%E3%83%BC",
     "wiki": "ja",
     "year": 1995
+  },
+  "Q11284100": {
+    "dam": "ジェドゥーザムール",
+    "name": "アドマイヤビッグ",
+    "revision": 108693827,
+    "title": "アドマイヤビッグ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%89%E3%83%9E%E3%82%A4%E3%83%A4%E3%83%93%E3%83%83%E3%82%B0",
+    "wiki": "ja",
+    "year": 2001
   },
   "Q11284106": {
     "dam": "プロモーション",
@@ -509,6 +572,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2007
   },
+  "Q11284753": {
+    "dam": "レーヴドスカー",
+    "name": "アプレザンレーヴ",
+    "revision": 97286683,
+    "title": "アプレザンレーヴ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%97%E3%83%AC%E3%82%B6%E3%83%B3%E3%83%AC%E3%83%BC%E3%83%B4",
+    "wiki": "ja",
+    "year": 2006
+  },
   "Q11285199": {
     "dam": "バイザキャット",
     "name": "アユサン",
@@ -517,6 +589,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%A6%E3%82%B5%E3%83%B3",
     "wiki": "ja",
     "year": 2010
+  },
+  "Q11285398": {
+    "dam": "クリアアンバー",
+    "name": "アンバーシャダイ",
+    "revision": 110125503,
+    "title": "アンバーシャダイ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%B3%E3%83%90%E3%83%BC%E3%82%B7%E3%83%A3%E3%83%80%E3%82%A4",
+    "wiki": "ja",
+    "year": 1977
   },
   "Q11285690": {
     "dam": "レットルダムール",
@@ -562,6 +643,42 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%82%A6%E3%82%A4%E3%83%B3%E3%83%A9%E3%83%87%E3%82%A3%E3%82%A6%E3%82%B9",
     "wiki": "ja",
     "year": 1998
+  },
+  "Q11289434": {
+    "dam": "アイドリームドアドリーム",
+    "name": "エアシャカール",
+    "revision": 111515638,
+    "title": "エアシャカール",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%A8%E3%82%A2%E3%82%B7%E3%83%A3%E3%82%AB%E3%83%BC%E3%83%AB",
+    "wiki": "ja",
+    "year": 1997
+  },
+  "Q11289442": {
+    "dam": "ダンシングキイ",
+    "name": "エアダブリン",
+    "revision": 109889185,
+    "title": "エアダブリン",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%A8%E3%82%A2%E3%83%80%E3%83%96%E3%83%AA%E3%83%B3",
+    "wiki": "ja",
+    "year": 1991
+  },
+  "Q11289444": {
+    "dam": "スキーパラダイス",
+    "name": "エアトゥーレ",
+    "revision": 109889209,
+    "title": "エアトゥーレ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%A8%E3%82%A2%E3%83%88%E3%82%A5%E3%83%BC%E3%83%AC",
+    "wiki": "ja",
+    "year": 1997
+  },
+  "Q11289445": {
+    "dam": "アイドリームドアドリーム",
+    "name": "エアデジャヴー",
+    "revision": 111704894,
+    "title": "エアデジャヴー",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%A8%E3%82%A2%E3%83%87%E3%82%B8%E3%83%A3%E3%83%B4%E3%83%BC",
+    "wiki": "ja",
+    "year": 1995
   },
   "Q11289550": {
     "dam": "エイシンウイザード",
@@ -671,6 +788,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 1976
   },
+  "Q11295679": {
+    "dam": "Detroit",
+    "name": "カーネギー",
+    "revision": 111562206,
+    "title": "カーネギー (競走馬)",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%BC%E3%83%8D%E3%82%AE%E3%83%BC_%28%E7%AB%B6%E8%B5%B0%E9%A6%AC%29",
+    "wiki": "ja",
+    "year": 1991
+  },
   "Q11295735": {
     "dam": "フランクアーギュメント",
     "name": "カーム",
@@ -752,6 +878,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2000
   },
+  "Q11300124": {
+    "dam": "Pound Foolish",
+    "name": "グッバイヘイロー",
+    "revision": 109618053,
+    "title": "グッバイヘイロー",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%B0%E3%83%83%E3%83%90%E3%82%A4%E3%83%98%E3%82%A4%E3%83%AD%E3%83%BC",
+    "wiki": "ja",
+    "year": 1985
+  },
   "Q11300176": {
     "dam": "Ameriflora",
     "name": "グラスワンダー",
@@ -769,6 +904,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%82%B0%E3%83%AC%E3%82%A4%E3%83%88%E3%82%B8%E3%83%A3%E3%83%BC%E3%83%8B%E3%83%BC",
     "wiki": "ja",
     "year": 2001
+  },
+  "Q11300768": {
+    "dam": "バレークイーン",
+    "name": "グレースアドマイヤ",
+    "revision": 110018918,
+    "title": "グレースアドマイヤ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%B0%E3%83%AC%E3%83%BC%E3%82%B9%E3%82%A2%E3%83%89%E3%83%9E%E3%82%A4%E3%83%A4",
+    "wiki": "ja",
+    "year": 1994
   },
   "Q11300985": {
     "dam": "アンナステルツ",
@@ -806,6 +950,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 1999
   },
+  "Q11303942": {
+    "dam": "Sequence",
+    "name": "ゴールドディガー",
+    "revision": 111562328,
+    "title": "ゴールドディガー",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%B4%E3%83%BC%E3%83%AB%E3%83%89%E3%83%87%E3%82%A3%E3%82%AC%E3%83%BC",
+    "wiki": "ja",
+    "year": 1962
+  },
   "Q11303951": {
     "dam": "ニアーザゴールド",
     "name": "ゴールドヘイロー",
@@ -815,6 +968,24 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 1997
   },
+  "Q11304119": {
+    "dam": "ゴールデンジャック",
+    "name": "サイドワインダー",
+    "revision": 111762415,
+    "title": "サイドワインダー (競走馬)",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%B5%E3%82%A4%E3%83%89%E3%83%AF%E3%82%A4%E3%83%B3%E3%83%80%E3%83%BC_%28%E7%AB%B6%E8%B5%B0%E9%A6%AC%29",
+    "wiki": "ja",
+    "year": 1998
+  },
+  "Q11304250": {
+    "dam": "フェアリードール",
+    "name": "サイレントディール",
+    "revision": 111517035,
+    "title": "サイレントディール",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%B5%E3%82%A4%E3%83%AC%E3%83%B3%E3%83%88%E3%83%87%E3%82%A3%E3%83%BC%E3%83%AB",
+    "wiki": "ja",
+    "year": 2000
+  },
   "Q11304252": {
     "dam": "ダンジグアウェー",
     "name": "サイレントネーム",
@@ -823,6 +994,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%82%B5%E3%82%A4%E3%83%AC%E3%83%B3%E3%83%88%E3%83%8D%E3%83%BC%E3%83%A0",
     "wiki": "ja",
     "year": 2002
+  },
+  "Q11304254": {
+    "dam": "レガシーオブストレングス",
+    "name": "サイレントハピネス",
+    "revision": 104697357,
+    "title": "サイレントハピネス",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%B5%E3%82%A4%E3%83%AC%E3%83%B3%E3%83%88%E3%83%8F%E3%83%94%E3%83%8D%E3%82%B9",
+    "wiki": "ja",
+    "year": 1992
   },
   "Q11304256": {
     "dam": "ヒロポリシー",
@@ -977,6 +1157,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2002
   },
+  "Q11307661": {
+    "dam": "サワーオレンジ",
+    "name": "シャダイアイバー",
+    "revision": 97452868,
+    "title": "シャダイアイバー",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%B7%E3%83%A3%E3%83%80%E3%82%A4%E3%82%A2%E3%82%A4%E3%83%90%E3%83%BC",
+    "wiki": "ja",
+    "year": 1979
+  },
   "Q11307663": {
     "dam": "ルーラースミストレス",
     "name": "シャダイソフィア",
@@ -1003,6 +1192,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%82%B7%E3%83%A7%E3%82%A6%E3%83%AA%E3%83%A5%E3%82%A6%E3%83%A0%E3%83%BC%E3%83%B3",
     "wiki": "ja",
     "year": 2007
+  },
+  "Q11308284": {
+    "dam": "ウェイブウインド",
+    "name": "シラユキヒメ",
+    "revision": 111515499,
+    "title": "シラユキヒメ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%B7%E3%83%A9%E3%83%A6%E3%82%AD%E3%83%92%E3%83%A1",
+    "wiki": "ja",
+    "year": 1996
   },
   "Q11308343": {
     "dam": "ユーワメルド",
@@ -1085,6 +1283,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2001
   },
+  "Q11311176": {
+    "dam": "ホワイトウォーターアフェア",
+    "name": "スウィフトカレント",
+    "revision": 111517245,
+    "title": "スウィフトカレント (競走馬)",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%B9%E3%82%A6%E3%82%A3%E3%83%95%E3%83%88%E3%82%AB%E3%83%AC%E3%83%B3%E3%83%88_%28%E7%AB%B6%E8%B5%B0%E9%A6%AC%29",
+    "wiki": "ja",
+    "year": 2001
+  },
   "Q11311360": {
     "dam": "Consentida",
     "name": "スカーレットインク",
@@ -1112,6 +1319,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2004
   },
+  "Q11311676": {
+    "dam": "ローズオブスズカ",
+    "name": "スズカフェニックス",
+    "revision": 109953951,
+    "title": "スズカフェニックス",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%B9%E3%82%BA%E3%82%AB%E3%83%95%E3%82%A7%E3%83%8B%E3%83%83%E3%82%AF%E3%82%B9",
+    "wiki": "ja",
+    "year": 2002
+  },
   "Q11311677": {
     "dam": "スプリングマンボ",
     "name": "スズカマンボ",
@@ -1121,6 +1337,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2001
   },
+  "Q11312212": {
+    "dam": "レガシーオブストレングス",
+    "name": "スティンガー",
+    "revision": 111515886,
+    "title": "スティンガー (競走馬)",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%B9%E3%83%86%E3%82%A3%E3%83%B3%E3%82%AC%E3%83%BC_%28%E7%AB%B6%E8%B5%B0%E9%A6%AC%29",
+    "wiki": "ja",
+    "year": 1996
+  },
   "Q11312511": {
     "dam": "コートアウト",
     "name": "ストロングリターン",
@@ -1129,6 +1354,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%82%B9%E3%83%88%E3%83%AD%E3%83%B3%E3%82%B0%E3%83%AA%E3%82%BF%E3%83%BC%E3%83%B3",
     "wiki": "ja",
     "year": 2006
+  },
+  "Q11312651": {
+    "dam": "クラフティワイフ",
+    "name": "スパイキュール",
+    "revision": 111518374,
+    "title": "スパイキュール",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%B9%E3%83%91%E3%82%A4%E3%82%AD%E3%83%A5%E3%83%BC%E3%83%AB",
+    "wiki": "ja",
+    "year": 2000
   },
   "Q11312941": {
     "dam": "キャンペンガール",
@@ -1220,6 +1454,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 1992
   },
+  "Q11316818": {
+    "dam": "モデルスポート",
+    "name": "ダイナアクトレス",
+    "revision": 110925318,
+    "title": "ダイナアクトレス",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%80%E3%82%A4%E3%83%8A%E3%82%A2%E3%82%AF%E3%83%88%E3%83%AC%E3%82%B9",
+    "wiki": "ja",
+    "year": 1983
+  },
   "Q11316819": {
     "dam": "シャダイフェザー",
     "name": "ダイナカール",
@@ -1291,6 +1534,24 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%83%80%E3%83%8E%E3%83%B3%E3%82%B7%E3%83%A3%E3%83%BC%E3%82%AF",
     "wiki": "ja",
     "year": 2008
+  },
+  "Q11317501": {
+    "dam": "ダンシングキイ",
+    "name": "ダンスインザムード",
+    "revision": 111515450,
+    "title": "ダンスインザムード",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%80%E3%83%B3%E3%82%B9%E3%82%A4%E3%83%B3%E3%82%B6%E3%83%A0%E3%83%BC%E3%83%89",
+    "wiki": "ja",
+    "year": 2001
+  },
+  "Q11317504": {
+    "dam": "ダンシングキイ",
+    "name": "ダンスパートナー",
+    "revision": 111507428,
+    "title": "ダンスパートナー",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%80%E3%83%B3%E3%82%B9%E3%83%91%E3%83%BC%E3%83%88%E3%83%8A%E3%83%BC",
+    "wiki": "ja",
+    "year": 1992
   },
   "Q11317513": {
     "dam": "サンフラワーガール",
@@ -1436,6 +1697,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2009
   },
+  "Q11321029": {
+    "dam": "フェアリードール",
+    "name": "トゥザヴィクトリー",
+    "revision": 111084405,
+    "title": "トゥザヴィクトリー",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%88%E3%82%A5%E3%82%B6%E3%83%B4%E3%82%A3%E3%82%AF%E3%83%88%E3%83%AA%E3%83%BC",
+    "wiki": "ja",
+    "year": 1996
+  },
   "Q11321082": {
     "dam": "トウカイナチュラル",
     "name": "トウカイテイオー",
@@ -1444,6 +1714,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%83%88%E3%82%A6%E3%82%AB%E3%82%A4%E3%83%86%E3%82%A4%E3%82%AA%E3%83%BC",
     "wiki": "ja",
     "year": 1988
+  },
+  "Q11322362": {
+    "dam": "ダンシングキイ",
+    "name": "トーセンダンス",
+    "revision": 109721070,
+    "title": "トーセンダンス",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%88%E3%83%BC%E3%82%BB%E3%83%B3%E3%83%80%E3%83%B3%E3%82%B9",
+    "wiki": "ja",
+    "year": 2002
   },
   "Q11322363": {
     "dam": "アサヒブライト",
@@ -1580,6 +1859,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2001
   },
+  "Q11328013": {
+    "dam": "バブルカンパニー",
+    "name": "バブルガムフェロー",
+    "revision": 111670549,
+    "title": "バブルガムフェロー",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%90%E3%83%96%E3%83%AB%E3%82%AC%E3%83%A0%E3%83%95%E3%82%A7%E3%83%AD%E3%83%BC",
+    "wiki": "ja",
+    "year": 1993
+  },
   "Q11328548": {
     "dam": "ホームスイートホーム",
     "name": "バーディバーディ",
@@ -1615,6 +1903,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%83%93%E3%83%83%E3%82%B0%E3%82%B5%E3%83%B3%E3%83%87%E3%83%BC",
     "wiki": "ja",
     "year": 1994
+  },
+  "Q11330750": {
+    "dam": "クラフティワイフ",
+    "name": "ビッグテースト",
+    "revision": 110568303,
+    "title": "ビッグテースト",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%93%E3%83%83%E3%82%B0%E3%83%86%E3%83%BC%E3%82%B9%E3%83%88",
+    "wiki": "ja",
+    "year": 1998
   },
   "Q11330964": {
     "dam": "Bastet",
@@ -1669,6 +1966,24 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%83%95%E3%82%A3%E3%83%95%E3%82%B9%E3%83%9A%E3%83%88%E3%83%AB",
     "wiki": "ja",
     "year": 2006
+  },
+  "Q11332612": {
+    "dam": "Special",
+    "name": "フェアリーブリッジ",
+    "revision": 91048117,
+    "title": "フェアリーブリッジ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%95%E3%82%A7%E3%82%A2%E3%83%AA%E3%83%BC%E3%83%96%E3%83%AA%E3%83%83%E3%82%B8",
+    "wiki": "ja",
+    "year": 1975
+  },
+  "Q11333075": {
+    "dam": "ラスティックベル",
+    "name": "フサイチエアデール",
+    "revision": 104642144,
+    "title": "フサイチエアデール",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%95%E3%82%B5%E3%82%A4%E3%83%81%E3%82%A8%E3%82%A2%E3%83%87%E3%83%BC%E3%83%AB",
+    "wiki": "ja",
+    "year": 1996
   },
   "Q11333077": {
     "dam": "セトフローリアンII",
@@ -1769,6 +2084,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2000
   },
+  "Q11336820": {
+    "dam": "アンティックヴァリュー",
+    "name": "ベガ",
+    "revision": 109889217,
+    "title": "ベガ (競走馬)",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%99%E3%82%AC_%28%E7%AB%B6%E8%B5%B0%E9%A6%AC%29",
+    "wiki": "ja",
+    "year": 1990
+  },
   "Q11336895": {
     "dam": "コマーサント",
     "name": "ベストディール",
@@ -1823,6 +2147,33 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2008
   },
+  "Q11338986": {
+    "dam": "バレークイーン",
+    "name": "ボーンキング",
+    "revision": 110197616,
+    "title": "ボーンキング",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%9C%E3%83%BC%E3%83%B3%E3%82%AD%E3%83%B3%E3%82%B0",
+    "wiki": "ja",
+    "year": 1998
+  },
+  "Q11339751": {
+    "dam": "マイネプリテンダー",
+    "name": "マイネヌーヴェル",
+    "revision": 110305445,
+    "title": "マイネヌーヴェル",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%9E%E3%82%A4%E3%83%8D%E3%83%8C%E3%83%BC%E3%83%B4%E3%82%A7%E3%83%AB",
+    "wiki": "ja",
+    "year": 2000
+  },
+  "Q11339753": {
+    "dam": "マイネプリテンダー",
+    "name": "マイネルアワグラス",
+    "revision": 110305492,
+    "title": "マイネルアワグラス",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%9E%E3%82%A4%E3%83%8D%E3%83%AB%E3%82%A2%E3%83%AF%E3%82%B0%E3%83%A9%E3%82%B9",
+    "wiki": "ja",
+    "year": 2004
+  },
   "Q11339758": {
     "dam": "アラデヤ",
     "name": "マイネルスケルツィ",
@@ -1831,6 +2182,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%83%9E%E3%82%A4%E3%83%8D%E3%83%AB%E3%82%B9%E3%82%B1%E3%83%AB%E3%83%84%E3%82%A3",
     "wiki": "ja",
     "year": 2003
+  },
+  "Q11339760": {
+    "dam": "マイネプリテンダー",
+    "name": "マイネルチャールズ",
+    "revision": 109790435,
+    "title": "マイネルチャールズ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%9E%E3%82%A4%E3%83%8D%E3%83%AB%E3%83%81%E3%83%A3%E3%83%BC%E3%83%AB%E3%82%BA",
+    "wiki": "ja",
+    "year": 2005
   },
   "Q11339765": {
     "dam": "サクセスウーマン",
@@ -1876,6 +2236,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%83%9E%E3%83%81%E3%82%AB%E3%83%8D%E3%82%BF%E3%83%B3%E3%83%9B%E3%82%A4%E3%82%B6",
     "wiki": "ja",
     "year": 1989
+  },
+  "Q11340626": {
+    "dam": "ペイパーレイン",
+    "name": "マツリダゴッホ",
+    "revision": 111517088,
+    "title": "マツリダゴッホ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%9E%E3%83%84%E3%83%AA%E3%83%80%E3%82%B4%E3%83%83%E3%83%9B",
+    "wiki": "ja",
+    "year": 2003
   },
   "Q11341206": {
     "dam": "シェンク",
@@ -1958,6 +2327,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2015
   },
+  "Q11342787": {
+    "dam": "バレークイーン",
+    "name": "ミラクルアドマイヤ",
+    "revision": 110018978,
+    "title": "ミラクルアドマイヤ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%9F%E3%83%A9%E3%82%AF%E3%83%AB%E3%82%A2%E3%83%89%E3%83%9E%E3%82%A4%E3%83%A4",
+    "wiki": "ja",
+    "year": 1995
+  },
   "Q11342969": {
     "dam": "ドルスク",
     "name": "ミレニアムバイオ",
@@ -2003,6 +2381,42 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 1998
   },
+  "Q11343624": {
+    "dam": "メジロラモーヌ",
+    "name": "メジロリベーラ",
+    "revision": 110421311,
+    "title": "メジロリベーラ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%A1%E3%82%B8%E3%83%AD%E3%83%AA%E3%83%99%E3%83%BC%E3%83%A9",
+    "wiki": "ja",
+    "year": 1990
+  },
+  "Q11345210": {
+    "dam": "ヤマニンパラダイス",
+    "name": "ヤマニンセラフィム",
+    "revision": 108920060,
+    "title": "ヤマニンセラフィム",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%A4%E3%83%9E%E3%83%8B%E3%83%B3%E3%82%BB%E3%83%A9%E3%83%95%E3%82%A3%E3%83%A0",
+    "wiki": "ja",
+    "year": 1999
+  },
+  "Q11345216": {
+    "dam": "ヤマニンシャレード",
+    "name": "ヤマニンリスペクト",
+    "revision": 111741725,
+    "title": "ヤマニンリスペクト",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%A4%E3%83%9E%E3%83%8B%E3%83%B3%E3%83%AA%E3%82%B9%E3%83%9A%E3%82%AF%E3%83%88",
+    "wiki": "ja",
+    "year": 1997
+  },
+  "Q11347616": {
+    "dam": "ソニンク",
+    "name": "ランフォルセ",
+    "revision": 111518632,
+    "title": "ランフォルセ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%A9%E3%83%B3%E3%83%95%E3%82%A9%E3%83%AB%E3%82%BB",
+    "wiki": "ja",
+    "year": 2006
+  },
   "Q11348445": {
     "dam": "アドモニッシュ",
     "name": "リマンド",
@@ -2011,6 +2425,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%83%AA%E3%83%9E%E3%83%B3%E3%83%89",
     "wiki": "ja",
     "year": 1965
+  },
+  "Q11349325": {
+    "dam": "レイズユー",
+    "name": "レイズアネイティヴ",
+    "revision": 110033794,
+    "title": "レイズアネイティヴ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%AC%E3%82%A4%E3%82%BA%E3%82%A2%E3%83%8D%E3%82%A4%E3%83%86%E3%82%A3%E3%83%B4",
+    "wiki": "ja",
+    "year": 1961
   },
   "Q11349398": {
     "dam": "アローム",
@@ -2083,6 +2506,24 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%83%AD%E3%83%B3%E3%83%89%E3%83%B3%E3%83%96%E3%83%AA%E3%83%83%E3%82%B8_%28%E7%AB%B6%E8%B5%B0%E9%A6%AC%29",
     "wiki": "ja",
     "year": 1995
+  },
+  "Q11350932": {
+    "dam": "ロゼカラー",
+    "name": "ローズバド",
+    "revision": 109289313,
+    "title": "ローズバド",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%AD%E3%83%BC%E3%82%BA%E3%83%90%E3%83%89",
+    "wiki": "ja",
+    "year": 1998
+  },
+  "Q11350946": {
+    "dam": "ロゼカラー",
+    "name": "ローゼンクロイツ",
+    "revision": 110549601,
+    "title": "ローゼンクロイツ (競走馬)",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%AD%E3%83%BC%E3%82%BC%E3%83%B3%E3%82%AF%E3%83%AD%E3%82%A4%E3%83%84_%28%E7%AB%B6%E8%B5%B0%E9%A6%AC%29",
+    "wiki": "ja",
+    "year": 2002
   },
   "Q11350999": {
     "dam": "レディブラッサム",
@@ -2345,6 +2786,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2008
   },
+  "Q115101955": {
+    "dam": "ステラリード",
+    "name": "キングエルメス",
+    "revision": 111519824,
+    "title": "キングエルメス",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%AD%E3%83%B3%E3%82%B0%E3%82%A8%E3%83%AB%E3%83%A1%E3%82%B9",
+    "wiki": "ja",
+    "year": 2019
+  },
   "Q115177777": {
     "dam": "トロピカルレディー",
     "name": "スマートオリオン",
@@ -2597,6 +3047,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2015
   },
+  "Q120335323": {
+    "dam": "ムードインディゴ",
+    "name": "ルビーカサブランカ",
+    "revision": 107930665,
+    "title": "ルビーカサブランカ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%AB%E3%83%93%E3%83%BC%E3%82%AB%E3%82%B5%E3%83%96%E3%83%A9%E3%83%B3%E3%82%AB",
+    "wiki": "ja",
+    "year": 2017
+  },
   "Q120335326": {
     "dam": "ウェーブクイーン",
     "name": "アールスター",
@@ -2822,6 +3281,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2003
   },
+  "Q123408112": {
+    "dam": "スターバレリーナ",
+    "name": "アンドゥオール",
+    "revision": 110315813,
+    "title": "アンドゥオール",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%B3%E3%83%89%E3%82%A5%E3%82%AA%E3%83%BC%E3%83%AB",
+    "wiki": "ja",
+    "year": 1999
+  },
   "Q123408114": {
     "dam": "ディープインアスク",
     "name": "アスクワンタイム",
@@ -2875,6 +3343,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%83%9B%E3%82%A6%E3%82%AA%E3%82%A6%E3%82%A8%E3%83%9F%E3%83%BC%E3%82%BA",
     "wiki": "ja",
     "year": 2017
+  },
+  "Q124496796": {
+    "dam": "メーデイア",
+    "name": "ディクテオン",
+    "revision": 111520308,
+    "title": "ディクテオン",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%87%E3%82%A3%E3%82%AF%E3%83%86%E3%82%AA%E3%83%B3",
+    "wiki": "ja",
+    "year": 2018
   },
   "Q124496798": {
     "dam": "アグネスナチュラル",
@@ -3137,6 +3614,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2001
   },
+  "Q135692080": {
+    "dam": "シンコウラブリイ",
+    "name": "ロードクロノス",
+    "revision": 111717501,
+    "title": "ロードクロノス",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%AD%E3%83%BC%E3%83%89%E3%82%AF%E3%83%AD%E3%83%8E%E3%82%B9",
+    "wiki": "ja",
+    "year": 1995
+  },
   "Q135692084": {
     "dam": "ファンドリパール",
     "name": "ポートブライアンズ",
@@ -3155,6 +3641,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2021
   },
+  "Q135692111": {
+    "dam": "アンティックヴァリュー",
+    "name": "マックロウ",
+    "revision": 109889256,
+    "title": "マックロウ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%9E%E3%83%83%E3%82%AF%E3%83%AD%E3%82%A6",
+    "wiki": "ja",
+    "year": 1997
+  },
   "Q135692138": {
     "dam": "マイネマジック",
     "name": "マイネソーサリス",
@@ -3172,6 +3667,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%83%81%E3%82%A2%E3%83%95%E3%83%AB%E3%82%B9%E3%83%9E%E3%82%A4%E3%83%AB",
     "wiki": "ja",
     "year": 2000
+  },
+  "Q135692153": {
+    "dam": "ケイウーマン",
+    "name": "モンテクリスエス",
+    "revision": 111560394,
+    "title": "モンテクリスエス",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%A2%E3%83%B3%E3%83%86%E3%82%AF%E3%83%AA%E3%82%B9%E3%82%A8%E3%82%B9",
+    "wiki": "ja",
+    "year": 2005
   },
   "Q135692154": {
     "dam": "ティッカーテープ",
@@ -3244,6 +3748,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%82%B9%E3%82%AF%E3%82%A4%E3%82%AD%E3%82%B4%E3%83%9F",
     "wiki": "ja",
     "year": 2023
+  },
+  "Q140006818": {
+    "dam": "リラヴァティ",
+    "name": "ワールズエンド",
+    "revision": 111521422,
+    "title": "ワールズエンド (競走馬)",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%AF%E3%83%BC%E3%83%AB%E3%82%BA%E3%82%A8%E3%83%B3%E3%83%89_%28%E7%AB%B6%E8%B5%B0%E9%A6%AC%29",
+    "wiki": "ja",
+    "year": 2021
   },
   "Q140512355": {
     "dam": "シャンデリアレディ",
@@ -3380,6 +3893,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 1999
   },
+  "Q140512512": {
+    "dam": "ランフォザドリーム",
+    "name": "フィーユドゥレーヴ",
+    "revision": 110217096,
+    "title": "フィーユドゥレーヴ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%95%E3%82%A3%E3%83%BC%E3%83%A6%E3%83%89%E3%82%A5%E3%83%AC%E3%83%BC%E3%83%B4",
+    "wiki": "ja",
+    "year": 2001
+  },
   "Q140512513": {
     "dam": "グリーングッズ",
     "name": "トーワトレジャー",
@@ -3416,6 +3938,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 1992
   },
+  "Q141735662": {
+    "dam": "レキシールー",
+    "name": "ギャラボーグ",
+    "revision": 111576400,
+    "title": "ギャラボーグ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%AE%E3%83%A3%E3%83%A9%E3%83%9C%E3%83%BC%E3%82%B0",
+    "wiki": "ja",
+    "year": 2023
+  },
   "Q141826103": {
     "dam": "ダイナアイドル",
     "name": "ダイワレイダース",
@@ -3433,6 +3964,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%83%95%E3%82%A1%E3%83%83%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%BC_%28%E7%AB%B6%E8%B5%B0%E9%A6%AC%29",
     "wiki": "ja",
     "year": 1992
+  },
+  "Q141826115": {
+    "dam": "グローブターフ",
+    "name": "グローバルダイナ",
+    "revision": 111392981,
+    "title": "グローバルダイナ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%B0%E3%83%AD%E3%83%BC%E3%83%90%E3%83%AB%E3%83%80%E3%82%A4%E3%83%8A",
+    "wiki": "ja",
+    "year": 1980
   },
   "Q141826142": {
     "dam": "ラークホイッスル",
@@ -3470,6 +4010,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 1994
   },
+  "Q141826188": {
+    "dam": "フェアリードール",
+    "name": "ビーポジティブ",
+    "revision": 111521521,
+    "title": "ビーポジティブ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%93%E3%83%BC%E3%83%9D%E3%82%B8%E3%83%86%E3%82%A3%E3%83%96",
+    "wiki": "ja",
+    "year": 1999
+  },
   "Q141826189": {
     "dam": "Angelic Song",
     "name": "レディバラード",
@@ -3496,6 +4045,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%82%B9%E3%83%AC%E3%82%A4%E3%83%9E%E3%83%B3_%28%E7%AB%B6%E8%B5%B0%E9%A6%AC%29",
     "wiki": "ja",
     "year": 2018
+  },
+  "Q1457136": {
+    "dam": "My Charmer",
+    "name": "シアトルスルー",
+    "revision": 110996715,
+    "title": "シアトルスルー",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%B7%E3%82%A2%E3%83%88%E3%83%AB%E3%82%B9%E3%83%AB%E3%83%BC",
+    "wiki": "ja",
+    "year": 1974
   },
   "Q16838742": {
     "dam": "Contrive",
@@ -3794,6 +4352,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2010
   },
+  "Q21857409": {
+    "dam": "Brigid",
+    "name": "リッスン",
+    "revision": 108404319,
+    "title": "リッスン (競走馬)",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%AA%E3%83%83%E3%82%B9%E3%83%B3_%28%E7%AB%B6%E8%B5%B0%E9%A6%AC%29",
+    "wiki": "ja",
+    "year": 2005
+  },
   "Q22006646": {
     "dam": "Cal Norma's Lady",
     "name": "ドナブリーニ",
@@ -3938,6 +4505,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2013
   },
+  "Q24871177": {
+    "dam": "レーヴドスカー",
+    "name": "レーヴミストラル",
+    "revision": 111542225,
+    "title": "レーヴミストラル",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%AC%E3%83%BC%E3%83%B4%E3%83%9F%E3%82%B9%E3%83%88%E3%83%A9%E3%83%AB",
+    "wiki": "ja",
+    "year": 2012
+  },
   "Q24874205": {
     "dam": "ミスパスカリ",
     "name": "マウントロブソン",
@@ -3946,6 +4522,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%83%9E%E3%82%A6%E3%83%B3%E3%83%88%E3%83%AD%E3%83%96%E3%82%BD%E3%83%B3",
     "wiki": "ja",
     "year": 2013
+  },
+  "Q26798": {
+    "dam": "Flaming Page",
+    "name": "ニジンスキー",
+    "revision": 111685594,
+    "title": "ニジンスキー (競走馬)",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%82%B8%E3%83%B3%E3%82%B9%E3%82%AD%E3%83%BC_%28%E7%AB%B6%E8%B5%B0%E9%A6%AC%29",
+    "wiki": "ja",
+    "year": 1967
   },
   "Q28458385": {
     "dam": "Great Majesty",
@@ -4010,6 +4595,24 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2013
   },
+  "Q3013377": {
+    "dam": "Navajo Princess",
+    "name": "ダンシングブレーヴ",
+    "revision": 109817639,
+    "title": "ダンシングブレーヴ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%80%E3%83%B3%E3%82%B7%E3%83%B3%E3%82%B0%E3%83%96%E3%83%AC%E3%83%BC%E3%83%B4",
+    "wiki": "ja",
+    "year": 1983
+  },
+  "Q30598673": {
+    "dam": "Halfway to Heaven",
+    "name": "ロードデンドロン",
+    "revision": 111270655,
+    "title": "ロードデンドロン",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%AD%E3%83%BC%E3%83%89%E3%83%87%E3%83%B3%E3%83%89%E3%83%AD%E3%83%B3",
+    "wiki": "ja",
+    "year": 2014
+  },
   "Q30924255": {
     "dam": "トランシーフレーズ",
     "name": "トーキングドラム",
@@ -4037,6 +4640,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2011
   },
+  "Q3307189": {
+    "dam": "Lady Angela",
+    "name": "ニアークティック",
+    "revision": 108403400,
+    "title": "ニアークティック",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%82%A2%E3%83%BC%E3%82%AF%E3%83%86%E3%82%A3%E3%83%83%E3%82%AF",
+    "wiki": "ja",
+    "year": 1954
+  },
   "Q3312800": {
     "dam": "Pasadoble",
     "name": "ミエスク",
@@ -4046,6 +4658,24 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 1984
   },
+  "Q3346473": {
+    "dam": "Special",
+    "name": "ヌレイエフ",
+    "revision": 108404418,
+    "title": "ヌレイエフ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%8C%E3%83%AC%E3%82%A4%E3%82%A8%E3%83%95",
+    "wiki": "ja",
+    "year": 1977
+  },
+  "Q3499831": {
+    "dam": "South Ocean",
+    "name": "ストームバード",
+    "revision": 111388201,
+    "title": "ストームバード",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%B9%E3%83%88%E3%83%BC%E3%83%A0%E3%83%90%E3%83%BC%E3%83%89",
+    "wiki": "ja",
+    "year": 1978
+  },
   "Q4713080": {
     "dam": "Chenille (GB)",
     "name": "アルサイド",
@@ -4054,6 +4684,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%AB%E3%82%B5%E3%82%A4%E3%83%89_%28%E7%AB%B6%E8%B5%B0%E9%A6%AC%29",
     "wiki": "ja",
     "year": 1955
+  },
+  "Q4733659": {
+    "dam": "Arbitrator",
+    "name": "アルマームード",
+    "revision": 111516906,
+    "title": "アルマームード",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%AB%E3%83%9E%E3%83%BC%E3%83%A0%E3%83%BC%E3%83%89",
+    "wiki": "ja",
+    "year": 1947
   },
   "Q47469470": {
     "dam": "インディアナギャル",
@@ -4144,6 +4783,24 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%82%AF%E3%83%AA%E3%83%A0%E3%82%BE%E3%83%B3%E3%82%B5%E3%82%BF%E3%83%B3",
     "wiki": "ja",
     "year": 1959
+  },
+  "Q5212022": {
+    "dam": "ケララ",
+    "name": "ダマスカス",
+    "revision": 111516083,
+    "title": "ダマスカス (競走馬)",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%80%E3%83%9E%E3%82%B9%E3%82%AB%E3%82%B9_%28%E7%AB%B6%E8%B5%B0%E9%A6%AC%29",
+    "wiki": "ja",
+    "year": 1964
+  },
+  "Q5215257": {
+    "dam": "ダンシングキイ",
+    "name": "ダンスインザダーク",
+    "revision": 110622099,
+    "title": "ダンスインザダーク",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%80%E3%83%B3%E3%82%B9%E3%82%A4%E3%83%B3%E3%82%B6%E3%83%80%E3%83%BC%E3%82%AF",
+    "wiki": "ja",
+    "year": 1993
   },
   "Q52716688": {
     "dam": "ドリームオブジェニー",
@@ -4442,6 +5099,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2016
   },
+  "Q62018159": {
+    "dam": "ムードインディゴ",
+    "name": "ユーキャンスマイル",
+    "revision": 111519141,
+    "title": "ユーキャンスマイル",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%A6%E3%83%BC%E3%82%AD%E3%83%A3%E3%83%B3%E3%82%B9%E3%83%9E%E3%82%A4%E3%83%AB",
+    "wiki": "ja",
+    "year": 2015
+  },
   "Q62597515": {
     "dam": "リッチダンサー",
     "name": "コントラチェック",
@@ -4459,6 +5125,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%82%B5%E3%82%A4%E3%83%A2%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89",
     "wiki": "ja",
     "year": 2008
+  },
+  "Q64780096": {
+    "dam": "ブロードアピール",
+    "name": "ミスアンコール",
+    "revision": 111519145,
+    "title": "ミスアンコール",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%9F%E3%82%B9%E3%82%A2%E3%83%B3%E3%82%B3%E3%83%BC%E3%83%AB",
+    "wiki": "ja",
+    "year": 2006
   },
   "Q64780101": {
     "dam": "チュウワブロッサム",
@@ -4685,6 +5360,33 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2013
   },
+  "Q7244431": {
+    "dam": "Cosquilla",
+    "name": "プリンスキロ",
+    "revision": 109654543,
+    "title": "プリンスキロ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%97%E3%83%AA%E3%83%B3%E3%82%B9%E3%82%AD%E3%83%AD",
+    "wiki": "ja",
+    "year": 1940
+  },
+  "Q7259595": {
+    "dam": "Preach",
+    "name": "プルピット",
+    "revision": 108129696,
+    "title": "プルピット",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%97%E3%83%AB%E3%83%94%E3%83%83%E3%83%88",
+    "wiki": "ja",
+    "year": 1994
+  },
+  "Q73010569": {
+    "dam": "レッドアゲート",
+    "name": "レッドジェニアル",
+    "revision": 111519205,
+    "title": "レッドジェニアル",
+    "url": "https://ja.wikipedia.org/wiki/%E3%83%AC%E3%83%83%E3%83%89%E3%82%B8%E3%82%A7%E3%83%8B%E3%82%A2%E3%83%AB",
+    "wiki": "ja",
+    "year": 2016
+  },
   "Q74126349": {
     "dam": "キャサリーンパー",
     "name": "クリソプレーズ",
@@ -4693,6 +5395,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%82%AF%E3%83%AA%E3%82%BD%E3%83%97%E3%83%AC%E3%83%BC%E3%82%BA_%28%E7%AB%B6%E8%B5%B0%E9%A6%AC%29",
     "wiki": "ja",
     "year": 2002
+  },
+  "Q7514393": {
+    "dam": "ワキア",
+    "name": "サイレンススズカ",
+    "revision": 111579182,
+    "title": "サイレンススズカ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%B5%E3%82%A4%E3%83%AC%E3%83%B3%E3%82%B9%E3%82%B9%E3%82%BA%E3%82%AB",
+    "wiki": "ja",
+    "year": 1994
   },
   "Q7595808": {
     "dam": "Soignee",
@@ -4775,6 +5486,15 @@ export const verifiedParentNames=Object.freeze({
     "wiki": "ja",
     "year": 2013
   },
+  "Q7702532": {
+    "dam": "Crimson Saint",
+    "name": "ターリングア",
+    "revision": 111517655,
+    "title": "ターリングア",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%BF%E3%83%BC%E3%83%AA%E3%83%B3%E3%82%B0%E3%82%A2",
+    "wiki": "ja",
+    "year": 1976
+  },
   "Q7848413": {
     "dam": "Sex Appeal",
     "name": "トライマイベスト",
@@ -4783,6 +5503,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%83%88%E3%83%A9%E3%82%A4%E3%83%9E%E3%82%A4%E3%83%99%E3%82%B9%E3%83%88",
     "wiki": "ja",
     "year": 1975
+  },
+  "Q7855618": {
+    "dam": "Source Sucree",
+    "name": "ターントゥ",
+    "revision": 111443826,
+    "title": "ターントゥ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%BF%E3%83%BC%E3%83%B3%E3%83%88%E3%82%A5",
+    "wiki": "ja",
+    "year": 1951
   },
   "Q7882431": {
     "dam": "Gana Facil",
@@ -4810,6 +5539,15 @@ export const verifiedParentNames=Object.freeze({
     "url": "https://ja.wikipedia.org/wiki/%E3%82%A6%E3%82%AA%E3%83%83%E3%82%AB_%28%E7%AB%B6%E8%B5%B0%E9%A6%AC%29",
     "wiki": "ja",
     "year": 2004
+  },
+  "Q8069153": {
+    "dam": "ローミンレイチェル",
+    "name": "ゼンノロブロイ",
+    "revision": 111515379,
+    "title": "ゼンノロブロイ",
+    "url": "https://ja.wikipedia.org/wiki/%E3%82%BC%E3%83%B3%E3%83%8E%E3%83%AD%E3%83%96%E3%83%AD%E3%82%A4",
+    "wiki": "ja",
+    "year": 2000
   },
   "Q83671753": {
     "dam": "ヒルダズパッション",
