@@ -21,7 +21,14 @@ export const verifiedParentNames=Object.freeze({
  Q109260579:{name:'サトノレイナス',year:2018,dam:'バラダセール',url:'https://www.jbis.or.jp/horse/0001269505/'},
  Q100450961:{name:'クルーガー',year:2012,dam:'アディクティド',url:'https://www.jbis.or.jp/horse/0001157765/'},
  Q109599095:{name:'サトノラーゼン',year:2012,dam:'トゥーピー',url:'https://www.jbis.or.jp/horse/0001157744/'},
- Q109260614:{name:'レッドルゼル',year:2016,dam:'フレンチノワール',url:'https://www.jbis.or.jp/horse/0001217307/'}
+ Q109260614:{name:'レッドルゼル',year:2016,dam:'フレンチノワール',url:'https://www.jbis.or.jp/horse/0001217307/'},
+ Q111132564:{name:'アスクビクターモア',year:2019,dam:'カルティカ',url:'https://www.jbis.or.jp/horse/0001308957/'},
+ Q111797326:{name:'プラダリア',year:2019,dam:'シャッセロール',url:'https://www.jbis.or.jp/horse/0001312416/'},
+ Q101192716:{name:'キングオブコージ',year:2016,dam:'ファイノメナ',url:'https://www.jbis.or.jp/horse/0001223164/'},
+ Q109260638:{name:'ファストフォース',year:2016,dam:'ラッシュライフ',url:'https://www.jbis.or.jp/horse/0001216121/'},
+ Q104528327:{name:'ジョーカナチャン',year:2015,dam:'ラッキーダイス',url:'https://www.jbis.or.jp/horse/0001206679/'},
+ Q101192043:{name:'ミュゼスルタン',year:2012,dam:'アスクデピュティ',url:'https://www.jbis.or.jp/horse/0001140460/pedigree/broodmare/'},
+ Q109260761:{name:'アルバートドック',year:2012,dam:'ゴールデンドックエー',url:'https://www.jbis.or.jp/horse/0001157747/'}
 });
 
 export function verifiedDamName(horse){
