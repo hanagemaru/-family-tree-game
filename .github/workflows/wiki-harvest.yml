@@ -5,6 +5,7 @@ on:
       - feature/wikipedia-dam-enrichment-20261114
     paths:
       - 'scripts/harvest_wikipedia_dams.py'
+      - 'scripts/harvest_unnamed_wikipedia_dams.py'
       - '.github/workflows/wiki-harvest.yml'
   workflow_dispatch:
 permissions:
@@ -21,7 +22,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Retrieve source-linked horse mothers
-        run: python scripts/harvest_wikipedia_dams.py
+        run: python scripts/harvest_unnamed_wikipedia_dams.py
       - name: Record audited Wikipedia references on research branch
         run: |
           git config user.name "github-actions[bot]"
