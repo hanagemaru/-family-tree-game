@@ -35,15 +35,24 @@ SAFE_TEMPLATE = re.compile(r"\{\{(?:small|nowrap|nobr)\s*\|\s*([^{}|]+)\}\}", re
 
 
 def http_json(url, label):
-    for attempt in range(4):
+    for attempt in range(3):
         try:
             req = Request(url,headers={"User-Agent":AGENT,"Accept":"application/json"})
-            with urlopen(req, timeout=30) as response:
+            with urlopen(req, timeout=50) as response:
                 return json.load(response)
-        except (HTTPError, URLError, TimeoutError) as error:
-            if attempt == 3:
-                raise RuntimeError(f"{label}: {error}") from error
-            time.sleep(1.5 * (attempt + 1))
+        except HTTPError as error:
+            # Respect rate limits instead of cycling immediately.
+            if error.code==429:
+                delay=min(75,max(30,int(error.headers.get("Retry-After","60"))))
+                print(f"RATE LIMIT {label}: retry after {delay}s",flush=True)
+                if attempt==2:raise RuntimeError(f"{label}: limited; stop safely") from error
+                time.sleep(delay)
+                continue
+            if attempt==2:raise RuntimeError(f"{label}: {error}") from error
+            time.sleep(3*(attempt+1))
+        except (URLError,TimeoutError) as error:
+            if attempt==2:raise RuntimeError(f"{label}: {error}") from error
+            time.sleep(3*(attempt+1))
     raise RuntimeError(f"{label}: unexpected failure")
 
 
@@ -56,34 +65,49 @@ def chunks(items, n):
         yield items[i:i+n]
 
 
-def wikidata_sitelinks(horses):
-    """Verify Japanese article identity via its own Wikibase QID page property.
+def fetch_verified_jawiki_dams(horses,counts):
+    """One Wikipedia query obtains both the QID and infobox from each page.
 
-    This avoids Wikidata's 429 response to a bulk query. Candidate Wikipedia
-    titles may be ambiguous, but ONLY a pageprop matching the exact QID is
-    accepted. No name-only match is ever admitted.
+    Wikimedia requests are intentionally slow (8 seconds apart), capped to
+    40 candidate titles at a time. A rate-limited page is NOT retried in a
+    tight loop. A returned record requires an exact matching Wikidata QID.
     """
     by_id={h["id"]:h for h in horses}
-    choices=[]
+    records={}
+    candidates=[]
     for h in horses:
-        for title in (h["name"],h["name"]+" (競走馬)",h["name"]+" (日本の競走馬)"):
-            choices.append(title)
-    result={}
-    for index,batch in enumerate(chunks(list(dict.fromkeys(choices)),25)):
+        candidates.extend((h["name"],h["name"]+" (競走馬)"))
+    unique=list(dict.fromkeys(candidates))
+    for index,titles in enumerate(chunks(unique,40)):
         payload=api("ja.wikipedia.org",{
-            "action":"query","prop":"pageprops","ppprop":"wikibase_item",
-            "titles":"|".join(batch),"redirects":"1",
+            "action":"query","prop":"pageprops|revisions",
+            "ppprop":"wikibase_item","rvprop":"ids|content","rvslots":"main",
+            "titles":"|".join(titles),"redirects":"1",
             "format":"json","formatversion":"2"
-        },"Japanese Wikipedia identity")
+        },"Japanese Wikipedia metadata + mother name")
         for page in payload.get("query",{}).get("pages",[]):
             qid=page.get("pageprops",{}).get("wikibase_item")
-            if qid in by_id and "missing" not in page:
-                result[qid]={"ja":page["title"]}
-        if (index+1)%10==0:
-            print("IDENTITIES",min(len(choices),(index+1)*25),"/",len(choices),
-                  "identified",len(result),flush=True)
-        time.sleep(.47)
-    return result
+            if qid not in by_id or "missing" in page or qid in records: continue
+            revisions=page.get("revisions",[])
+            if not revisions:
+                counts["article_no_revision"]+=1;continue
+            rev=revisions[0]
+            wikitext=rev.get("slots",{}).get("main",{}).get("content","")
+            dam=dam_from_article(wikitext)
+            if not dam:
+                counts["article_without_unambiguous_mother"]+=1;continue
+            horse=by_id[qid]
+            records[qid]={
+                "name":horse["name"],"year":horse.get("birthYear"),
+                "dam":dam,"wiki":"ja",
+                "title":page["title"],"revision":rev.get("revid"),
+                "url":f"https://ja.wikipedia.org/wiki/{quote(page['title'].replace(' ','_'))}"
+            }
+        counts["page_batches"]=index+1
+        print("PAGES",min(len(unique),(index+1)*40),"/",len(unique),
+              "QID-checked dams",len(records),flush=True)
+        time.sleep(8.0)
+    return records
 
 
 def clean_mother(raw):
@@ -119,46 +143,6 @@ def dam_from_article(wikitext):
     return unique[0] if len(unique)==1 else None
 
 
-def wikipedia_revisions(pairs,lang,counts,limit):
-    """
-    pairs=(QID,title). Wikidata sitelinks, not name-search matches, establish
-    identity. Only the first page per QID may be used.
-    """
-    records={}
-    for index,batch in enumerate(chunks(pairs,8)):
-        titles=[title for _,title in batch]
-        payload=api(f"{lang}.wikipedia.org",{
-            "action":"query","prop":"revisions","rvprop":"ids|content",
-            "rvslots":"main","titles":"|".join(titles),
-            "format":"json","formatversion":"2","redirects":"1"
-        },f"{lang} Wikipedia revisions")
-        pages=payload.get("query",{}).get("pages",[])
-        bytitle={p.get("title",""):p for p in pages}
-        redirects={r["from"]:r["to"] for r in payload.get("query",{}).get("redirects",[])}
-        normalized={r["from"]:r["to"] for r in payload.get("query",{}).get("normalized",[])}
-        for qid,title in batch:
-            resolved=normalized.get(title,title)
-            resolved=redirects.get(resolved,resolved)
-            page=bytitle.get(resolved)
-            if not page or page.get("missing"):
-                counts[f"{lang}_article_missing"]+=1;continue
-            rev=next(iter(page.get("revisions",[])),None)
-            if not rev:
-                counts[f"{lang}_revision_missing"]+=1;continue
-            source=rev.get("slots",{}).get("main",{}).get("content","")
-            dam=dam_from_article(source)
-            if not dam:
-                counts[f"{lang}_dam_not_unambiguous"]+=1;continue
-            url=f"https://{lang}.wikipedia.org/wiki/{quote(page['title'].replace(' ','_'))}"
-            records[qid]={"dam":dam,"wiki":lang,"url":url,
-                          "revision":rev.get("revid"),"title":page["title"]}
-            counts[f"{lang}_dam_found"]+=1
-        if (index+1)%10==0:
-            print(f"{lang} articles queried: {min(len(pairs),(index+1)*8)}/{len(pairs)}"
-                  f"; accepted: {counts[f'{lang}_dam_found']}",flush=True)
-        time.sleep(.24)
-    return records
-
 
 def generate_module(records):
     # JSON is valid JavaScript syntax for the named export.
@@ -191,19 +175,10 @@ def main():
     all_missing=[h for h in data["horses"] if h.get("named") and h.get("dam") is None]
     missing=all_missing if args.limit<=0 else all_missing[:args.limit]
     counts=Counter()
-    sitelinks=wikidata_sitelinks(missing)
-    print("Wikimedia QID-linked articles:",len(sitelinks),"for",len(missing),"missing dams",flush=True)
-    verified={}
-    for lang in ("ja","en"):
-        wanted=[(h["id"],sitelinks[h["id"]][lang]) for h in missing
-                if h["id"] not in verified and lang in sitelinks.get(h["id"],{})]
-        counts[f"{lang}_eligible"]=len(wanted)
-        records=wikipedia_revisions(wanted,lang,counts,args.limit)
-        for horse in missing:
-            claim=records.get(horse["id"])
-            if not claim:continue
-            claim.update({"name":horse["name"],"year":horse.get("birthYear")})
-            verified[horse["id"]]=claim
+    verified=fetch_verified_jawiki_dams(missing,counts)
+    counts["ja_dam_found"]=len(verified)
+    # Keep records sorted by QID for stable output and audit comparison.
+    ordered=dict(sorted(verified.items()))
     # Build runtime source with short, per-horse source references. Internal
     # JSON also records revision IDs and article titles for reproducibility.
     ordered=dict(sorted(verified.items()))
