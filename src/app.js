@@ -43,7 +43,7 @@ function help(){openDialog(`<p class="eyebrow">HOW TO PLAY</p><h2>手札を場�
 $('help-button').addEventListener('click',help);
 function showSources(){const list=state?[state.stage]:stages.filter(stage=>stage.id==='thoroughbred');openDialog(`<p class="eyebrow">ABOUT THE PEDIGREES</p><h2>血統情報・出典</h2>${list.map(stage=>`<h3>${stage.title}</h3><p>${stage.description}</p><p class="scope">${stage.scope}</p><ul>${[...new Map([...stage.sources,...stage.people.map(p=>p.source)].map(s=>[s.url,s])).values()].map(s=>`<li><a href="${escape(s.url)}" target="_blank" rel="noopener noreferrer">${escape(s.label)}</a></li>`).join('')}</ul>`).join('')}<h3>ランダム血統チャレンジ</h3><p>Wikidataの登録済み親子情報から18頭を抽出し、足りない母馬名は日本語Wikipediaの記事と馬IDを照合して補完しています。</p><ul><li><a href="https://www.wikidata.org/" target="_blank" rel="noopener noreferrer">Wikidata（CC0）</a></li><li><a href="https://ja.wikipedia.org/wiki/Wikipedia:%E8%91%97%E4%BD%9C%E6%A8%A9" target="_blank" rel="noopener noreferrer">日本語Wikipedia（CC BY-SA 4.0・編集履歴は各馬の記事を参照）</a></li></ul><p class="scope">未収録は血統不明を意味しません。掲載情報は出典に基づきますが、実際の血統を網羅・保証するものではありません。馬の写真・肖像は転載していません。</p>`);}
 $('sources-button').addEventListener('click',showSources);
-$('stage-list').addEventListener('click',e=>{const button=e.target.closest('[data-start]');if(button&&button.dataset.start==='thoroughbred')start(stageById('thoroughbred'));if(e.target.closest('[data-random-start]'))startRandomHorse(false);});
+$('stage-list').addEventListener('click',e=>{const button=e.target.closest('[data-start]');if(button)start(stageById(button.dataset.start));if(e.target.closest('[data-random-start]'))startRandomHorse(false);});
 function startRandomHorse(fresh){
  if(!horseSnapshot)return;
  try{
