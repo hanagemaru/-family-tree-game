@@ -1,9 +1,9 @@
 name: Family tree checks
 on:
   push:
-    branches: [main, 'ui/polish-20261108', 'feature/random-horse-ui-20261113', 'feature/horse-sex-drag-preview-20261113', 'feature/streamlined-card-ui-20261114']
+    branches: [main, 'ui/polish-20261108', 'feature/random-horse-ui-20261113', 'feature/horse-sex-drag-preview-20261113', 'feature/streamlined-card-ui-20261114', 'feature/clean-sports-trading-card-20261114']
   pull_request:
-    branches: [main, 'feature/random-horse-stage-20261112', 'feature/random-horse-ui-20261113', 'feature/horse-sex-drag-preview-20261113']
+    branches: [main, 'feature/random-horse-stage-20261112', 'feature/random-horse-ui-20261113', 'feature/horse-sex-drag-preview-20261113', 'feature/streamlined-card-ui-20261114']
 permissions:
   contents: read
 jobs:
@@ -17,10 +17,11 @@ jobs:
       - run: python3 -m unittest discover -s tests -p 'test_*.py'
       - run: npm test
       - run: npm run build
+      - run: test -s dist/sports-card.css && test -s dist/index.html
 
   browser-gestures:
     # Run a real browser review only on the feature branch, not on main.
-    if: github.ref_name == 'feature/horse-sex-drag-preview-20261113' || github.ref_name == 'feature/streamlined-card-ui-20261114'
+    if: github.ref_name == 'feature/horse-sex-drag-preview-20261113' || github.ref_name == 'feature/streamlined-card-ui-20261114' || github.ref_name == 'feature/clean-sports-trading-card-20261114'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

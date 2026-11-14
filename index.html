@@ -2,9 +2,9 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#203d37"><meta name="description" content="人物と名馬のつながりを、カードでたどる家系図パズル。知識で挑戦、困ったらヒント。">
+<meta name="theme-color" content="#17283c"><meta name="description" content="人物と名馬のつながりを、カードでたどる家系図パズル。知識で挑戦、困ったらヒント。">
 <title>家系図ならべ | 系譜をつなぐカードパズル</title>
-<link rel="icon" href="./favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css">
+<link rel="icon" href="./favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./sports-card.css">
 </head>
 <body>
 <div id="app">
@@ -24,12 +24,13 @@
 <div class="board-caption" id="board-caption"></div>
 <div class="board-tools"><button id="zoom-out" class="icon-button" aria-label="縮小">−</button><button id="fit-button" class="text-button" aria-label="系譜全体を表示">全体</button><button id="board-expand" class="text-button" aria-pressed="false" title="盤面だけを広く表示">広く</button><button id="zoom-in" class="icon-button" aria-label="拡大">＋</button></div>
 </section></div>
-<section class="hand-section" aria-label="手札と山札">
+<section class="hand-section" id="hand-section" aria-label="手札と山札">
 <div class="hand-track"><div class="stock-pile" id="stock-pile" aria-label="山札">
 <div class="stock-cards" aria-hidden="true"><span class="stock-sheet stock-bottom"></span><span class="stock-sheet stock-middle"></span><span class="stock-sheet stock-top"><span class="stock-emblem">✦</span></span></div><span class="stock-count" id="stock-count">残り 0</span>
 </div><div class="hand-group"><span class="hand-count" id="hand-count">5枚</span><div id="hand" class="hand"></div></div></div>
-<div class="hand-footer"><span id="selection-summary" role="status" aria-live="polite"></span><div><button class="text-button" id="hint-button" hidden>ヒント</button></div></div>
-<div id="hint-box" class="hint-box" hidden></div></section>
+<div class="hand-footer"><span id="selection-summary" role="status" aria-live="polite"></span></div>
+<button class="card-hint-button" id="hint-button" type="button" aria-label="選択した手札のヒント" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M9 15c-1.6-1-3-3-3-5a6 6 0 1 1 12 0c0 2-1.4 4-3 5-.7.5-.9 1.2-.9 2H9.9c0-.8-.2-1.5-.9-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>ヒント</span></button>
+<div id="hint-box" class="hint-box" role="status" aria-live="polite" hidden></div></section>
 <div id="status" class="status" role="status" aria-live="polite"></div>
 </div>
 </main>
