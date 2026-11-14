@@ -296,7 +296,7 @@ test('arming a slot is cancelled by leaving it; a quick re-entry cannot auto-pla
  assert.equal(app.$('modal').open,true);
 });
 
-test('holding a dotted slot at low zoom remains non-actionable and opens opponent list',async t=>{
+test('holding a dotted slot at low zoom does not auto-place but retains a clear opponent',async t=>{
  const app=await setup(t);
  for(let i=0;i<5;i++)app.$('zoom-out').click();
  const hand=app.$('hand').querySelector('[data-card="iemitsu"]');
@@ -316,5 +316,5 @@ test('holding a dotted slot at low zoom remains non-actionable and opens opponen
  }else app.window.fire('pointerup',{clientX:196,clientY:420});
  assert.equal(app.$('placed-count').textContent,'1');
  assert.equal(app.$('modal').open,true);
- assert.ok(app.$('modal-content').querySelector('[data-pick-anchor="hidetada"]'));
+ assert.ok(app.$('modal-content').querySelector('[data-place-relation="child"]'));
 });
