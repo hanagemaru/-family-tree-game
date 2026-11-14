@@ -17,3 +17,18 @@ for name,url in queries:
    print(name,"HTTP",resp.status,"bytes",len(body),"sample",body[:300].decode('utf-8','replace').replace('\n',' '))
  except Exception as exc:
   print(name,"ERROR",type(exc).__name__,str(exc))
+
+# Inspect only the infobox parameter lines, never dump full copyrighted articles.
+import re
+for horse in ["ウオッカ (競走馬)","トウカイテイオー","マカヒキ (競走馬)","パンサラッサ (競走馬)","レッドベルオーブ","レッドルゼル"]:
+ url="https://ja.wikipedia.org/w/api.php?"+urlencode({"action":"query","prop":"revisions","rvprop":"content|ids","rvslots":"main","titles":horse,"format":"json","formatversion":"2"})
+ try:
+  with urlopen(Request(url,headers={"User-Agent":USER_AGENT}),timeout=15) as resp:
+   data=json.load(resp)
+  pages=data.get("query",{}).get("pages",[])
+  page=pages[0] if pages else {}
+  text=(page.get("revisions",[{}])[0].get("slots",{}).get("main",{}).get("content","") if page.get("revisions") else "")
+  mother=re.findall(r'(?m)^\s*\|\s*(?:母|母馬|[Dd]am|[Mm]other)\s*=.*$',text[:12000])
+  print("SAMPLE",horse,"wikiTitle",page.get("title"),"exists",not page.get("missing"),"mother-raw",mother[:3])
+ except Exception as exc:
+  print("SAMPLE",horse,"ERROR",type(exc).__name__,str(exc))
