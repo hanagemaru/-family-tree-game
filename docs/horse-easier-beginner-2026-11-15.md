@@ -23,3 +23,11 @@
 - CI：GitHub Actions Family tree checks、および Easy beginner fame benchmark を参照。
 
 公開URLの反映はこの開発版には含まない。PR #13がマージされるまではmainと本番は変更されない。
+
+## 100シードの実測結果（GitHub Actions成功）
+- [Easy beginner fame benchmark #43620845759](https://github.com/hanagemaru/-family-tree-game/actions/runs/43620845759)
+- **100/100問生成成功、失敗0**。100問すべて異なるカード集合、出題された馬は99種類。
+- 採用馬の知名度順位の平均（872頭中）：**変更前328.35位 → 変更後36.03位**。小さいほど知名度上位。
+- 新初級は18頭中平均15.9頭が知名度上位7%（62頭以内）。上位15%以外からの出題0。
+- これは測定した馬の認知度を保証するものではない。Web閲覧数等に基づく相対的な近似。
+- その他の難易度は従来のhorse-stage-v3をそのまま使用。既存の保存済み問題の再現性は別テストで確認。
