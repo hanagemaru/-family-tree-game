@@ -17,8 +17,8 @@
 - [x] READMEとリリース方針を正式名へ更新。
 
 ## コード検証
-- [ ] 最新コミットの Node・Python・静的ビルド CI 成功を確認。
-- [ ] Chromium / WebKit の390×844相当の実ブラウザで、ホーム・2モード・ドラッグ・ヒント・完成を確認。
+- [x] Node.js 101件・Python 6件・静的ビルドが成功（[CI #43603705597](https://github.com/hanagemaru/-family-tree-game/actions/runs/43603705597)）。
+- [x] Chromium / WebKit の390×844相当の実ブラウザでホーム2モード・ドラッグ・ヒント・完成を確認（同CI、画面画像もartifactに保存）。
 - [ ] iPhone実機のSafariで縦表示・手札・スクロール・ヒント・全体ズームを目視確認。
 - [ ] Android Chromeなどの別端末があれば追試。
 
