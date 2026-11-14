@@ -1,0 +1,36 @@
+name: Enrich mother names from Wikimedia
+on:
+  push:
+    branches:
+      - feature/wikipedia-dam-enrichment-20261114
+    paths:
+      - 'scripts/harvest_wikipedia_dams.py'
+      - 'scripts/harvest_unnamed_wikipedia_dams.py'
+      - '.github/workflows/wiki-harvest.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  wikipedia-dams:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Retrieve source-linked horse mothers
+        run: python scripts/harvest_unnamed_wikipedia_dams.py
+      - name: Record audited Wikipedia references on research branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/horse-parent-evidence.js data/source/wikipedia-dam-evidence.v1.json
+          if git diff --cached --quiet; then
+            echo "No source changes to record"
+          else
+            git commit -m "data: incorporate QID-linked Wikipedia broodmare facts [skip ci]"
+            git push origin HEAD:feature/wikipedia-dam-enrichment-20261114
+          fi
