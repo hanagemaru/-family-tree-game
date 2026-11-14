@@ -373,3 +373,6 @@ body.playing #game-screen .hand-card.horse.selected{
  box-shadow:inset 0 0 0 1px #fff5c8,inset 0 0 0 3px #102C30,
  0 0 0 3px #f2d68d,0 0 20px #f7dca688,0 17px 17px #071d22bb;
 }
+
+/* Toast stays above the board, away from the zoom controls and hand. */
+body.playing #game-screen .status{top:14px;bottom:auto}
