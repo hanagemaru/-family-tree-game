@@ -4,7 +4,14 @@ import {readFileSync} from 'node:fs';import {restoreRandomHorseSession} from '..
 import {findPlayablePlacement} from '../src/game-assistance.js';
 const horseSnapshot=JSON.parse(readFileSync(new URL('../data/horse-pedigree.v1.json',import.meta.url),'utf8'));
 function fixture(){const state=newGame(stages[0]);state.hand=['ieyasu','go','iemitsu','tadanaga','sen'];state.deck=['yoshinao','yorinobu','yorifusa'];return {sessions:{tokugawa:pack(state)},best:{}};}
-async function setup(t){const app=await loadApp(fixture());t.after(()=>app.restore());app.$('stage-list').querySelector('[data-start="tokugawa"]').click();return app;}
+// Legacy Tokugawa regression tests exercise the retained engine without
+// exposing a history-mode button in the public horse-only release.
+function openLegacyForTest(app,id='tokugawa'){
+ const element=app.$('stage-list');
+ element.innerHTML+=`<button data-start="${id}">internal test stage</button>`;
+ element.querySelector(`[data-start="${id}"]`).click();
+}
+async function setup(t){const app=await loadApp(fixture());t.after(()=>app.restore());openLegacyForTest(app);return app;}
 function select(app,id='iemitsu'){app.$('hand').querySelector(`[data-card="${id}"]`).click({detail:0});}
 function target(app,id='hidetada'){app.$('nodes').querySelector(`[data-node="${id}"]`).click({detail:0});}
 function commitRelation(app,relation){const button=app.$('modal-content').querySelector(`[data-place-relation="${relation}"]`);assert.ok(button);button.click();}
@@ -60,7 +67,7 @@ test('actual app: board blank tap cancels selection but board pan does not',asyn
 test('actual app: both themes can be completed through real hand, picker and relation handlers',async t=>{
  for(const stage of stages){
   const app=await loadApp({sessions:{[stage.id]:pack(newGame(stage))},best:{}});
-  try{app.$('stage-list').querySelector(`[data-start="${stage.id}"]`).click();let turns=0;
+  try{openLegacyForTest(app,stage.id);let turns=0;
    while(turns++<100){const state=app.storage().sessions[stage.id];if(state.complete)break;const byId=id=>stage.people.find(p=>p.id===id);const move=state.hand.flatMap(card=>state.placed.flatMap(anchor=>relations(byId(card),byId(anchor)).map(relation=>({card,anchor,relation}))))[0];
     assert.ok(move,`${stage.id}: draw should always be playable`);select(app,move.card);target(app,move.anchor);commitRelation(app,move.relation);
    }
@@ -348,4 +355,18 @@ test('future-connected hand cards can consume both hints without being auto-sele
  assert.match(app.$('hint-box').textContent,/ヒント 2/);
  assert.equal(app.$('hint-button').hidden,true);
  assert.equal(app.$('hand').querySelector(`[data-card="${id}"]`).classList.contains('selected'),true);
+});
+
+test('public home offers exactly two horse modes; historical cards stay out of the release UI',async t=>{
+ const app=await loadApp(fixture());t.after(()=>app.restore());
+ const cards=app.$('stage-list');
+ assert.equal(cards.querySelectorAll('.stage-card').length,2);
+ assert.equal(cards.querySelector('[data-start="tokugawa"]'),null);
+ assert.ok(cards.querySelector('[data-start="thoroughbred"]'));
+ assert.ok(cards.querySelector('[data-random-start]'));
+ assert.doesNotMatch(app.$('home-screen').textContent,/徳川|歴史人物/);
+ assert.match(app.$('home-screen').textContent,/名馬の血統/);
+ app.$('sources-button').click();
+ assert.doesNotMatch(app.$('modal-content').textContent,/徳川/);
+ assert.match(app.$('modal-content').textContent,/Wikidata|Wikipedia/);
 });
