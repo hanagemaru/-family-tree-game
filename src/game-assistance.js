@@ -27,13 +27,51 @@ export function findPlayablePlacement(state){
  return null;
 }
 
+/**
+ * When a horse cannot be placed NOW, offer a real future connection instead
+ * of refusing the hint or automatically swapping to another card.
+ * BFS finds a shortest path to the field using only stage relationships.
+ */
+export function futureHorseConnection(state,cardId){
+ const people=new Map(state.stage.people.map(person=>[person.id,person]));
+ if(!people.has(cardId)||!state.hand.includes(cardId))return null;
+ const visited=new Set([cardId]),queue=[{id:cardId,first:null,distance:0}];
+ for(let i=0;i<queue.length;i++){
+  const item=queue[i];
+  if(state.placed.includes(item.id)&&item.distance>0)return item;
+  const current=people.get(item.id);
+  const options=[...people.values()].filter(p=>p.id!==item.id)
+   .flatMap(p=>relations(current,p).map(relation=>({id:p.id,relation})))
+   .sort((a,b)=>{
+    const weight=r=>r==='parent'||r==='child'?0:1;
+    return weight(a.relation)-weight(b.relation)||a.id.localeCompare(b.id);
+   });
+  for(const neighbor of options){
+   if(visited.has(neighbor.id))continue;
+   visited.add(neighbor.id);
+   queue.push({id:neighbor.id,first:item.first||neighbor,distance:item.distance+1});
+  }
+ }
+ return null;
+}
+
 export function horsePlacementHint(state,cardId,level){
- const move=findCorrectPlacement(state,cardId);
- if(!move)return 'この馬は今の盤面に直接つながりません。ほかの手札を選んでください。';
- const anchor=state.stage.people.find(person=>person.id===move.anchorId);
  const card=state.stage.people.find(person=>person.id===cardId);
- if(level===1)return `場にある「${anchor.name}」とつながります。`;
- return `「${card.name}」は「${anchor.name}」の${relationNames[move.relation]}です。`;
+ if(!card)return '';
+ const move=findCorrectPlacement(state,cardId);
+ if(move){
+  const anchor=state.stage.people.find(person=>person.id===move.anchorId);
+  if(level===1)return `場にある「${anchor.name}」とつながります。`;
+  return `「${card.name}」は「${anchor.name}」の${relationNames[move.relation]}です。`;
+ }
+ const path=futureHorseConnection(state,cardId);
+ if(!path){
+  // Even an incomplete legacy stage can display meaningful sourced metadata.
+  return card.clues[Math.min(1,Math.max(0,level-1))]||'血統情報は未収録です。';
+ }
+ const bridge=state.stage.people.find(person=>person.id===path.first.id);
+ if(level===1)return `今はまだ場に直接つながりません。「${bridge.name}」との血統関係が手がかりです（未配置）。`;
+ return `「${card.name}」は「${bridge.name}」の${relationNames[path.first.relation]}です。「${bridge.name}」が盤面に加わると置けます。`;
 }
 
 /** 未配置の全カードを実際のルールで配置した、別のゲーム状態を返す。

@@ -1,21 +1,21 @@
-import {HORSE_GENERATOR_VERSION,generateRandomHorseStage} from './random-horse-stage.js';
+import {HORSE_GENERATOR_VERSION,LEGACY_HORSE_GENERATOR_VERSION,generateRandomHorseStage} from './random-horse-stage.js';
 
 export const RANDOM_HORSE_MODE_ID='horse-random';
 
-export function randomHorseDescriptor(snapshot,stage,seed){
- return {mode:RANDOM_HORSE_MODE_ID,seed:String(seed),snapshotVersion:snapshot.version,generatorVersion:HORSE_GENERATOR_VERSION,stageId:stage.id,cardIds:stage.people.map(person=>person.id)};
+export function randomHorseDescriptor(snapshot,stage,seed,version=HORSE_GENERATOR_VERSION){
+ return {mode:RANDOM_HORSE_MODE_ID,seed:String(seed),snapshotVersion:snapshot.version,generatorVersion:version,stageId:stage.id,cardIds:stage.people.map(person=>person.id)};
 }
 
-export function generateRandomHorseSession(snapshot,seed){
- const generated=generateRandomHorseStage(snapshot,{seed:String(seed)});
- return {...generated,descriptor:randomHorseDescriptor(snapshot,generated.stage,seed)};
+export function generateRandomHorseSession(snapshot,seed,{version=HORSE_GENERATOR_VERSION}={}){
+ const generated=generateRandomHorseStage(snapshot,{seed:String(seed),version,attempts:version===LEGACY_HORSE_GENERATOR_VERSION?24:48});
+ return {...generated,descriptor:randomHorseDescriptor(snapshot,generated.stage,seed,version)};
 }
 
 export function restoreRandomHorseSession(snapshot,descriptor){
  if(!descriptor||descriptor.mode!==RANDOM_HORSE_MODE_ID||typeof descriptor.seed!=='string'||
-  descriptor.snapshotVersion!==snapshot.version||descriptor.generatorVersion!==HORSE_GENERATOR_VERSION||
+  descriptor.snapshotVersion!==snapshot.version||![HORSE_GENERATOR_VERSION,LEGACY_HORSE_GENERATOR_VERSION].includes(descriptor.generatorVersion)||
   typeof descriptor.stageId!=='string'||!Array.isArray(descriptor.cardIds)||descriptor.cardIds.length!==18)return null;
- const generated=generateRandomHorseSession(snapshot,descriptor.seed);
+ const generated=generateRandomHorseSession(snapshot,descriptor.seed,{version:descriptor.generatorVersion});
  if(generated.stage.id!==descriptor.stageId||generated.descriptor.cardIds.some((id,index)=>id!==descriptor.cardIds[index]))return null;
  return generated;
 }

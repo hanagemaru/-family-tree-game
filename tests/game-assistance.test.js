@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {newGame,place,pack,restore,relations} from '../src/core.js';
 import {generateRandomHorseStage,seededRandom} from '../src/random-horse-stage.js';
-import {findCorrectPlacement,findPlayablePlacement,horsePlacementHint,completedAnswer} from '../src/game-assistance.js';
+import {findCorrectPlacement,findPlayablePlacement,futureHorseConnection,horsePlacementHint,completedAnswer} from '../src/game-assistance.js';
 
 const snapshot=JSON.parse(readFileSync(new URL('../data/horse-pedigree.v1.json',import.meta.url),'utf8'));
 const makeState=seed=>{
@@ -52,4 +52,24 @@ test('answer reveal completes the true game without mutating play state or recor
   assert.deepEqual(pack(original),before,'giving up must not mutate the running game');
   assert.equal(restore(pack(answer),original.stage).gaveUp,true);
  }
+});
+
+test('two meaningful hint levels are available for a hand horse with no immediate placement',()=>{
+ const state=makeState(9);
+ let target=state.hand.find(id=>!findCorrectPlacement(state,id));
+ for(let turn=0;!target&&turn<12;turn++){
+  const move=findPlayablePlacement(state);assert.ok(move);
+  assert.equal(place(state,move.cardId,move.anchorId,move.relation).ok,true);
+  target=state.hand.find(id=>!findCorrectPlacement(state,id));
+ }
+ assert.ok(target,'test fixture should produce a future-connected hand card');
+ const path=futureHorseConnection(state,target);
+ assert.ok(path);
+ assert.ok(path.distance>=2);
+ const bridge=state.stage.people.find(p=>p.id===path.first.id);
+ assert.ok(!state.placed.includes(bridge.id));
+ const hint1=horsePlacementHint(state,target,1),hint2=horsePlacementHint(state,target,2);
+ assert.ok(hint1.includes(bridge.name)&&hint2.includes(bridge.name));
+ assert.doesNotMatch(hint1+hint2,/Q\d+|ほかの手札を選んで/);
+ assert.match(hint2,/父または母|産駒|きょうだい/);
 });

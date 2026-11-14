@@ -2,8 +2,10 @@
 import {relations,newGame,place,fitCamera} from './core.js';
 import {layoutFamily,buildDiagram,renderGeometry} from './diagram.js';
 import {horseSex} from './horse-sex.js';
+import {verifiedDamName} from './horse-parent-evidence.js';
 
-export const HORSE_GENERATOR_VERSION='horse-stage-v1';
+export const HORSE_GENERATOR_VERSION='horse-stage-v2';
+export const LEGACY_HORSE_GENERATOR_VERSION='horse-stage-v1';
 const graphCache=new WeakMap();
 const byId=stage=>new Map(stage.people.map(p=>[p.id,p]));
 
@@ -15,13 +17,13 @@ export function seededRandom(seed){
 export function prepareHorseGraph(snapshot){
  if(graphCache.has(snapshot))return graphCache.get(snapshot);
  if(!snapshot||typeof snapshot.version!=='string'||!Array.isArray(snapshot.horses))throw Error('Invalid horse snapshot');
- const all=new Map(),named=new Map(),links=new Map(),children=new Map(),parentSets=new Map();
+ const all=new Map(),named=new Map(),links=new Map(),directLinks=new Map(),children=new Map(),parentSets=new Map();
  for(const h of snapshot.horses){
   if(!/^Q[1-9]\d*$/.test(h.id)||all.has(h.id))throw Error('Duplicate or invalid horse ID: '+h.id);
   all.set(h.id,h);if(h.named&&typeof h.name==='string'&&h.name!==h.id)named.set(h.id,h);
  }
  for(const h of named.values()){
-  links.set(h.id,new Set());
+  links.set(h.id,new Set());directLinks.set(h.id,new Set());
   const ids=[h.sire,h.dam].filter(Boolean);
   if(new Set(ids).size!==ids.length||ids.some(id=>!all.has(id)||id===h.id))throw Error('Invalid parent ID: '+h.id);
   parentSets.set(h.id,new Set(ids));
@@ -29,7 +31,7 @@ export function prepareHorseGraph(snapshot){
  }
  const connect=(a,b)=>{if(a!==b&&links.has(a)&&links.has(b)){links.get(a).add(b);links.get(b).add(a);}};
  for(const h of named.values()){
-  for(const parent of parentSets.get(h.id))connect(h.id,parent);
+  for(const parent of parentSets.get(h.id)){connect(h.id,parent);if(directLinks.has(parent)){directLinks.get(h.id).add(parent);directLinks.get(parent).add(h.id);}}
  }
  for(const siblings of children.values())for(let i=0;i<siblings.length;i++)for(let j=i+1;j<siblings.length;j++)connect(siblings[i],siblings[j]);
  const components=new Map();let groupIndex=0;
@@ -39,7 +41,7 @@ export function prepareHorseGraph(snapshot){
  }
  const sizes=new Map();for(const group of components.values())sizes.set(group,(sizes.get(group)||0)+1);
  const roots=Object.entries(snapshot.roots||{}).map(([name,root])=>({name,id:root.qid,component:components.get(root.qid)}));
- const graph={all,named,links,children,parentSets,components,sizes,roots};graphCache.set(snapshot,graph);return graph;
+ const graph={all,named,links,directLinks,children,parentSets,components,sizes,roots};graphCache.set(snapshot,graph);return graph;
 }
 
 function relativeGeneration(candidate,anchor){
@@ -49,13 +51,19 @@ function relativeGeneration(candidate,anchor){
  if(c.some(id=>a.includes(id)))return 0;
  return null;
 }
-function attemptGraph(graph,anchorId,random,count){
+function attemptGraph(graph,anchorId,random,count,{strongOnly=false}={}){
  const selected=[anchorId],selectedSet=new Set(selected),gens=new Map([[anchorId,0]]),names=new Set([graph.named.get(anchorId).name]);
  for(let step=1;step<count;step++){
-  const frontier=new Set();for(const id of selected)for(const candidate of graph.links.get(id))if(!selectedSet.has(candidate))frontier.add(candidate);
+  const frontier=new Set();for(const id of selected)for(const candidate of (strongOnly?graph.directLinks:graph.links).get(id))if(!selectedSet.has(candidate))frontier.add(candidate);
   const scored=[];
   for(const id of frontier){
    const horse=graph.named.get(id);if(!horse||names.has(horse.name))continue;
+   // A sibling bond without its common named parent would remain dotted in
+   // the completed board. In v2, never introduce such a pair.
+   if(strongOnly&&selected.some(chosen=>{
+    const known=graph.parentSets.get(chosen);
+    return [horse.sire,horse.dam].some(parent=>parent&&!selectedSet.has(parent)&&known?.has(parent));
+   }))continue;
    let generation=null,valid=true,degree=0;
    for(const chosen of selected){
     const other=graph.named.get(chosen),difference=relativeGeneration(horse,other);
@@ -108,7 +116,7 @@ function analyzeSelection(graph,selected,gens){
   softCriteriaMet:generations>=3&&generations<=5&&visibleBranches>=2&&visibleGrandparents>=1&&widestSire<=8};
 }
 
-function toStage(snapshot,graph,selection,seed){
+function toStage(snapshot,graph,selection,seed,version){
  const {selected,gens}=selection,minimum=Math.min(...gens.values());
  const people=selected.map(id=>{
   const h=graph.named.get(id),parents=[h.sire,h.dam].filter(Boolean);
@@ -116,16 +124,19 @@ function toStage(snapshot,graph,selection,seed){
    const parent=graph.all.get(parentId);
    return parent?.named&&typeof parent.name==='string'&&!/^Q[1-9]\d*$/.test(parent.name)?parent.name:null;
   };
-  const sireName=h.sire?readableName(h.sire):null,damName=h.dam?readableName(h.dam):null;
+  const sireName=h.sire?readableName(h.sire):null;
+  const extra=version===LEGACY_HORSE_GENERATOR_VERSION?null:verifiedDamName(h);
+  const damName=(h.dam?readableName(h.dam):null)||extra?.name||null;
   const summary=sireName?`父は${sireName}。`:damName?`母は${damName}。`:'父母の馬名は未取得です。';
-  const detail=`父：${h.sire?sireName||'馬名未取得':'データなし'}／母：${h.dam?damName||'馬名未取得':'データなし'}`;
+  const detail=`父：${h.sire?sireName||'馬名未取得':'未収録'}／母：${damName||'未収録'}`;
+  const source=extra?{label:`JBIS／Wikidata: ${h.name}`,url:extra.source}:{label:`Wikidata: ${h.name}`,url:h.source};
   return {id,name:h.name,short:h.name,sex:horseSex(id,snapshot),generation:gens.get(id)-minimum,parents,spouses:[],
    clues:[summary,detail],
-   source:{label:`Wikidata: ${h.name}`,url:h.source}};
+   source};
  });
- const stage={id:`horse-generated:${snapshot.version}:${HORSE_GENERATOR_VERSION}:${String(seed)}`,title:'競走馬の血統（自動生成）',category:'競走馬',tag:'父母・産駒・きょうだい',symbol:'馬',anchor:selected[0],people,
-  summary:'父・母と産駒の関係をたどる18枚。',description:'Wikidata由来の血統記録からシード固定で抽出。',
-  scope:'Wikidataの登録情報に基づきます。実際の血統と照合した保証はなく、未登録は血統不明を意味しません。',sources:[{label:'Wikidata（CC0）',url:'https://www.wikidata.org/'}]};
+ const stage={id:`horse-generated:${snapshot.version}:${version}:${String(seed)}`,title:'競走馬の血統（自動生成）',category:'競走馬',tag:'父母・産駒・きょうだい',symbol:'馬',anchor:selected[0],people,
+  summary:'父・母と産駒の関係をたどる18枚。',description:'登録済みの親子関係からシード固定で抽出。',
+  scope:'Wikidataの血統記録を元に作成。確認済みの一部母馬名はJBISの情報で補完。未収録は血統不明を意味しません。',sources:[{label:'Wikidata（CC0）',url:'https://www.wikidata.org/'},{label:'JBISサーチ（母馬名の一部を照合）',url:'https://www.jbis.or.jp/'}]};
  return stage;
 }
 
@@ -147,16 +158,18 @@ export function replayHorseStage(stage,seed){
   for(const p of points){if(!rows.has(p.y))rows.set(p.y,[]);rows.get(p.y).push(p.x);}
   const rowOverlap=[...rows.values()].some(row=>{row.sort((a,b)=>a-b);return row.some((x,i)=>i>0&&x-row[i-1]<108);});
   const camera=fitCamera(state.positions,360,320);
-  return {ok:true,steps,crossings:geometry.crossings.length,scale360x320:camera.scale,
+  return {ok:true,steps,crossings:geometry.crossings.length,dottedSiblingLinks:diagram.networks.filter(n=>n.kind==='sibling').length,scale360x320:camera.scale,
    width:Math.max(...xs)-Math.min(...xs)+108,height:Math.max(...ys)-Math.min(...ys)+154,rowOverlap};
  }catch(e){return {ok:false,reason:'diagram_error',steps,message:String(e)};}
 }
 
 /** Return {stage,metrics,diagnostics}, or throw with stable reason after bounded retries. */
-export function generateRandomHorseStage(snapshot,{seed=1,count=18,attempts=24}={}){
+export function generateRandomHorseStage(snapshot,{seed=1,count=18,attempts=48,version=HORSE_GENERATOR_VERSION}={}){
+ if(![HORSE_GENERATOR_VERSION,LEGACY_HORSE_GENERATOR_VERSION].includes(version))throw Error('Unsupported generator version');
+ const strongOnly=version!==LEGACY_HORSE_GENERATOR_VERSION;
  if(!Number.isInteger(count)||count<2||count>64)throw Error('Invalid card count');
  if(!Number.isInteger(attempts)||attempts<1||attempts>200)throw Error('Invalid candidate count');
- const graph=prepareHorseGraph(snapshot),random=seededRandom(`${HORSE_GENERATOR_VERSION}:${snapshot.version}:${seed}`);
+ const graph=prepareHorseGraph(snapshot),random=seededRandom(`${version}:${snapshot.version}:${seed}`);
  const eligible=[...graph.named.keys()].filter(id=>graph.sizes.get(graph.components.get(id))>=count&&graph.links.get(id).size>0);
  if(!eligible.length)throw Error('insufficient_connected_named_records');
  const rootChoices=graph.roots.filter(x=>graph.named.has(x.id)&&graph.sizes.get(x.component)>=count);
@@ -167,19 +180,29 @@ export function generateRandomHorseStage(snapshot,{seed=1,count=18,attempts=24}=
   const useRoot=rootChoices.length>0&&i%4!==3;
   const root=useRoot?rootChoices[Math.floor(random()*rootChoices.length)]:null;
   const pool=root?eligible.filter(id=>graph.components.get(id)===root.component):eligible;
-  const anchor=pool[Math.floor(random()*pool.length)],candidate=attemptGraph(graph,anchor,random,count);
+  const anchor=pool[Math.floor(random()*pool.length)],candidate=attemptGraph(graph,anchor,random,count,{strongOnly});
   if(!candidate.selected){reject(candidate.reason);continue;}
   const metrics=analyzeSelection(graph,candidate.selected,candidate.gens);
+  if(strongOnly){
+   const chosen=new Set(candidate.selected);
+   const orphanPairs=candidate.selected.some((id,i)=>candidate.selected.slice(i+1).some(other=>{
+    const shared=[...graph.parentSets.get(id)].some(parent=>graph.parentSets.get(other)?.has(parent));
+    return shared&&![...graph.parentSets.get(id)].some(parent=>chosen.has(parent)&&graph.parentSets.get(other)?.has(parent));
+   }));
+   if(orphanPairs){reject('unresolved_sibling_links');continue;}
+   if(metrics.parentEdges<count-1){reject('not_fully_connected_by_parent_child');continue;}
+  }
   candidates.push({candidate,metrics});
  }
  candidates.sort((a,b)=>b.metrics.quality-a.metrics.quality);
  // Evaluate the real game layout for several structurally promising candidates.
  // Comparing only structural quality would ignore line crossings and phone fit.
  let best=null;
- for(const {candidate,metrics} of candidates.slice(0,Math.min(2,candidates.length))){
-  const stage=toStage(snapshot,graph,candidate,seed),replay=replayHorseStage(stage,seed);
+ for(const {candidate,metrics} of candidates.slice(0,Math.min(strongOnly?6:2,candidates.length))){
+  const stage=toStage(snapshot,graph,candidate,seed,version),replay=replayHorseStage(stage,seed);
   if(!replay.ok){reject(replay.reason);continue;}
   if(replay.rowOverlap){reject('overlapping_cards');continue;}
+  if(strongOnly&&replay.dottedSiblingLinks>0){reject('dotted_sibling_links');continue;}
   const score=metrics.quality-Math.min(80,replay.crossings*3)+replay.scale360x320*18
    -Math.max(0,metrics.maxRowCards-8)*4;
   if(!best||score>best.metrics.score){

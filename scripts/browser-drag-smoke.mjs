@@ -165,6 +165,33 @@ try{
   assert.equal(errors.length,0,name+' page errors: '+errors.join('; '));
   console.log('BROWSER_COLORS_PASS',name,'male/female distinct');
 
+  // A freshly generated v2 horse puzzle must end with a single strong pedigree
+  // graph, no permanent dotted-only sibling edges. The final camera must fit
+  // all 18 cards even on a 390px-wide mobile viewport.
+  await page.locator('[data-action="home"]').click();
+  await page.locator('[data-random-start]').click();
+  await page.locator('#menu-button').click();
+  await page.locator('[data-action="give-up-confirm"]').click();
+  await page.locator('[data-action="give-up"]').click();
+  await page.locator('#modal-close').click();
+  await page.waitForTimeout(500);
+  const completeGraph=await page.evaluate(()=>{
+   const board=document.querySelector('#board').getBoundingClientRect();
+   const cards=[...document.querySelectorAll('#nodes [data-node]')];
+   const out=cards.filter(card=>{
+    const rect=card.getBoundingClientRect();
+    return rect.left<board.left-2||rect.right>board.right+2||
+      rect.top<board.top-2||rect.bottom>board.bottom+2;
+   });
+   return {cards:cards.length,dotted:document.querySelectorAll('#edges .sibling').length,
+    outside:out.length,scale:document.querySelector('#world').style.transform};
+  });
+  assert.equal(completeGraph.cards,18,name+' generated question must show 18 cards');
+  assert.equal(completeGraph.dotted,0,name+' v2 should have no unresolved sibling-only links');
+  assert.equal(completeGraph.outside,0,name+' whole final pedigree must fit the board');
+  await page.screenshot({path:`artifacts/browser-drag/${name}-v2-complete.png`,fullPage:true});
+  console.log('BROWSER_V2_GRAPH_PASS',name,JSON.stringify(completeGraph));
+
   await page.close();await browser.close();browser=null;
  }
 }finally{
