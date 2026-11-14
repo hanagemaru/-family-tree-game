@@ -36,7 +36,7 @@ function openDialog(html,closeLabel='閉じる',kind='info'){dialogKind=kind;mod
 function closeDialog(){modal.close();lastTick=performance.now();}
 modal.addEventListener('close',()=>{lastTick=performance.now();if(state)renderCaption();});
 $('modal-close').addEventListener('click',closeDialog);
-function help(){openDialog(`<p class="eyebrow">HOW TO PLAY</p><h2>相手に置いて、関係を選ぶ。</h2><ol><li>手札をドラッグすると、相手の上に「親」、左右に「きょうだい」、下に「子」の点線枠が出ます。点線枠に位置マーカーを重ね、少し止めてから離すと配置できます。枠の外で離した場合は関係を選びます。</li><li>場のカード上で離した場合や、名前一覧から相手を選んだ場合は、関係ボタンを1回タップして配置できます。</li><li>手札をタップ → 相手をタップ、でも同じ操作ができます。押しにくい相手は「相手を一覧から」で選べます。</li><li>置ける札がない状態は自動で防ぎます。困ったらヒントを確認できます。メニューから答えを見ることもできます。時間制限はありません。</li><li>●は実際の接続点、線の切れ目は非接続の交差。手札未選択で場のカードをタップすると関係線を強調します。</li><li>盤面をスワイプして移動。ピンチ、＋ / −で拡縮し、「全体」で見渡せます。</li></ol><p class="scope">${state?escape(state.stage.scope):'進行はこのブラウザへ自動保存されます。'}</p>`);}
+function help(){openDialog(`<p class="eyebrow">HOW TO PLAY</p><h2>手札を場につなぐ。</h2><ol><li>手札をタップし、場の相手をタップ。親・子・きょうだいなどを選ぶと配置します。</li><li>ドラッグ中は点線枠に位置マーカーを合わせ、少し止めて離すと直接配置できます。それ以外は関係を選ぶだけです。</li><li>同じ手札または盤面の余白をタップすると選択解除。ヒントは選択中の手札について表示されます。</li><li>相手が判別できないときは名前一覧から選べます。降参して答えを見る操作はメニュー内にあります。</li><li>●は実際の接続点、線の切れ目は非接続の交差。手札未選択で場のカードをタップすると関係線を強調します。</li><li>盤面をスワイプして移動。ピンチ、＋ / −で拡縮し、「全体」で見渡せます。</li></ol><p class="scope">${state?escape(state.stage.scope):'進行はこのブラウザへ自動保存されます。'}</p>`);}
 $('help-button').addEventListener('click',help);
 function showSources(){const list=state?[state.stage]:stages;openDialog(`<p class="eyebrow">ABOUT THE FAMILY TREES</p><h2>題材・出典</h2>${list.map(stage=>`<h3>${stage.title}</h3><p>${stage.description}</p><p class="scope">${stage.scope}</p><ul>${[...new Map([...stage.sources,...stage.people.map(p=>p.source)].map(s=>[s.url,s])).values()].map(s=>`<li><a href="${escape(s.url)}" target="_blank" rel="noopener noreferrer">${escape(s.label)}</a></li>`).join('')}</ul>`).join('')}<p class="scope">関係情報をもとに作成した選抜ステージです。人物・馬の肖像や写真は転載していません。</p>`);}
 $('sources-button').addEventListener('click',showSources);
@@ -240,15 +240,25 @@ function showAnswer(){
 function results(){fit();const random=isRandomHorseStage(state.stage);openDialog(`<p class="eyebrow">${state.gaveUp?'ANSWER REVEALED':'FAMILY TREE COMPLETED'}</p><h2>${state.gaveUp?'答えの系譜':'ひとつの系譜が、つながった。'}</h2>${state.gaveUp?'<p>降参して残りの答えを表示しました。クリア記録には含まれません。</p>':''}<p>${state.stage.title} · ${state.stage.people.length}${state.stage.id==='tokugawa'?'人':'頭'}のカードを配置しました。</p>${random?`<p class="random-seed">問題ID <code>${escape(records.randomHorse?.seed||'')}</code></p>`:''}<div class="result-stats"><div>プレイ時間<b>${formatTime(state.elapsed)}</b></div><div>ミス<b>${state.mistakes}</b></div><div>ヒント<b>${hintCount()}</b></div></div><details><summary>つながりを振り返る</summary><ul>${state.stage.people.filter(p=>p.id!==state.stage.anchor).map(p=>`<li><strong>${escape(p.name)}</strong><br>${escape(p.clues[1])}</li>`).join('')}</ul></details><button class="button" data-action="home">ほかの系譜をたどる</button><button class="button secondary" data-action="restart-confirm">同じ問題でもう一度</button>${random?'<button class="button secondary" data-action="random-retry-confirm">別の問題に挑戦</button>':''}`,state.gaveUp?'答えの系譜を見る':'完成した系譜を見る');}
 // Pointer events unify mouse, pen and touch. No HTML Drag and Drop dependency on iOS.
 $('hand').addEventListener('pointerdown',e=>{
- const button=e.target.closest('[data-card]');if(!button||e.button!==0||drag)return;e.preventDefault();updateTransform();selectCard(button.dataset.card);drag={pointerId:e.pointerId,id:selected,startX:e.clientX,startY:e.clientY,x:e.clientX,y:e.clientY,active:false};$('app').setPointerCapture(e.pointerId);
+ const button=e.target.closest('[data-card]');if(!button||e.button!==0||drag)return;
+ e.preventDefault();updateTransform();
+ const id=button.dataset.card,wasSelected=id===selected;
+ if(!wasSelected)selectCard(id);
+ drag={pointerId:e.pointerId,id,startX:e.clientX,startY:e.clientY,
+  x:e.clientX,y:e.clientY,active:false,wasSelected};
+ $('app').setPointerCapture(e.pointerId);
 });
-$('hand').addEventListener('click',e=>{if(e.detail!==0)return;const button=e.target.closest('[data-card]');if(button)selectCard(button.dataset.card);});
+$('hand').addEventListener('click',e=>{
+ if(e.detail!==0)return;
+ const button=e.target.closest('[data-card]');
+ if(button){if(selected===button.dataset.card)clearSelection();else selectCard(button.dataset.card);}
+});
 board.addEventListener('pointerdown',e=>{
  if(drag||modal.open||e.button!==0||e.target.closest('.board-tools'))return;e.preventDefault();board.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
  if(pointers.size===1)pan={id:e.pointerId,x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,node:e.target.closest('[data-node]')?.dataset.node,moved:false};else if(pan)pan.moved=true;
 });
 window.addEventListener('pointermove',e=>{
- if(drag&&e.pointerId===drag.pointerId){drag.x=e.clientX;drag.y=e.clientY;if(!drag.active&&Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)>6){drag.active=true;$('drag-ghost').innerHTML=cardFace(drag.id);$('drag-ghost').classList.toggle('horse',isHorseStage(state.stage));$('drag-ghost').hidden=false;document.body.classList.add('drag-active');$('hand').querySelector(`[data-card="${drag.id}"]`)?.classList.add('dragging');frame=requestAnimationFrame(autoPan);}
+ if(drag&&e.pointerId===drag.pointerId){drag.x=e.clientX;drag.y=e.clientY;if(!drag.active&&Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)>6){drag.active=true;$('drag-ghost').innerHTML=cardFace(drag.id);$('drag-ghost').classList.toggle('horse',isHorseStage(state.stage));for(const cls of ['sex-male','sex-female','sex-gelding','sex-unknown'])$('drag-ghost').classList.toggle(cls,sexTone(drag.id)===cls);$('drag-ghost').hidden=false;document.body.classList.add('drag-active');$('hand').querySelector(`[data-card="${drag.id}"]`)?.classList.add('dragging');frame=requestAnimationFrame(autoPan);}
  if(drag.active){const point=dragHotspot(e.clientX,e.clientY);$('drag-ghost').style.left=`${point.x}px`;$('drag-ghost').style.top=`${point.y}px`;hoverAt(point.x,point.y);}return;}
  if(!pointers.has(e.pointerId))return;const old=[...pointers.values()];pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});const next=[...pointers.values()];
  if(pointers.size===2){const oldMid={x:(old[0].x+old[1].x)/2,y:(old[0].y+old[1].y)/2},mid={x:(next[0].x+next[1].x)/2,y:(next[0].y+next[1].y)/2},d1=Math.hypot(old[0].x-old[1].x,old[0].y-old[1].y),d2=Math.hypot(next[0].x-next[1].x,next[0].y-next[1].y),r=board.getBoundingClientRect();if(d1>2)zoomAt(d2/d1,oldMid.x-r.left,oldMid.y-r.top);camera.x+=mid.x-oldMid.x;camera.y+=mid.y-oldMid.y;updateTransform();if(pan)pan.moved=true;
@@ -257,14 +267,31 @@ window.addEventListener('pointermove',e=>{
 function autoPan(){if(!drag?.active)return;const hotspot=dragHotspot(drag.x,drag.y),p=pointOnBoard(hotspot.x,hotspot.y);if(p.inside){if(!dragPlacement?.overSlot){const dx=p.x<28?3:p.x>board.clientWidth-28?-3:0,dy=p.y<34?3:p.y>board.clientHeight-34?-3:0;if(dx||dy){camera.x+=dx;camera.y+=dy;updateTransform();}}hoverAt(hotspot.x,hotspot.y);}frame=requestAnimationFrame(autoPan);}
 function cancelDrag(){if(frame)cancelAnimationFrame(frame);frame=null;if(drag){try{if($('app').hasPointerCapture(drag.pointerId))$('app').releasePointerCapture(drag.pointerId);}catch{}}drag=null;hoverAnchor=null;clearDragPreview();$('drag-ghost').hidden=true;$('drag-ghost').classList.remove('in-board');document.body.classList.remove('drag-active');$('hand').querySelectorAll('.dragging').forEach(b=>b.classList.remove('dragging'));paintTarget();if(state)renderCaption();}
 window.addEventListener('pointerup',e=>{
- if(drag&&e.pointerId===drag.pointerId){const active=drag.active,hotspot=dragHotspot(e.clientX,e.clientY),point=pointOnBoard(hotspot.x,hotspot.y);if(active)hoverAt(hotspot.x,hotspot.y);const directed=active&&camera.scale>=.55&&dragDropReady(dragPlacement,performance.now())?dragPlacement:null;const decision=dropDecision({active,inside:point.inside,anchor:camera.scale<.55?null:hoverAnchor,card:selected});cancelDrag();if(directed&&decision.type==='relation'){targetAnchor=directed.anchorId;attempt(directed.relation);}else if(decision.type==='relation')chooseRelations(decision.anchor);else if(decision.type==='choose-anchor')chooseAnchor();else if(selected)say(`${person(selected).name}を選択中。場の相手をタップしてください。`);return;}
- if(!pointers.has(e.pointerId))return;pointers.delete(e.pointerId);if(pan&&pan.id===e.pointerId&&!pan.moved){if(selected){const point=pointOnBoard(e.clientX,e.clientY),id=pan.node||pickDropCard(point,screenNodes(state.positions,camera));if(id)chooseRelations(id);else say('場のカードをタップするか「相手を一覧から」で選んでください。');}else if(pan.node)focusLines(pan.node);}
+ if(drag&&e.pointerId===drag.pointerId){const active=drag.active,wasSelected=drag.wasSelected,hotspot=dragHotspot(e.clientX,e.clientY),
+ point=pointOnBoard(hotspot.x,hotspot.y);
+ if(active)hoverAt(hotspot.x,hotspot.y);
+ const nodes=active?screenNodes(state.positions,camera):[];
+ const exact=exactDropTarget(point,nodes);
+ const crowded=ambiguousNearbyDrop(point,nodes);
+ const suggested=dragPlacement?.anchorId,near=hoverAnchor;
+ const directed=active&&camera.scale>=.55&&dragDropReady(dragPlacement,performance.now())?dragPlacement:null;
+ cancelDrag();
+ if(!active){if(wasSelected)clearSelection();return;}
+ if(!point.inside)return;
+ if(directed){targetAnchor=directed.anchorId;attempt(directed.relation);return;}
+ if(exact.kind==='card'){chooseRelations(exact.id);return;}
+ if(exact.kind==='ambiguous'||crowded){chooseAnchor();return;}
+ if(suggested){chooseRelations(suggested);return;}
+ if(near&&camera.scale>=.55){chooseRelations(near);return;}
+ say('場のカードに重ねると、相手を指定できます。');
+ return;}
+ if(!pointers.has(e.pointerId))return;pointers.delete(e.pointerId);if(pan&&pan.id===e.pointerId&&!pan.moved){if(selected){const point=pointOnBoard(e.clientX,e.clientY),id=pan.node||pickDropCard(point,screenNodes(state.positions,camera));if(id)chooseRelations(id);else clearSelection();}else if(pan.node)focusLines(pan.node);}
  if(pointers.size===1){const [id,p]=[...pointers.entries()][0];pan={id,x:p.x,y:p.y,startX:p.x,startY:p.y,moved:true};}else pan=null;
 });
 window.addEventListener('pointercancel',e=>{if(drag?.pointerId===e.pointerId){cancelDrag();clearTargets();}pointers.delete(e.pointerId);pan=null;});
 window.addEventListener('blur',()=>{cancelDrag();pointers.clear();pan=null;if(!(modal.open&&dialogKind==='relation'))clearTargets();persist();lastTick=performance.now();});
 $('nodes').addEventListener('click',e=>{if(e.detail!==0)return;const node=e.target.closest('[data-node]');if(node){if(selected)chooseRelations(node.dataset.node);else focusLines(node.dataset.node);}});
-window.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.open){cancelDrag();clearTargets();selected=null;lineFocus=null;renderLines();for(const node of $('nodes').querySelectorAll('[data-node]')){node.classList.remove('line-focused');node.setAttribute('aria-pressed','false');}if(state){renderHand();renderHint();renderStats();}}});
+window.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.open&&state){cancelDrag();clearSelection();}});
 let previousWidth=0,previousHeight=0;
 new ResizeObserver(()=>{if(!state||!board.clientWidth||!board.clientHeight)return;if(!previousWidth||!previousHeight||camera.scale<=0){previousWidth=board.clientWidth;previousHeight=board.clientHeight;fit(false);return;}camera.x+=(board.clientWidth-previousWidth)/2;camera.y+=(board.clientHeight-previousHeight)/2;previousWidth=board.clientWidth;previousHeight=board.clientHeight;updateTransform();}).observe(board);
 setInterval(()=>{const now=performance.now(),playingSheet=dialogKind==='relation'||dialogKind==='anchor';if(state&&!state.complete&&!document.hidden&&(!modal.open||playingSheet)){state.elapsed+=Math.max(0,Math.min(now-lastTick,1500));$('timer').textContent=formatTime(state.elapsed);if(now-lastSaved>10000){persist();lastSaved=now;}}lastTick=now;},500);
