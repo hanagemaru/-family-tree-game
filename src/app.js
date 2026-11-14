@@ -65,13 +65,33 @@ function renderStats(){
  renderCaption();
  renderSelection();
 }
+function positionHintButton(){
+ const button=$('hint-button'),section=$('hand-section');
+ if(!selected||button.hidden)return;
+ const card=[...$('hand').querySelectorAll('[data-card]')].find(node=>node.dataset.card===selected);
+ if(!card)return;
+ const surface=section.getBoundingClientRect(),rect=card.getBoundingClientRect();
+ // Position it near the selected card, but never clip the 90px touch target
+ // against the left or right edge of a narrow viewport.
+ if(surface.width&&rect.width){
+  const buttonWidth=92;
+  const x=Math.max(5,Math.min(surface.width-buttonWidth-5,rect.right-surface.left-buttonWidth*.53));
+  const y=rect.top-surface.top-31;
+  button.style.left=`${Math.round(x)}px`;
+  button.style.top=`${Math.round(y)}px`;
+  const clue=$('hint-box'),width=Math.min(surface.width-28,320);
+  const center=rect.left+rect.width/2-surface.left;
+  clue.style.left=`${Math.round(Math.max(14,Math.min(surface.width-width-14,center-width/2)))}px`;
+ }
+}
 function renderSelection(){
  const summary=$('selection-summary'),hint=$('hint-button');
  summary.textContent=selected?`選択中 · ${person(selected).name}`:'';
  summary.title=selected?'同じ手札か盤面の余白をタップして解除':'';
  const level=selected?(state.hints[selected]||0):0;
- hint.hidden=!selected||state.complete||level>=2;
- hint.textContent=level===1?'次のヒント':'ヒント';
+ hint.hidden=!selected||state.complete||level>=2||!!drag?.active;
+ hint.querySelector('span').textContent=level===1?'ヒント 2':'ヒント';
+ positionHintButton();
 }
 function renderBoard(newId){
  $('nodes').innerHTML=state.placed.map(id=>{const p=person(id),position=state.positions[id];return `<button class="person-node table-card ${isHorseStage(state.stage)?'horse':''} ${sexTone(id)} ${id===state.stage.anchor?'anchor':''} ${id===newId?'new-card':''}" data-node="${id}" aria-pressed="false" style="left:${position.x}px;top:${position.y}px" aria-label="${escape(p.name)}${id===state.stage.anchor?'、起点のカード':''}">${cardFace(id)}</button>`;}).join('');
@@ -85,11 +105,12 @@ function cardFace(id){
  const sex=horse?horseSexLabel(p.sex||horseSex(id)):null;
  const sexMarkup=horse?`<span class="card-sex" aria-label="性別：${sex}">${sex}</span>`:'';
  const art=horse?'<path d="M34 115C34 91 45 70 61 57L47 50L55 21L67 32L83 19L85 43C103 50 115 68 103 81L86 71L72 85L82 115Z"/><path d="M39 109C22 86 31 62 43 51L48 65L43 90Z" opacity=".5"/>':'<path d="M38 65L22 45L37 49L42 31L54 38L65 22L76 38L88 31L93 49L108 45L92 65Z"/><path d="M47 66H84L79 91L66 102L52 91Z"/><path d="M26 121L35 100L50 94L65 108L81 94L99 101L108 121Z"/><path d="M59 42L65 34L71 42L65 53Z" fill="#f0d69a"/>';
- return `<span class="card-corner" aria-hidden="true">${String(number).padStart(2,'0')}<i>${horse?'血統':'歴史'}</i></span>${sexMarkup}<span class="card-art" aria-hidden="true"><span class="card-orbit"></span><svg viewBox="0 0 130 135">${art}</svg><span class="card-seal">${horse?'名馬':'徳川'}</span></span><span class="card-name">${escape(p.name)}</span><small>${horse?'THOROUGHBRED COLLECTION':'TOKUGAWA COLLECTION'}</small>`;
+ return `<span class="card-corner" aria-hidden="true">No.${String(number).padStart(2,'0')}</span>${sexMarkup}<span class="card-art" aria-hidden="true"><span class="card-track-lines"></span><svg viewBox="0 0 130 135">${art}</svg></span><span class="card-name">${escape(p.name)}</span><small>${horse?'RACEHORSE':'HISTORY'}</small>`;
 }
 function renderHand(){
  $('hand').innerHTML=state.hand.map((id,index)=>`<button class="hand-card ${isHorseStage(state.stage)?'horse':''} ${sexTone(id)} ${id===selected?'selected':''}" style="--slot:${index};--tint:${(state.stage.people.findIndex(p=>p.id===id)*19)%70}deg" data-card="${id}" aria-pressed="${id===selected}" aria-label="${escape(person(id).name)}。ドラッグするか、選択して場のカードをタップ">${cardFace(id)}</button>`).join('');
  if(state.complete)$('hand').innerHTML='<p class="complete-note">すべてのカードがつながりました。</p>';
+ positionHintButton();
 }
 function animateDraw(beforeHand){
  const dealt=state.hand.find(id=>!beforeHand.includes(id));if(!dealt)return;
@@ -129,9 +150,9 @@ function clearSelection(){
 function renderHint(){
  const box=$('hint-box');box.hidden=true;if(!selected)return;
  const level=state.hints[selected]||0;if(!level)return;
- const generated=isRandomHorseStage(state.stage),move=generated?findCorrectPlacement(state,selected):null;
+ const generated=isRandomHorseStage(state.stage);
  const clue=generated?horsePlacementHint(state,selected,level):person(selected).clues[level-1];
- box.hidden=false;
+ box.hidden=!!drag?.active;
  box.innerHTML=`<strong>${escape(person(selected).name)}</strong> <small>ヒント ${level} / 2</small><br>${escape(clue)}`;
 }
 function revealHint(){
@@ -257,13 +278,13 @@ board.addEventListener('pointerdown',e=>{
 });
 window.addEventListener('pointermove',e=>{
  if(drag&&e.pointerId===drag.pointerId){drag.x=e.clientX;drag.y=e.clientY;if(!drag.active&&Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)>6){drag.active=true;$('drag-ghost').innerHTML=cardFace(drag.id);$('drag-ghost').classList.toggle('horse',isHorseStage(state.stage));for(const cls of ['sex-male','sex-female','sex-gelding','sex-unknown'])$('drag-ghost').classList.toggle(cls,sexTone(drag.id)===cls);$('drag-ghost').hidden=false;document.body.classList.add('drag-active');$('hand').querySelector(`[data-card="${drag.id}"]`)?.classList.add('dragging');frame=requestAnimationFrame(autoPan);}
- if(drag.active){const point=dragHotspot(e.clientX,e.clientY);$('drag-ghost').style.left=`${point.x}px`;$('drag-ghost').style.top=`${point.y}px`;hoverAt(point.x,point.y);}return;}
+ if(drag.active){$('hint-button').hidden=true;$('hint-box').hidden=true;const point=dragHotspot(e.clientX,e.clientY);$('drag-ghost').style.left=`${point.x}px`;$('drag-ghost').style.top=`${point.y}px`;hoverAt(point.x,point.y);}return;}
  if(!pointers.has(e.pointerId))return;const old=[...pointers.values()];pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});const next=[...pointers.values()];
  if(pointers.size===2){const oldMid={x:(old[0].x+old[1].x)/2,y:(old[0].y+old[1].y)/2},mid={x:(next[0].x+next[1].x)/2,y:(next[0].y+next[1].y)/2},d1=Math.hypot(old[0].x-old[1].x,old[0].y-old[1].y),d2=Math.hypot(next[0].x-next[1].x,next[0].y-next[1].y),r=board.getBoundingClientRect();if(d1>2)zoomAt(d2/d1,oldMid.x-r.left,oldMid.y-r.top);camera.x+=mid.x-oldMid.x;camera.y+=mid.y-oldMid.y;updateTransform();if(pan)pan.moved=true;
  }else if(pan&&pan.id===e.pointerId){if(Math.hypot(e.clientX-pan.startX,e.clientY-pan.startY)>5)pan.moved=true;if(pan.moved){camera.x+=e.clientX-pan.x;camera.y+=e.clientY-pan.y;clearTargets();updateTransform();}pan.x=e.clientX;pan.y=e.clientY;}
 });
 function autoPan(){if(!drag?.active)return;const hotspot=dragHotspot(drag.x,drag.y),p=pointOnBoard(hotspot.x,hotspot.y);if(p.inside){if(!dragPlacement?.overSlot){const dx=p.x<28?3:p.x>board.clientWidth-28?-3:0,dy=p.y<34?3:p.y>board.clientHeight-34?-3:0;if(dx||dy){camera.x+=dx;camera.y+=dy;updateTransform();}}hoverAt(hotspot.x,hotspot.y);}frame=requestAnimationFrame(autoPan);}
-function cancelDrag(){if(frame)cancelAnimationFrame(frame);frame=null;if(drag){try{if($('app').hasPointerCapture(drag.pointerId))$('app').releasePointerCapture(drag.pointerId);}catch{}}drag=null;hoverAnchor=null;clearDragPreview();$('drag-ghost').hidden=true;$('drag-ghost').classList.remove('in-board');document.body.classList.remove('drag-active');$('hand').querySelectorAll('.dragging').forEach(b=>b.classList.remove('dragging'));paintTarget();if(state)renderCaption();}
+function cancelDrag(){if(frame)cancelAnimationFrame(frame);frame=null;if(drag){try{if($('app').hasPointerCapture(drag.pointerId))$('app').releasePointerCapture(drag.pointerId);}catch{}}drag=null;hoverAnchor=null;clearDragPreview();$('drag-ghost').hidden=true;$('drag-ghost').classList.remove('in-board');document.body.classList.remove('drag-active');$('hand').querySelectorAll('.dragging').forEach(b=>b.classList.remove('dragging'));paintTarget();if(state){renderCaption();renderSelection();renderHint();}}
 window.addEventListener('pointerup',e=>{
  if(drag&&e.pointerId===drag.pointerId){const active=drag.active,wasSelected=drag.wasSelected,hotspot=dragHotspot(e.clientX,e.clientY),
  point=pointOnBoard(hotspot.x,hotspot.y);
@@ -291,7 +312,7 @@ window.addEventListener('blur',()=>{cancelDrag();pointers.clear();pan=null;if(!(
 $('nodes').addEventListener('click',e=>{if(e.detail!==0)return;const node=e.target.closest('[data-node]');if(node){if(selected)chooseRelations(node.dataset.node);else focusLines(node.dataset.node);}});
 window.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.open&&state){cancelDrag();clearSelection();}});
 let previousWidth=0,previousHeight=0;
-new ResizeObserver(()=>{if(!state||!board.clientWidth||!board.clientHeight)return;if(!previousWidth||!previousHeight||camera.scale<=0){previousWidth=board.clientWidth;previousHeight=board.clientHeight;fit(false);return;}camera.x+=(board.clientWidth-previousWidth)/2;camera.y+=(board.clientHeight-previousHeight)/2;previousWidth=board.clientWidth;previousHeight=board.clientHeight;updateTransform();}).observe(board);
+new ResizeObserver(()=>{if(!state||!board.clientWidth||!board.clientHeight)return;if(!previousWidth||!previousHeight||camera.scale<=0){previousWidth=board.clientWidth;previousHeight=board.clientHeight;fit(false);return;}camera.x+=(board.clientWidth-previousWidth)/2;camera.y+=(board.clientHeight-previousHeight)/2;previousWidth=board.clientWidth;previousHeight=board.clientHeight;updateTransform();positionHintButton();}).observe(board);
 setInterval(()=>{const now=performance.now(),playingSheet=dialogKind==='relation'||dialogKind==='anchor';if(state&&!state.complete&&!document.hidden&&(!modal.open||playingSheet)){state.elapsed+=Math.max(0,Math.min(now-lastTick,1500));$('timer').textContent=formatTime(state.elapsed);if(now-lastSaved>10000){persist();lastSaved=now;}}lastTick=now;},500);
 document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelDrag();pointers.clear();pan=null;persist();}lastTick=performance.now();});window.addEventListener('pagehide',persist);
 renderHome();
