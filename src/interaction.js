@@ -22,3 +22,24 @@ export function dropDecision({active,inside,anchor,card}){
  if(!active||!inside)return {type:'selected',card};
  return anchor?{type:'relation',card,anchor}:{type:'choose-anchor',card};
 }
+
+/** A card explicitly under the release point always wins over the loose
+ * directional hover zones. An overlapping hit is ambiguous, never guessed. */
+export function exactDropTarget(point,nodes){
+ if(!point.inside)return {kind:'none'};
+ const matches=nodes.filter(node=>
+  Math.abs(point.x-node.x)<=node.width/2&&
+  Math.abs(point.y-node.y)<=node.height/2);
+ if(matches.length===1)return {kind:'card',id:matches[0].id};
+ return matches.length>1?{kind:'ambiguous'}:{kind:'none'};
+}
+
+/** Avoid a selection sheet on blank space. Use it only when a drop falls
+ * among several nearby nodes that could not be distinguished. */
+export function ambiguousNearbyDrop(point,nodes){
+ if(!point.inside)return false;
+ const candidates=nodes.filter(node=>
+  Math.abs(point.x-node.x)<Math.max(26,node.width/2+8)&&
+  Math.abs(point.y-node.y)<Math.max(26,node.height/2+8));
+ return candidates.length>1;
+}
