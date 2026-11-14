@@ -1,0 +1,464 @@
+{
+  "dataVersion": "wikidata-pedigree-v1",
+  "generatorVersion": "horse-stage-v1",
+  "runCount": 1000,
+  "attemptsPerSeed": 24,
+  "successCount": 1000,
+  "successRate": 1,
+  "failureCount": 0,
+  "failures": {},
+  "failureSamples": [],
+  "uniqueProblems": 997,
+  "duplicateCardSets": 3,
+  "uniqueHorseCards": 853,
+  "qualifiedQualityCount": 929,
+  "qualifiedQualityRate": 0.929,
+  "perRoot": {
+    "サンデーサイレンス": 280,
+    "ブライアンズタイム": 221,
+    "キングカメハメハ": 107,
+    "シンボリクリスエス": 87,
+    "シンボリルドルフ": 82,
+    "ノーザンテースト": 81,
+    "ディープインパクト": 55,
+    "グラスワンダー": 43,
+    "トニービン": 19,
+    "未分類": 13,
+    "クロフネ": 8,
+    "ロードカナロア": 4
+  },
+  "originDistinct": 442,
+  "topAnchors": [
+    {
+      "id": "Q6968342",
+      "name": "ナタルマ",
+      "count": 15
+    },
+    {
+      "id": "Q11302085",
+      "name": "コスマー",
+      "count": 14
+    },
+    {
+      "id": "Q7244431",
+      "name": "プリンスキロ",
+      "count": 12
+    },
+    {
+      "id": "Q11343600",
+      "name": "メジロアサマ",
+      "count": 12
+    },
+    {
+      "id": "Q5212022",
+      "name": "ダマスカス",
+      "count": 10
+    },
+    {
+      "id": "Q11329825",
+      "name": "パーソロン",
+      "count": 10
+    },
+    {
+      "id": "Q11282471",
+      "name": "アイルトンシンボリ",
+      "count": 10
+    },
+    {
+      "id": "Q11343607",
+      "name": "メジロティターン",
+      "count": 9
+    },
+    {
+      "id": "Q5643313",
+      "name": "ヘイロー",
+      "count": 9
+    },
+    {
+      "id": "Q11343624",
+      "name": "メジロリベーラ",
+      "count": 9
+    },
+    {
+      "id": "Q4733659",
+      "name": "アルマームード",
+      "count": 9
+    },
+    {
+      "id": "Q117354569",
+      "name": "シャープ・クイーン",
+      "count": 9
+    },
+    {
+      "id": "Q11308703",
+      "name": "シンボリルドルフ",
+      "count": 8
+    },
+    {
+      "id": "Q11328548",
+      "name": "バーディバーディ",
+      "count": 8
+    },
+    {
+      "id": "Q3307189",
+      "name": "ニアークティック",
+      "count": 7
+    }
+  ],
+  "topCards": [
+    {
+      "id": "Q180387",
+      "name": "サンデーサイレンス",
+      "count": 376
+    },
+    {
+      "id": "Q7351567",
+      "name": "ロベルト",
+      "count": 367
+    },
+    {
+      "id": "Q5643313",
+      "name": "ヘイロー",
+      "count": 324
+    },
+    {
+      "id": "Q4962908",
+      "name": "ブライアンズタイム",
+      "count": 305
+    },
+    {
+      "id": "Q5639203",
+      "name": "ヘイルトゥリーズン",
+      "count": 261
+    },
+    {
+      "id": "Q6437279",
+      "name": "クリスエス",
+      "count": 261
+    },
+    {
+      "id": "Q11308429",
+      "name": "シルヴァーホーク",
+      "count": 230
+    },
+    {
+      "id": "Q1969034",
+      "name": "ノーザンダンサー",
+      "count": 214
+    },
+    {
+      "id": "Q61994633",
+      "name": "Bramalea",
+      "count": 197
+    },
+    {
+      "id": "Q11300124",
+      "name": "グッバイヘイロー",
+      "count": 176
+    },
+    {
+      "id": "Q117354569",
+      "name": "シャープ・クイーン",
+      "count": 166
+    },
+    {
+      "id": "Q11302085",
+      "name": "コスマー",
+      "count": 165
+    },
+    {
+      "id": "Q7059024",
+      "name": "ノーザンテースト",
+      "count": 165
+    },
+    {
+      "id": "Q7661156",
+      "name": "シンボリクリスエス",
+      "count": 158
+    },
+    {
+      "id": "Q8027625",
+      "name": "ウィッシングウェル",
+      "count": 152
+    }
+  ],
+  "metrics": {
+    "generations": {
+      "min": 3,
+      "max": 8,
+      "mean": 4.917
+    },
+    "branches": {
+      "min": 1,
+      "max": 6,
+      "mean": 3.174
+    },
+    "sharedParentGroups": {
+      "min": 2,
+      "max": 8,
+      "mean": 3.743
+    },
+    "parentEdges": {
+      "min": 8,
+      "max": 19,
+      "mean": 16.387
+    },
+    "maternalEdges": {
+      "min": 0,
+      "max": 8,
+      "mean": 3.374
+    },
+    "grandparentPaths": {
+      "min": 2,
+      "max": 11,
+      "mean": 5.101
+    },
+    "largestSireGroup": {
+      "min": 2,
+      "max": 8,
+      "mean": 5.744
+    },
+    "maxRowCards": {
+      "min": 3,
+      "max": 11,
+      "mean": 7.099
+    },
+    "crossings": {
+      "min": 0,
+      "max": 176,
+      "mean": 4.722
+    },
+    "scale360x320": {
+      "min": 0.15845070422535212,
+      "max": 0.2719033232628399,
+      "mean": 0.206
+    },
+    "width": {
+      "min": 898,
+      "max": 2162,
+      "mean": 1637.282
+    },
+    "height": {
+      "min": 604,
+      "max": 1729,
+      "mean": 1035.325
+    },
+    "score": {
+      "min": 34.01288343558281,
+      "max": 156.22412060301508,
+      "mean": 121.778
+    }
+  },
+  "sourceStats": {
+    "total": 991,
+    "named": 872,
+    "knownSires": 860,
+    "knownDams": 271
+  },
+  "examples": [
+    {
+      "seed": 1,
+      "anchor": "コスモヘレノス",
+      "root": "グラスワンダー",
+      "ids": [
+        "Q123408085",
+        "Q123408082",
+        "Q11293250",
+        "Q11339758",
+        "Q11300176",
+        "Q11304527",
+        "Q11308429",
+        "Q7351567",
+        "Q5639203",
+        "Q61994633",
+        "Q5643313",
+        "Q11285690",
+        "Q6437279",
+        "Q180387",
+        "Q116739400",
+        "Q11282571",
+        "Q11304252",
+        "Q11311676"
+      ],
+      "horses": [
+        "コスモヘレノス",
+        "メイショウカンパク",
+        "オースミグラスワン",
+        "マイネルスケルツィ",
+        "グラスワンダー",
+        "サクラメガワンダー",
+        "シルヴァーホーク",
+        "ロベルト",
+        "ヘイルトゥリーズン",
+        "Bramalea",
+        "ヘイロー",
+        "アーネストリー",
+        "クリスエス",
+        "サンデーサイレンス",
+        "チューニー",
+        "アイーンベル",
+        "サイレントネーム",
+        "スズカフェニックス"
+      ],
+      "metrics": {
+        "quality": 130.79999999999998,
+        "generations": 5,
+        "branches": 4,
+        "sharedParentGroups": 4,
+        "parentEdges": 17,
+        "maternalEdges": 1,
+        "grandparentPaths": 5,
+        "distinctParents": 15,
+        "largestSireGroup": 6,
+        "maxRowCards": 6,
+        "softCriteriaMet": true,
+        "ok": true,
+        "steps": 17,
+        "crossings": 0,
+        "scale360x320": 0.20022246941045607,
+        "width": 1688,
+        "height": 1054,
+        "rowOverlap": false,
+        "score": 134.4040044493882
+      }
+    },
+    {
+      "seed": 2,
+      "anchor": "サトノアポロ",
+      "root": "シンボリクリスエス",
+      "ids": [
+        "Q115099790",
+        "Q17225317",
+        "Q7661156",
+        "Q140512461",
+        "Q6437279",
+        "Q47469483",
+        "Q120335388",
+        "Q117354569",
+        "Q85871328",
+        "Q4962908",
+        "Q140512523",
+        "Q140512357",
+        "Q11290986",
+        "Q140512390",
+        "Q11322363",
+        "Q7351567",
+        "Q61994633",
+        "Q116735335"
+      ],
+      "horses": [
+        "サトノアポロ",
+        "ユールシンギング",
+        "シンボリクリスエス",
+        "クリーバレン",
+        "クリスエス",
+        "ルヴァンスレーヴ",
+        "エアアンセム",
+        "シャープ・クイーン",
+        "コルテジア",
+        "ブライアンズタイム",
+        "エリモマキシム",
+        "エリモブライアン",
+        "エリモダンディー",
+        "ナイキアースワーク",
+        "トーセンブライト",
+        "ロベルト",
+        "Bramalea",
+        "ビッグゴールド"
+      ],
+      "metrics": {
+        "quality": 123.4,
+        "generations": 5,
+        "branches": 3,
+        "sharedParentGroups": 3,
+        "parentEdges": 17,
+        "maternalEdges": 2,
+        "grandparentPaths": 4,
+        "distinctParents": 11,
+        "largestSireGroup": 6,
+        "maxRowCards": 7,
+        "softCriteriaMet": true,
+        "ok": true,
+        "steps": 17,
+        "crossings": 0,
+        "scale360x320": 0.18404907975460122,
+        "width": 1846,
+        "height": 1054,
+        "rowOverlap": false,
+        "score": 126.71288343558282
+      }
+    },
+    {
+      "seed": 3,
+      "anchor": "コイントス",
+      "root": "サンデーサイレンス",
+      "ids": [
+        "Q112735598",
+        "Q11320231",
+        "Q11303951",
+        "Q140512402",
+        "Q11343615",
+        "Q180387",
+        "Q5643313",
+        "Q11342008",
+        "Q11302085",
+        "Q11300124",
+        "Q5639203",
+        "Q4733659",
+        "Q11350946",
+        "Q11325871",
+        "Q11292282",
+        "Q11334538",
+        "Q7351567",
+        "Q11349793"
+      ],
+      "horses": [
+        "コイントス",
+        "ディープサイレンス",
+        "ゴールドヘイロー",
+        "タヤスアゲイン",
+        "メジロベイリー",
+        "サンデーサイレンス",
+        "ヘイロー",
+        "ミスキャスト",
+        "コスマー",
+        "グッバイヘイロー",
+        "ヘイルトゥリーズン",
+        "アルマームード",
+        "ローゼンクロイツ",
+        "ノースフライト",
+        "オフサイドトラップ",
+        "ブラックタキシード",
+        "ロベルト",
+        "レディパステル"
+      ],
+      "metrics": {
+        "quality": 111.19999999999999,
+        "generations": 5,
+        "branches": 3,
+        "sharedParentGroups": 4,
+        "parentEdges": 15,
+        "maternalEdges": 3,
+        "grandparentPaths": 4,
+        "distinctParents": 15,
+        "largestSireGroup": 8,
+        "maxRowCards": 8,
+        "softCriteriaMet": true,
+        "ok": true,
+        "steps": 17,
+        "crossings": 13,
+        "scale360x320": 0.18404907975460122,
+        "width": 1846,
+        "height": 1054,
+        "rowOverlap": false,
+        "score": 75.51288343558281
+      }
+    }
+  ],
+  "caveats": [
+    "All 18 cards were replayed through core.newGame/place and diagram.layoutFamily/buildDiagram.",
+    "A connected and finishable problem does not imply manually verified real-world pedigree.",
+    "Crossings and 360x320 camera scale are deterministic geometric proxies, not visual screenshot review.",
+    "Some lineage categories overlap; perRoot uses the largest recorded direct-offspring membership."
+  ]
+}
