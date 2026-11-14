@@ -349,3 +349,47 @@ body.playing dialog.placement-dialog .relation-choice small{color:#577084}
 body.playing dialog.placement-dialog #modal-close{
  background:#DDE6EC;color:#253B4E;border-radius:8px;
 }
+
+/* Carry the same identity to the stage-selection screen, without turning the
+   landing page into a full-bleed illustration or a splash advertisement. */
+:root{
+ --green:#28649A;--gold:#C57748;--ink:#1B3448;
+ --muted:#61758A;--line:#D8E1E7;--paper:#F3F6F8;
+}
+body:not(.playing) .brand .brand-mark{
+ border-radius:8px;background:#275D92;color:#FFFFFF;
+}
+body:not(.playing) .brand>span{
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",sans-serif;
+ font-weight:850;letter-spacing:-.03em;color:#20384B;
+}
+#home-screen .intro h1{
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",sans-serif;
+ font-weight:850;letter-spacing:-.04em;color:#1B3448;
+}
+#home-screen .stage-card{
+ border:1px solid #D2DEE7;border-bottom:3px solid #A5BACA;
+ border-radius:12px;box-shadow:0 5px 16px #1931450B;
+}
+#home-screen .horse-theme .stage-art{
+ background:#DEE9F1;
+ color:#3C6B94;
+ border-bottom:1px solid #C7D8E5;
+}
+#home-screen .history-theme .stage-art{
+ background:#E6EAEC;color:#526B7B;
+ border-bottom:1px solid #D4DBDF;
+}
+#home-screen .stage-art:before,
+#home-screen .stage-art:after{display:none}
+#home-screen .stage-card h3{
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",sans-serif;
+ font-weight:850;letter-spacing:-.035em;
+}
+#home-screen .stage-card .button{
+ background:#285F93;border-radius:8px;
+ font-weight:750;box-shadow:0 2px 0 #173F69;
+}
+#home-screen .stage-card .tag{
+ background:#E7EEF4;color:#396B93;border-radius:4px;font-weight:750;
+}
