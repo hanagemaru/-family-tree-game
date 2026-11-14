@@ -154,7 +154,7 @@ function toStage(snapshot,graph,selection,seed,version,difficulty='normal',fame=
    clues:[summary,detail],
    source};
  });
- const stage={id:`horse-generated:${snapshot.version}:${version}:${[FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE_GENERATOR_VERSION].includes(version)?fame.period.through+':'+difficulty+':''}${String(seed)}`,title:[FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE_GENERATOR_VERSION].includes(version)?`競走馬の血統（${HORSE_DIFFICULTIES[difficulty].label}）`:'競走馬の血統（自動生成）',category:'競走馬',tag:'父母・産駒・きょうだい',symbol:'馬',anchor:selected[0],people,
+ const stage={id:`horse-generated:${snapshot.version}:${version}:${[FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE_GENERATOR_VERSION].includes(version)?fame.period.through+':'+difficulty+':' : ''}${String(seed)}`,title:[FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE_GENERATOR_VERSION].includes(version)?`競走馬の血統（${HORSE_DIFFICULTIES[difficulty].label}）`:'競走馬の血統（自動生成）',category:'競走馬',tag:'父母・産駒・きょうだい',symbol:'馬',anchor:selected[0],people,
   summary:'父・母と産駒の関係をたどる18枚。',description:'登録済みの親子関係からシード固定で抽出。',
   scope:'Wikidataの親子IDを元に生成。日本語Wikipediaの記事と馬IDを照合して母馬名を補完しました。未収録は血統不明を意味しません。',sources:[{label:'Wikidata（CC0）',url:'https://www.wikidata.org/'},{label:'日本語Wikipedia（CC BY-SA 4.0・著者履歴は記事リンク先）',url:'https://ja.wikipedia.org/wiki/Wikipedia:%E8%91%97%E4%BD%9C%E6%A8%A9'},{label:'JRA（登録馬名の表記照合のみ）',url:'https://www.jra.go.jp/gallery/dendo/horse23/index.html'}]};
  return stage;
