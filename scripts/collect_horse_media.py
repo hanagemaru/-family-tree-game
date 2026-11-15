@@ -93,7 +93,7 @@ def main():
                 by_filename[filename]={"filename":filename,"photoUrl":photo_url,
                     "filePage":info.get("descriptionurl",""),"license":license_short,
                     "licenseUrl":clean(meta.get("LicenseUrl",{}).get("value"),500),
-                    "artist":author,"allowed":allowed}
+                    "artist":author,"allowed":allowed,"mime":info.get("mime"),"nonfree":get("NonFree")}
         except Exception as e:errors.append(f"Commons {i}: {type(e).__name__}: {str(e)[:130]}")
         time.sleep(.23)
     approved={};rejected=collections.Counter();origin_stats=collections.Counter()
@@ -113,7 +113,8 @@ def main():
        "licensePolicy":"Wikimedia Commons CC BY/CC BY-SA/CC0/Public domain; photograph association from Wikidata/Wikipedia, not individually visual-verified.",
        "horses":dict(sorted(approved.items()))}
     MEDIA.write_text(json.dumps(output,ensure_ascii=False,indent=2)+"\n","utf-8")
-    stats={"named":len(horses),"wikidataFound":len(entities),"photoFiles":len(filenames),
+    debug=[{"file":k,"license":v["license"],"mime":v.get("mime"),"artist":bool(v["artist"]),"urlStart":v["photoUrl"][:75],"nonfree":v.get("nonfree")} for k,v in by_filename.items() if not v["allowed"]][:6]
+    stats={"named":len(horses),"wikidataFound":len(entities),"photoFiles":len(filenames),"sampleRejected":debug,
        "approved":len(approved),"coveragePercent":round(len(approved)*100/len(horses),1),
        "origin":dict(origin_stats),"licenseRejected":dict(rejected),"errors":errors}
     lines=["# 競走馬写真のライセンス照合（Wikimedia Commons）","",
