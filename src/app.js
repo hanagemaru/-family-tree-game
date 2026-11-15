@@ -186,7 +186,7 @@ function cardFace(id){
  const sexMarkup=horse?`<span class="card-sex" aria-label="性別：${sex}">${sex}</span>`:'';
  const art=horse?'<path d="M34 115C34 91 45 70 61 57L47 50L55 21L67 32L83 19L85 43C103 50 115 68 103 81L86 71L72 85L82 115Z"/><path d="M39 109C22 86 31 62 43 51L48 65L43 90Z" opacity=".5"/>':'<path d="M38 65L22 45L37 49L42 31L54 38L65 22L76 38L88 31L93 49L108 45L92 65Z"/><path d="M47 66H84L79 91L66 102L52 91Z"/><path d="M26 121L35 100L50 94L65 108L81 94L99 101L108 121Z"/><path d="M59 42L65 34L71 42L65 53Z" fill="#f0d69a"/>';
  const photo=horse&&horsePhotos[id];
- const image=photo?.photoUrl?.startsWith('https://upload.wikimedia.org/')?`<img class="horse-photo" loading="lazy" decoding="async" src="${escape(photo.photoUrl)}" alt="">`:'';
+ const image=/^https:\/\/(?:upload|thumb)\.wikimedia\.org\//.test(photo?.photoUrl||'')?`<img class="horse-photo" loading="lazy" decoding="async" src="${escape(photo.photoUrl)}" alt="">`:'';
  const birthYear=horse&&Number.isInteger(p.birthYear)?`<span class="card-birth-year" aria-label="${p.birthYear}年生まれ">${p.birthYear}年生</span>`:'';
  return `<span class="card-corner" aria-hidden="true">No.${String(number).padStart(2,'0')}</span>${sexMarkup}<span class="card-art" aria-hidden="true"><span class="card-track-lines"></span><svg viewBox="0 0 130 135">${art}</svg>${image}${birthYear}</span><span class="card-name">${escape(p.name)}</span>`;
 }
