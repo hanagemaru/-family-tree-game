@@ -376,3 +376,65 @@ body.playing #game-screen .hand-card.horse.selected{
 
 /* Toast stays above the board, away from the zoom controls and hand. */
 body.playing #game-screen .status{top:14px;bottom:auto}
+
+/* Three-level pedigree selector: compact, touch-friendly, and unambiguous. */
+.random-theme .difficulty-picker{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:15px 0 7px}
+.random-theme .difficulty-option{border:1px solid #cdd8e2;border-radius:10px;background:#f3f6fa;color:#476079;min-height:46px;padding:8px 4px;font-size:13px;font-weight:700;touch-action:manipulation}
+.random-theme .difficulty-option:hover{background:#e7eff7;border-color:#8ca3b9}
+.random-theme .difficulty-option.active{background:#264e71;border-color:#264e71;color:#fff;box-shadow:0 2px 7px #24405c25}
+.random-theme .difficulty-option:focus-visible{outline:3px solid #c49a4e;outline-offset:2px}
+.random-theme .difficulty-description{font-size:11px;line-height:1.65;color:#66798b;min-height:36px;margin:7px 0 4px}
+.random-theme .stage-bottom{margin-top:4px!important;padding-top:17px}
+.random-theme .stage-bottom .best{min-width:0}
+.random-theme .stage-bottom .button{white-space:nowrap}
+.random-theme .legacy-resume{display:block;width:100%;text-align:left;margin-top:8px;font-size:11px;color:#526b80}
+@media(max-width:430px){.random-theme .stage-bottom{align-items:stretch;flex-direction:column}.random-theme .stage-bottom .button{width:100%}}
+
+/* Single-product entry from hanage.app (horse-only). */
+.horse-home-intro{padding:28px 0 18px;text-align:center}
+.horse-home-intro h1{font-family:serif;font-size:clamp(24px,4vw,35px);font-weight:500;margin:8px 0 10px}
+.horse-home-intro>p:last-child{color:var(--muted);font-size:12px;line-height:1.6}
+.horse-home-stages{max-width:600px;margin:0 auto}
+.horse-home-stages #stage-list{display:block}
+.horse-home-stages .random-theme{display:block;padding:22px;max-width:600px}
+.horse-home-stages .random-theme .stage-art{display:none}
+.horse-home-stages .random-theme .stage-content{width:100%}
+.horse-home-stages .random-theme .stage-meta{margin-bottom:10px}
+.horse-home-stages .random-theme .difficulty-picker{margin:20px 0 9px}
+.horse-home-stages .random-theme .stage-bottom{margin-top:10px}
+.home-score-guide{text-align:center;font-size:11px;line-height:1.8;margin:18px 0 32px;color:var(--muted)}
+.app-header .hub-back{margin-left:auto;white-space:nowrap}
+.app-header .help-nav{flex-shrink:0}
+body.playing .stats{justify-content:space-between;align-items:center;padding:3px 0 13px;gap:12px}
+body.playing .stats .score-main{display:flex;flex-direction:column;gap:2px}
+body.playing .stats .score-main small{font-size:10px;color:var(--muted)}
+body.playing .stats .score-main b{font-size:24px;line-height:1.1;letter-spacing:.02em;font-weight:700;font-variant-numeric:tabular-nums}
+body.playing .stats .progress-summary{text-align:right;font-size:12px;margin-left:auto}
+body.playing .stats .progress-summary small{font-size:10px;color:var(--muted)}
+body.playing .stats .progress-summary small b{font-weight:500}
+body.playing .stats .secondary-stat{display:none!important}
+body.playing .hand-footer{display:flex;justify-content:space-between;align-items:center;min-height:42px;gap:7px}
+body.playing .hand-footer .auto-place-button{flex-shrink:0;color:#f2dbb1;font-size:11px;min-height:32px;padding:3px 7px;text-decoration-color:#bdaa8d}
+body.playing .hand-footer .auto-place-button:disabled{opacity:.4}
+.score-result{font-size:42px;font-weight:700;letter-spacing:-.03em;text-align:center;margin:8px 0;font-variant-numeric:tabular-nums}
+.score-subline{text-align:center;font-size:12px;color:var(--muted);line-height:1.7}
+.score-breakdown{display:grid;grid-template-columns:1fr auto;row-gap:9px;column-gap:15px;font-size:12px;max-width:350px;margin:22px auto}
+.score-breakdown span:nth-child(even){text-align:right;font-variant-numeric:tabular-nums}
+.score-result-actions{display:flex;flex-direction:column;gap:9px}
+@media(max-width:560px){
+ .app-header .brand>span{font-size:14px}
+ .app-header .hub-back{font-size:10px}
+ .horse-home-intro{padding:20px 0 15px}
+ .horse-home-stages .random-theme{padding:19px 15px}
+ .horse-home-stages .random-theme .stage-content{padding:0}
+}
+
+/* Cloud rankings keep the same quiet hierarchy as the score result. */
+.ranking-table{display:grid;gap:0;max-height:45vh;overflow:auto;margin:15px 0}
+.ranking-row{display:grid;grid-template-columns:50px minmax(0,1fr) auto;align-items:center;gap:12px;padding:11px 8px;border-bottom:1px solid var(--line);font-size:12px;font-variant-numeric:tabular-nums}
+.ranking-row>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ranking-row.is-you{background:#e4eddf;border-radius:5px}
+.ranking-delete{margin-top:16px;font-size:11px}
+.ranking-name-label{font-size:12px;display:block;margin:20px 0 7px;font-weight:600}
+#ranking-name{width:100%;min-height:46px;border:1px solid #b8c8b9;border-radius:8px;padding:10px;font:inherit;margin-bottom:12px}
+#ranking-name:focus{outline:2px solid #8da777}

@@ -1,0 +1,83 @@
+/** Real Chromium + iPhone-sized WebKit smoke for all three live selectors. */
+import assert from 'node:assert/strict';
+import {spawn} from 'node:child_process';
+import {mkdir} from 'node:fs/promises';
+import {chromium,webkit} from 'playwright';
+
+const port=5189;
+const server=spawn(process.execPath,['scripts/dev.mjs','--port',String(port)],{stdio:'pipe'});
+let browser;
+try{
+ let ready=false;
+ for(let n=0;n<100;n++){
+  try{const res=await fetch('http://127.0.0.1:'+port+'/');if(res.ok){ready=true;break;}}catch{}
+  await new Promise(resolve=>setTimeout(resolve,150));
+ }
+ assert.ok(ready,'development server did not start');
+ await mkdir('artifacts/browser-difficulty',{recursive:true});
+ for(const [engine,driver] of [['chromium',chromium],['webkit',webkit]]){
+  browser=await driver.launch({headless:true});
+  const page=await browser.newPage({viewport:{width:390,height:844},deviceScaleFactor:3,isMobile:true,hasTouch:true});
+  const errors=[];
+  page.on('pageerror',err=>errors.push(String(err)));
+  page.on('response',res=>{if(res.status()>=400)errors.push('HTTP '+res.status()+' '+res.url());});
+  await page.goto('http://127.0.0.1:'+port+'/',{waitUntil:'networkidle'});
+  await page.locator('[data-random-start]').waitFor({state:'visible'});
+  await page.waitForFunction(()=>!document.querySelector('[data-random-start]').disabled,{timeout:30000});
+  assert.equal(await page.locator('[data-random-level]').count(),3);
+  await page.screenshot({path:'artifacts/browser-difficulty/'+engine+'-home.png',fullPage:true});
+  const stages={};
+  for(const [difficulty,label] of [['easy','初級'],['normal','中級'],['hard','上級']]){
+   await page.locator('[data-random-level="'+difficulty+'"]').click();
+   assert.equal(await page.locator('[data-random-level="'+difficulty+'"]').getAttribute('aria-pressed'),'true');
+   await page.locator('[data-random-start]').click();
+   await page.waitForFunction(()=>document.body.classList.contains('playing'),{timeout:40000});
+   assert.match(await page.locator('#stage-title').textContent(),new RegExp(label));
+   assert.equal(await page.locator('#hand [data-card]').count(),5);
+   assert.equal(await page.locator('#nodes [data-node]').count(),1);
+   assert.equal(await page.locator('#score-timer').count(),1);
+   assert.equal(await page.locator('#auto-place-button').count(),1);
+   const descriptor=await page.evaluate(level=>JSON.parse(localStorage.getItem('family-tree-game:v1')).randomHorseByDifficulty[level],difficulty);
+   assert.equal(descriptor.difficulty,difficulty);
+   assert.equal(descriptor.generatorVersion,'horse-stage-v6');
+   assert.equal(descriptor.cardIds.length,12);
+   stages[difficulty]=descriptor.stageId;
+   await page.screenshot({path:'artifacts/browser-difficulty/'+engine+'-'+difficulty+'.png',fullPage:true});
+   await page.locator('#menu-button').click();
+   await page.locator('[data-action="home"]').click();
+  }
+  await page.locator('[data-random-level="easy"]').click();
+  assert.match(await page.locator('[data-random-start]').textContent(),/つづきから/);
+  await page.locator('[data-random-start]').click();
+  const restored=await page.evaluate(()=>JSON.parse(localStorage.getItem('family-tree-game:v1')).randomHorseByDifficulty.easy.stageId);
+  assert.equal(restored,stages.easy);
+  // Mobile touch: tapping the dimmed backdrop exits relation selection without
+  // losing the selected card, changing placement, or charging a mistake.
+  await page.locator('#hand [data-card]').first().click();
+  const selectedId=await page.locator('#hand [data-card].selected').getAttribute('data-card');
+  assert.ok(selectedId,'hand-card selected via touch click');
+  await page.locator('#nodes [data-node]').first().click();
+  assert.equal(await page.locator('#modal').evaluate(dialog=>dialog.open),true);
+  await page.locator('#modal-content h2').click();
+  assert.equal(await page.locator('#modal').evaluate(dialog=>dialog.open),true,
+   'touching inside relation-picker content must not dismiss');
+  await page.touchscreen.tap(8,8);
+  assert.equal(await page.locator('#modal').evaluate(dialog=>dialog.open),false,
+   'touching backdrop must dismiss on '+engine);
+  assert.equal(await page.locator('#hand [data-card].selected').getAttribute('data-card'),selectedId,
+   'selected horse remains in hand after backdrop dismissal');
+  assert.equal(await page.locator('#placed-count').textContent(),'1');
+  assert.equal(await page.locator('#penalty-count').textContent(),'+0秒');
+  // The same pairing can still be chosen, and Cancel remains available.
+  await page.locator('#nodes [data-node]').first().click();
+  assert.equal(await page.locator('#modal').evaluate(dialog=>dialog.open),true);
+  await page.locator('#modal-close').click();
+  assert.equal(await page.locator('#modal').evaluate(dialog=>dialog.open),false);
+  assert.deepEqual(errors,[],'browser errors for '+engine);
+  console.log(engine+' difficulty smoke succeeded: '+JSON.stringify(stages));
+  await page.close();await browser.close();browser=null;
+ }
+}finally{
+ await browser?.close();
+ server.kill('SIGTERM');
+}

@@ -1,0 +1,25 @@
+{
+  // Deploy only after creating a D1 named horse-pedigree-ranking and replacing database_id.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "horse-pedigree-hub",
+  "main": "src/server/worker.js",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "horse-pedigree-ranking",
+      "database_id": "SET_DATABASE_ID_BEFORE_DEPLOY",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "routes": [
+    { "pattern": "hanage.app/games/horse-pedigree/play/*", "zone_name": "hanage.app" },
+    { "pattern": "hanage.app/games/horse-pedigree/play", "zone_name": "hanage.app" }
+  ],
+  "observability": { "enabled": true }
+}

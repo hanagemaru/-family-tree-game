@@ -405,3 +405,29 @@ body.playing #game-screen #board .table-card .card-name{
 body.playing #game-screen #board .table-card.horse .card-name{
  font-size:10px;letter-spacing:-.075em;
 }
+
+
+/* Birth-year clue and optional Commons photo. Both hand and board retain the
+   same compact card dimensions; the original SVG remains a load-failure fallback. */
+body.playing #game-screen .horse .card-art .horse-photo,
+body.playing #game-screen .hand-card.horse .card-art .horse-photo,
+#drag-ghost.horse .card-art .horse-photo{
+ position:absolute!important;
+ inset:0!important;width:100%!important;height:100%!important;
+ display:block!important;object-fit:cover!important;object-position:center 38%;
+ border:0!important;border-radius:2px;z-index:3!important;
+ pointer-events:none;filter:none!important;
+}
+body.playing #game-screen .horse .card-art .horse-photo[hidden],
+#drag-ghost.horse .card-art .horse-photo[hidden]{display:none!important}
+body.playing #game-screen .horse .card-art .card-birth-year,
+body.playing #game-screen .hand-card.horse .card-art .card-birth-year,
+#drag-ghost.horse .card-art .card-birth-year{
+ position:absolute!important;bottom:3px!important;right:3px!important;
+ display:block!important;z-index:4!important;
+ background:#F8FAF9F2!important;color:#172C41!important;
+ padding:2px 3px!important;border-radius:3px!important;
+ font:700 10px/1.1 -apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif!important;
+ white-space:nowrap!important;letter-spacing:0!important;
+ box-shadow:0 1px 2px #172C4140!important;
+}

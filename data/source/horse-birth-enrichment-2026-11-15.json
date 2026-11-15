@@ -1,0 +1,96 @@
+{
+  "retrievedAt": "2026-11-15",
+  "method": "Verified by primary thoroughbred registry JBIS pedigree / individual profiles, cross-check other source where possible. Birth-year-only field from source facts; no copyrighted prose/images copied.",
+  "items": [
+    {
+      "qid": "Q127603169",
+      "name": "シュガーハート",
+      "birthYear": 2005,
+      "sources": [
+        {
+          "name": "JBIS サーチ・シュガーハート繁殖牝馬情報",
+          "url": "https://www.jbis.or.jp/horse/0000882634/broodmare/info/"
+        },
+        {
+          "name": "JBIS キタサンブラック血統",
+          "url": "https://www.jbis.or.jp/horse/0001155349/pedigree/broodmare/"
+        }
+      ]
+    },
+    {
+      "qid": "Q127950242",
+      "name": "ソーマジック",
+      "birthYear": 2005,
+      "sources": [
+        {
+          "name": "JBIS 個体プロフィール",
+          "url": "https://www.jbis.or.jp/horse/0000890077/"
+        },
+        {
+          "name": "JBIS 繁殖牝馬情報",
+          "url": "https://www.jbis.or.jp/horse/0000890077/broodmare/info/"
+        }
+      ]
+    },
+    {
+      "qid": "Q21996489",
+      "name": "メジロフランシス",
+      "birthYear": 2001,
+      "sources": [
+        {
+          "name": "JBIS 個体プロフィール",
+          "url": "https://www.jbis.or.jp/horse/0000729927/"
+        },
+        {
+          "name": "JBIS 繁殖牝馬情報",
+          "url": "https://www.jbis.or.jp/horse/0000729927/broodmare/info/"
+        }
+      ]
+    },
+    {
+      "qid": "Q61970475",
+      "name": "Strawberry Reason",
+      "birthYear": 1992,
+      "sources": [
+        {
+          "name": "JBIS サーチ・繁殖牝馬情報",
+          "url": "https://www.jbis.or.jp/horse/0000434352/broodmare/info/"
+        },
+        {
+          "name": "JBIS English",
+          "url": "https://www.jbis.jp/horse/0000434352/broodmare/info/"
+        }
+      ]
+    },
+    {
+      "qid": "Q61976466",
+      "name": "Burghclere",
+      "birthYear": 1977,
+      "sources": [
+        {
+          "name": "JBIS 個体プロフィール（英語）",
+          "url": "https://www.jbis.jp/horse/0000394655/"
+        },
+        {
+          "name": "JBIS Deep Impact pedigree",
+          "url": "https://www.jbis.jp/horse/0000742976/pedigree/broodmare/"
+        }
+      ]
+    },
+    {
+      "qid": "Q61994633",
+      "name": "Bramalea",
+      "birthYear": 1959,
+      "sources": [
+        {
+          "name": "JBIS Roberto pedigree",
+          "url": "https://www.jbis.jp/horse/0000335167/pedigree/broodmare/"
+        },
+        {
+          "name": "Netkeiba Roberto pedigree",
+          "url": "https://db.sp.netkeiba.com/horse/ped/000a0012cb/"
+        }
+      ]
+    }
+  ]
+}

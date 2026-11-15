@@ -1,0 +1,46 @@
+name: Horse fame difficulty benchmark (frozen evidence)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Source snapshot must be checked in (no live API changes)
+        run: |
+          test -s data/horse-fame-2026-10.v1.json
+          python3 - <<'PY'
+          import json
+          obj=json.load(open("data/horse-fame-2026-10.v1.json"))
+          assert obj["coverage"]["named"]==872
+          assert obj["coverage"]["observedViews"]==815
+          assert obj["coverage"]["requestErrors"]==0
+          print(obj["period"],obj["coverage"])
+          PY
+      - name: Offline regression tests
+        run: |
+          python3 -m unittest discover -s tests -p 'test_*.py'
+          npm test
+          npm run build
+      - name: Benchmark 1000 questions per difficulty
+        run: |
+          mkdir -p artifacts
+          node scripts/benchmark-horse-difficulty.mjs \
+            --runs=1000 --attempts=96 \
+            --fame=data/horse-fame-2026-10.v1.json \
+            --output=artifacts/horse-difficulty-benchmark.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: horse-difficulty-benchmark
+          path: artifacts/horse-difficulty-benchmark.json
+          if-no-files-found: warn

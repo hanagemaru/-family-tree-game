@@ -1,0 +1,25 @@
+name: Horse v6 difficulty 100-seed benchmark
+on:
+  push:
+    branches: ['feature/horse-fame-difficulty-20261115']
+    paths: ['.github/workflows/benchmark-horse-v6.yml', 'scripts/benchmark-horse-v6.mjs']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Generate and measure 100 seeded questions for each difficulty
+        run: node scripts/benchmark-horse-v6.mjs 100
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: horse-v6-difficulty-100-seeds
+          path: artifacts/benchmarks/horse-v6-100-seeds.json
+          if-no-files-found: warn

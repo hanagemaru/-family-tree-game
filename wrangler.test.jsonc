@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "horse-pedigree-local-test",
+  "main": "src/server/worker.js",
+  "compatibility_date": "2026-11-01",
+  "vars": { "RANKING_SECRET": "local-test-secret-not-for-production-change-before-release" },
+  "assets": { "directory": "./dist", "binding": "ASSETS", "run_worker_first": true },
+  "d1_databases": [{
+    "binding": "DB", "database_name": "horse-pedigree-ranking",
+    "database_id": "00000000-0000-0000-0000-000000000001", "migrations_dir": "migrations"
+  }]
+}
