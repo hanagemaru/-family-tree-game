@@ -18,7 +18,7 @@ export function ensurePlayable(state){
  const index=state.deck.findIndex(id=>connectable(state,id));
  if(index>=0){const old=state.hand.pop();state.hand.push(state.deck.splice(index,1)[0]);state.deck.push(old);}
 }
-export function newGame(stage,random=Math.random){const state={version:1,stage,placed:[stage.anchor],hand:[],deck:shuffled(stage.people.filter(p=>p.id!==stage.anchor).map(p=>p.id),random),positions:{},mistakes:0,hints:{},exchanges:0,elapsed:0,complete:false};state.positions[stage.anchor]={x:0,y:0};deal(state);ensurePlayable(state);return state;}
+export function newGame(stage,random=Math.random){const state={version:1,stage,placed:[stage.anchor],hand:[],deck:shuffled(stage.people.filter(p=>p.id!==stage.anchor).map(p=>p.id),random),positions:{},mistakes:0,hints:{},autoPlacedIds:[],actions:[],exchanges:0,elapsed:0,complete:false};state.positions[stage.anchor]={x:0,y:0};deal(state);ensurePlayable(state);return state;}
 export function positionFor(state,id,anchorId,relation){
  const person=state.stage.people.find(p=>p.id===id),anchor=state.stage.people.find(p=>p.id===anchorId),point=state.positions[anchorId];
  const y=point.y+(person.generation-anchor.generation)*STEP_Y;
@@ -27,11 +27,14 @@ export function positionFor(state,id,anchorId,relation){
  for(let i=0;i<100;i++){for(const sign of i===0?[1]:[1,-1]){const test=x+i*STEP_X*sign;if(occupied.every(p=>Math.abs(p.x-test)>=STEP_X-1))return {x:test,y};}}
  throw Error('No space for card');
 }
-export function place(state,id,anchorId,relation){
+export function place(state,id,anchorId,relation,{auto=false}={}){
  if(state.complete||!state.hand.includes(id)||!state.placed.includes(anchorId))return {ok:false,reason:'invalid'};
  const candidate=state.stage.people.find(p=>p.id===id),anchor=state.stage.people.find(p=>p.id===anchorId);
- if(!relations(candidate,anchor).includes(relation)){state.mistakes++;return {ok:false,reason:'relation'};}
- const position=positionFor(state,id,anchorId,relation);state.positions[id]=position;state.placed.push(id);state.hand.splice(state.hand.indexOf(id),1);deal(state);ensurePlayable(state);state.complete=state.placed.length===state.stage.people.length;return {ok:true,position};
+ if(!relations(candidate,anchor).includes(relation)){state.mistakes++;(state.actions??=[]).push({type:'place',cardId:id,anchorId,relation,auto:false,at:Math.round(state.elapsed),ok:false});return {ok:false,reason:'relation'};}
+ const position=positionFor(state,id,anchorId,relation);state.positions[id]=position;state.placed.push(id);state.hand.splice(state.hand.indexOf(id),1);deal(state);ensurePlayable(state);state.complete=state.placed.length===state.stage.people.length;
+ if(auto)(state.autoPlacedIds??=[]).push(id);
+ (state.actions??=[]).push({type:'place',cardId:id,anchorId,relation,auto,at:Math.round(state.elapsed),ok:true});
+ return {ok:true,position};
 }
 export function visibleEdges(state){
  const edges=[];const byId=new Map(state.stage.people.map(p=>[p.id,p]));
@@ -52,7 +55,9 @@ export function restore(data,stage){
  const legacy=original.length&&all.length===original.length&&original.every(id=>all.includes(id));
  if(!legacy&&all.length!==ids.length)return null;
  if(new Set(all).size!==all.length||all.some(id=>!ids.includes(id))||!data.placed.includes(stage.anchor)||data.hand.length>5||!data.placed.every(id=>Number.isFinite(data.positions?.[id]?.x)&&Number.isFinite(data.positions?.[id]?.y))||!Number.isFinite(data.elapsed)||data.elapsed<0||!Number.isInteger(data.mistakes)||data.mistakes<0||!Number.isInteger(data.exchanges)||data.exchanges<0||!data.hints||typeof data.hints!=='object'||Array.isArray(data.hints)||Object.entries(data.hints).some(([id,n])=>!ids.includes(id)||!Number.isInteger(n)||n<0||n>2))return null;
- const result={...data,hand:[...data.hand],deck:[...data.deck],stage,complete:data.placed.length===ids.length};
+ if(data.autoPlacedIds!==undefined&&(!Array.isArray(data.autoPlacedIds)||new Set(data.autoPlacedIds).size!==data.autoPlacedIds.length||data.autoPlacedIds.some(id=>!data.placed.includes(id)||id===stage.anchor)))return null;
+ if(data.actions!==undefined&&(!Array.isArray(data.actions)||data.actions.length>500||data.actions.some(x=>!x||!['place','hint'].includes(x.type)||!ids.includes(x.cardId)||!Number.isFinite(x.at)||x.at<0)))return null;
+ const result={...data,autoPlacedIds:[...(data.autoPlacedIds||[])],actions:[...(data.actions||[])],hand:[...data.hand],deck:[...data.deck],stage,complete:data.placed.length===ids.length};
  if(legacy){result.deck.push(...ids.filter(id=>!all.includes(id)));deal(result);ensurePlayable(result);}
  return result;
 }
