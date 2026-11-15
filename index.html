@@ -2,21 +2,21 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#17283c"><meta name="description" content="人物と名馬のつながりを、カードでたどる家系図パズル。知識で挑戦、困ったらヒント。">
-<title>家系図ならべ | 系譜をつなぐカードパズル</title>
+<meta name="theme-color" content="#17283c"><meta name="description" content="名馬の親子関係をならべる競走馬血統パズル。12頭・最大4世代、3段階の難易度。">
+<title>競走馬血統ならべ | hanage.app</title>
 <link rel="icon" href="./favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./sports-card.css">
 </head>
 <body>
 <div id="app">
-<header class="app-header"><button class="brand" id="home-button" aria-label="ステージ選択へ"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M16 9v7M7 23v-7h18v7" stroke="currentColor" stroke-width="2"/><rect x="12" y="3" width="8" height="8" rx="2" fill="currentColor"/><rect x="3" y="21" width="8" height="8" rx="2" fill="currentColor"/><rect x="21" y="21" width="8" height="8" rx="2" fill="currentColor"/></svg></span><span>家系図ならべ<small>FAMILY TREE PUZZLE</small></span></button><span class="header-note">知識で楽しむカードパズル</span><button class="text-button help-nav" id="help-button" aria-label="遊び方"><span aria-hidden="true">?</span> 遊び方</button></header>
+<header class="app-header"><button class="brand" id="home-button" aria-label="難易度選択へ"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M16 9v7M7 23v-7h18v7" stroke="currentColor" stroke-width="2"/><rect x="12" y="3" width="8" height="8" rx="2" fill="currentColor"/><rect x="3" y="21" width="8" height="8" rx="2" fill="currentColor"/><rect x="21" y="21" width="8" height="8" rx="2" fill="currentColor"/></svg></span><span>競走馬血統ならべ<small>HORSE PEDIGREE PUZZLE</small></span></button><a class="text-button hub-back" href="https://hanage.app/" rel="noopener">hanage.app に戻る</a><button class="text-button help-nav" id="help-button" aria-label="遊び方"><span aria-hidden="true">?</span> 遊び方</button></header>
 <main id="home-screen">
-<section class="intro"><div class="intro-copy"><p class="eyebrow">歴史と名馬のカードパズル</p><h1>歴史と名馬の系譜を、<br>カードでつなぐ。</h1><p>親子、夫婦、きょうだい。<br>カードを並べて、家系図を完成させましょう。</p><div class="intro-features"><span>時間制限なし</span><span>ヒントあり</span><span>自動保存</span></div></div><div class="intro-visual" aria-hidden="true"><div class="visual-label">FAMILY CONNECTIONS <span>01 — 03</span></div><svg class="demo-lines" viewBox="0 0 480 300"><path d="M240 67V140H112V202M240 140H368V202"/><circle cx="240" cy="140" r="4"/></svg><div class="demo-card demo-parent"><span class="demo-avatar">家</span><div><small>初代将軍</small><strong>徳川 家康</strong></div></div><div class="demo-card demo-child"><span class="demo-avatar">秀</span><div><small>二代将軍</small><strong>徳川 秀忠</strong></div><span class="demo-check">✓</span></div><div class="demo-card demo-next"><span class="demo-avatar">?</span><div><small>次につながる人物は？</small><strong>あなたの手札から</strong></div></div><span class="visual-foot">知っている関係から、少しずつ。</span></div></section>
-<section class="stages" aria-labelledby="stage-heading"><div class="section-heading"><div><p class="eyebrow">COLLECTION</p><h2 id="stage-heading">遊ぶテーマを選ぶ</h2></div><span id="stage-count">全3テーマ</span></div><div id="stage-list"></div></section>
-<div class="home-guide"><span class="guide-icon" aria-hidden="true">↗</span><p><strong>カードを選んで、相手につなぐ。</strong><br>ドラッグでもタップでも遊べます。迷ったらヒントをどうぞ。</p><span class="save-note">進行はこのブラウザに保存されます</span></div>
+<section class="horse-home-intro"><p class="eyebrow">HORSE PEDIGREE PUZZLE</p><h1>名馬の血統を、つなぐ。</h1><p>12頭のカードで親子関係を完成させよう。最大4世代のランダム出題。</p></section>
+<section class="stages horse-home-stages" aria-label="競走馬の難易度選択"><div id="stage-list"></div></section>
+<p class="home-score-guide">ヒント +10秒 ／ ミス +15秒 ／ 自動配置 +45秒。記録は補正タイムで競います。</p>
 </main>
 <main id="game-screen" hidden>
 <div class="game-heading"><div><p class="eyebrow" id="stage-category"></p><h1 id="stage-title"></h1></div><button id="menu-button" class="text-button" aria-label="メニュー">☰</button></div>
-<div class="stats"><span>配置 <b id="placed-count">1</b><span id="total-count"></span></span><span>ミス <b id="mistake-count">0</b></span><span class="secondary-stat" aria-hidden="true" id="timer">0:00</span><span class="secondary-stat" aria-hidden="true">ヒント <b id="hint-count">0</b></span></div>
+<div class="stats"><span class="score-main"><small>補正タイム</small><b id="score-timer">0:00</b></span><span class="progress-summary"><b id="placed-count">1</b><span id="total-count"></span> 頭<br><small>ペナルティ <b id="penalty-count">+0秒</b></small></span><span class="secondary-stat" hidden id="timer">0:00</span><span class="secondary-stat" hidden>ミス <b id="mistake-count">0</b> / ヒント <b id="hint-count">0</b></span></div>
 <div class="progress"><div id="progress-fill"></div></div>
 <div class="play-layout">
 <div class="play-area"><section id="board" aria-label="家系図の盤面。指で動かし、ピンチで拡大縮小できます。" tabindex="0">
@@ -28,13 +28,13 @@
 <div class="hand-track"><div class="stock-pile" id="stock-pile" aria-label="山札">
 <div class="stock-cards" aria-hidden="true"><span class="stock-sheet stock-bottom"></span><span class="stock-sheet stock-middle"></span><span class="stock-sheet stock-top"><span class="stock-emblem">✦</span></span></div><span class="stock-count" id="stock-count">残り 0</span>
 </div><div class="hand-group"><span class="hand-count" id="hand-count">5枚</span><div id="hand" class="hand"></div></div></div>
-<div class="hand-footer"><span id="selection-summary" role="status" aria-live="polite"></span></div>
-<button class="card-hint-button" id="hint-button" type="button" aria-label="選択した手札のヒント" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M9 15c-1.6-1-3-3-3-5a6 6 0 1 1 12 0c0 2-1.4 4-3 5-.7.5-.9 1.2-.9 2H9.9c0-.8-.2-1.5-.9-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>ヒント</span></button>
+<div class="hand-footer"><span id="selection-summary" role="status" aria-live="polite"></span><button id="auto-place-button" type="button" class="text-button auto-place-button" hidden>諦めて配置 +45秒</button></div>
+<button class="card-hint-button" id="hint-button" type="button" aria-label="選択した手札のヒント" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M9 15c-1.6-1-3-3-3-5a6 6 0 1 1 12 0c0 2-1.4 4-3 5-.7.5-.9 1.2-.9 2H9.9c0-.8-.2-1.5-.9-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>ヒント +10秒</span></button>
 <div id="hint-box" class="hint-box" role="status" aria-live="polite" hidden></div></section>
 <div id="status" class="status" role="status" aria-live="polite"></div>
 </div>
 </main>
-<footer class="app-footer"><span>家系図ならべ <span class="footer-sub">歴史と血統を楽しむパズル</span></span><button class="text-button" id="sources-button">題材・出典</button></footer>
+<footer class="app-footer"><span>競走馬血統ならべ</span><button class="text-button" id="sources-button">題材・出典</button></footer>
 </div>
 <dialog id="modal" aria-labelledby="dialog-title"><div id="modal-content"></div><button id="modal-close" class="button secondary">閉じる</button></dialog>
 <div id="drag-ghost" hidden aria-hidden="true"></div>
