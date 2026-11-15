@@ -115,7 +115,7 @@ test('all 12 horses can be completed via the real game UI and a score breakdown 
  assert.match(app.$('modal-content').textContent,/補正タイム/);
  assert.ok(app.$('modal-content').querySelector('[data-action="ranking-submit"]'));
  assert.equal(app.$('penalty-count').textContent,'+0秒');
- const best=app.storage().best['v5:normal'];assert.ok(best);assert.equal(best.totalMs,horseScore(session(app)).totalMs);
+ const best=app.storage().best['v6:normal'];assert.ok(best);assert.equal(best.totalMs,horseScore(session(app)).totalMs);
 });
 test('full surrender never grants ranked win or a personal best',async t=>{
  const app=await setup(t),d=descriptor(app);
@@ -123,7 +123,7 @@ test('full surrender never grants ranked win or a personal best',async t=>{
  app.$('modal-content').querySelector('[data-action="give-up-confirm"]').click();
  app.$('modal-content').querySelector('[data-action="give-up"]').click();
  assert.equal(session(app).gaveUp,true);
- assert.equal(app.storage().best['v5:normal'],undefined);
+ assert.equal(app.storage().best['v6:normal'],undefined);
  assert.equal(app.$('modal-content').querySelector('[data-action="ranking-submit"]'),null);
  assert.equal(app.$('nodes').querySelectorAll('[data-node]').length,12);
 });
