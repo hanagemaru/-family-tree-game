@@ -79,7 +79,7 @@ export function horsePlacementHint(state,cardId,level){
  */
 export function completedAnswer(state){
  if(state.complete)return null;
- const draft={...state,placed:[...state.placed],hand:[...state.hand],deck:[...state.deck],positions:{...state.positions},hints:{...state.hints}};
+ const draft={...state,placed:[...state.placed],hand:[...state.hand],deck:[...state.deck],positions:{...state.positions},hints:{...state.hints},actions:[...(state.actions||[])],autoPlacedIds:[...(state.autoPlacedIds||[])]};
  const max=state.stage.people.length;
  for(let turn=0;turn<max&&!draft.complete;turn++){
   const move=findPlayablePlacement(draft);
