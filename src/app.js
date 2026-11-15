@@ -34,7 +34,7 @@ function randomStageCard(){
  const generated=randomHorseByDifficulty[selectedDifficulty];
  const current=generated?.descriptor.generatorVersion===CURRENT_HORSE_GENERATOR_VERSION;
  const saved=current&&generated&&savedGame(generated.stage);
- const resume=!!(saved&&!saved.complete),best=current&&generated&&records.best[generated.stage.id];
+ const resume=!!(saved&&!saved.complete),best=current&&generated&&records.best['v5:'+selectedDifficulty];
  const ready=!!horseSnapshot&&!!fameSnapshot,mode=HORSE_DIFFICULTIES[selectedDifficulty];
  const status=randomHorseError||(!ready?'難易度データを準備中…':resume?`${saved.placed.length} / 12 配置済み`:best?`自己ベスト ${formatTime(best.totalMs??best.elapsed)}`:'12頭・最大4世代');
  const explanations={easy:'知名度上位15%の馬だけが登場。名馬の親子関係をたどろう。',normal:'名馬とその血統。知名度が中程度の馬も登場。',hard:'繁殖馬や知名度が低めの産駒まで幅広く登場。'};
@@ -327,7 +327,34 @@ function showAnswer(){
  try{answer.positions=layoutFamily(answer);}catch{say('完成図を作成できませんでした。進行は変更されていません。',true);closeDialog();return;}
  state=answer;selected=null;lineFocus=null;closeDialog();clearTargets();render();fit(false);persist();results();
 }
-function results(){fit();const random=isRandomHorseStage(state.stage);openDialog(`<p class="eyebrow">${state.gaveUp?'ANSWER REVEALED':'FAMILY TREE COMPLETED'}</p><h2>${state.gaveUp?'答えの系譜':'ひとつの系譜が、つながった。'}</h2>${state.gaveUp?'<p>降参して残りの答えを表示しました。クリア記録には含まれません。</p>':''}<p>${state.stage.title} · ${state.stage.people.length}${state.stage.id==='tokugawa'?'人':'頭'}のカードを配置しました。</p>${random?`<p class="random-seed">問題ID <code>${escape(randomDescriptorForStage(state.stage)?.seed||'')}</code></p>`:''}<div class="result-stats"><div>プレイ時間<b>${formatTime(state.elapsed)}</b></div><div>ミス<b>${state.mistakes}</b></div><div>ヒント<b>${hintCount()}</b></div></div><details><summary>つながりを振り返る</summary><ul>${state.stage.people.filter(p=>p.id!==state.stage.anchor).map(p=>`<li><strong>${escape(p.name)}</strong><br>${escape(p.clues[1])}</li>`).join('')}</ul></details><button class="button" data-action="home">ほかの系譜をたどる</button><button class="button secondary" data-action="restart-confirm">同じ問題でもう一度</button>${random?'<button class="button secondary" data-action="random-retry-confirm">別の問題に挑戦</button>':''}`,state.gaveUp?'答えの系譜を見る':'完成した系譜を見る');}
+function results(){
+ fit();
+ const random=isRandomHorseStage(state.stage),ranked=rankedHorseStage(state.stage);
+ const score=horseScore(state),difficulty=randomDescriptorForStage(state.stage)?.difficulty;
+ const best=records.best['v5:'+difficulty];
+ if(ranked&&!state.gaveUp){
+  const wasBest=best&&Math.round(best.totalMs)===score.totalMs;
+  openDialog(`<p class="eyebrow">PEDIGREE COMPLETED</p><h2>血統図完成</h2>
+   <p class="score-subline">${escape(HORSE_DIFFICULTIES[difficulty]?.label||'')} · 12頭 · 最大4世代</p>
+   <div class="score-result">${formatTime(score.totalMs)}</div>
+   <p class="score-subline">補正タイム${wasBest?' · 自己ベスト':''}</p>
+   <div class="score-breakdown">
+    <span>実プレイ時間</span><span>${formatTime(score.timeMs)}</span>
+    <span>ヒント（${score.hints}頭）</span><span>+${score.hintMs/1000}秒</span>
+    <span>誤回答（${score.errors}回）</span><span>+${score.mistakeMs/1000}秒</span>
+    <span>自動配置（${score.autoCount}頭）</span><span>+${score.autoMs/1000}秒</span>
+   </div>
+   <p class="score-subline">自己ベスト ${best?formatTime(best.totalMs):'--:--'}</p>
+   <div class="score-result-actions">
+    <button class="button" data-action="ranking-submit">ランキングに登録</button>
+    <button class="button secondary" data-action="ranking-view">ランキングを見る</button>
+    <button class="button secondary" data-action="random-retry-confirm">別の問題に挑戦</button>
+    <button class="text-button" data-action="home">難易度選択に戻る</button>
+   </div>`,'完成図を見る');
+  return;
+ }
+ openDialog(`<p class="eyebrow">${state.gaveUp?'ANSWER REVEALED':'FAMILY TREE COMPLETED'}</p><h2>${state.gaveUp?'答えの血統図':'血統図完成'}</h2><p>${state.stage.title} · ${state.stage.people.length}頭</p>${state.gaveUp?'<p>全体の答えを表示したため、ランキングには登録できません。</p>':''}<div class="result-stats"><div>プレイ時間<b>${formatTime(state.elapsed)}</b></div><div>ミス<b>${state.mistakes}</b></div><div>ヒント<b>${hintCount()}</b></div></div><button class="button" data-action="home">難易度選択へ</button><button class="button secondary" data-action="random-retry-confirm">別の問題に挑戦</button>`,'完成図を見る');
+}
 // Pointer events unify mouse, pen and touch. No HTML Drag and Drop dependency on iOS.
 $('hand').addEventListener('pointerdown',e=>{
  const button=e.target.closest('[data-card]');if(!button||e.button!==0||drag)return;
