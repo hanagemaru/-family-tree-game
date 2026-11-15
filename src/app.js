@@ -165,7 +165,7 @@ function startRandomHorse(fresh,difficulty=selectedDifficulty){
  }catch(error){console.error('Horse difficulty generation failed',error);randomHorseError='問題の生成に失敗しました。もう一度お試しください。';renderHome();}
 }
 function start(stage,fresh=false){
- persist();state=(!fresh&&savedGame(stage))||newStageGame(stage);if(state.complete&&!fresh)state=newStageGame(stage);selected=null;targetAnchor=null;lineFocus=null;state.positions=layoutFamily(state);
+ persist();state=(!fresh&&savedGame(stage))||newStageGame(stage);if(state.complete&&!fresh)state=newStageGame(stage);selected=null;targetAnchor=null;lineFocus=null;state.positions=layoutFamily(state,{minimizeCrossings:true});
  if(isCurrentRankedStage(stage)){
   if(fresh)delete records.rankedRunTickets?.[stage.id];
   if(onlineRankingEnabled&&!records.rankedRunTickets?.[stage.id]){
@@ -313,7 +313,7 @@ function confirmAutoPlace(){
  const beforeHand=[...state.hand];
  const outcome=place(state,move.cardId,move.anchorId,move.relation,{auto:true});
  if(!outcome.ok){closeDialog();say('自動配置に失敗しました。',true);return;}
- state.positions=layoutFamily(state);selected=null;lineFocus=null;closeDialog();clearTargets();
+ state.positions=layoutFamily(state,{minimizeCrossings:true});selected=null;lineFocus=null;closeDialog();clearTargets();
  renderBoard(move.cardId);renderHand();animateDraw(beforeHand);renderStats();renderHint();fit(true);persist();
  say('正しく配置しました。補正タイム +45秒');
  if(state.complete)completeGame();
@@ -408,14 +408,14 @@ function hoverAt(clientX,clientY){
 function attempt(relation){
  if(!selected||!targetAnchor)return;const id=selected,anchor=targetAnchor,p=person(id),a=person(anchor),beforeHand=[...state.hand],outcome=place(state,id,anchor,relation);
  if(!outcome.ok){if(outcome.reason==='relation'){if(!modal.open)chooseRelations(anchor);const message=`${p.name}は${a.name}の「${relationName(relation)}」ではなさそうです。`;say(message,true);if($('placement-error'))$('placement-error').textContent=message;const button=$('modal-content').querySelector(`[data-place-relation="${relation}"]`);if(button)button.disabled=true;}renderStats();persist();return;}
- clearDragPreview();const oldAnchor=state.positions[anchor];state.positions=layoutFamily(state);camera.x+=(oldAnchor.x-state.positions[anchor].x)*camera.scale;camera.y+=(oldAnchor.y-state.positions[anchor].y)*camera.scale;lineFocus=null;
+ clearDragPreview();const oldAnchor=state.positions[anchor];state.positions=layoutFamily(state,{minimizeCrossings:true});camera.x+=(oldAnchor.x-state.positions[anchor].x)*camera.scale;camera.y+=(oldAnchor.y-state.positions[anchor].y)*camera.scale;lineFocus=null;
  selected=null;closeDialog();clearTargets();renderBoard(id);renderHand();animateDraw(beforeHand);renderStats();renderHint();fit(true);say(`${p.name}が、${a.name}の${relationName(relation)}としてつながりました。`);persist();
  if(state.complete)completeGame();
 }
 function showAnswer(){
  const answer=completedAnswer(state);
  if(!answer){say('答えを表示できませんでした。進行は変更されていません。',true);closeDialog();return;}
- try{answer.positions=layoutFamily(answer);}catch{say('完成図を作成できませんでした。進行は変更されていません。',true);closeDialog();return;}
+ try{answer.positions=layoutFamily(answer,{minimizeCrossings:true});}catch{say('完成図を作成できませんでした。進行は変更されていません。',true);closeDialog();return;}
  state=answer;selected=null;lineFocus=null;closeDialog();clearTargets();render();fit(false);persist();results();
 }
 
