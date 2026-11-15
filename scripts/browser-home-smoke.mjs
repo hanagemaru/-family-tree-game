@@ -26,6 +26,45 @@ try{
    await page.locator('[data-random-start]').waitFor({state:'visible'});
    await page.waitForFunction(()=>!document.querySelector('[data-random-start]').disabled,{timeout:30000});
    assert.equal(await page.locator('.home-preview-card').count(),0,'no decorative landing cards');
+   // Recreate the twelve horses in the screenshot, with their actual QIDs
+   // and sire/dam data, in both Chromium and WebKit. This tests the rendering
+   // topology rather than only a synthetic unit-test drawing.
+   const crossings=await page.evaluate(async()=>{
+    const [layout,horseJson]=await Promise.all([
+     import('./src/diagram.js'),
+     fetch('./data/horse-pedigree.v1.json').then(r=>r.json())
+    ]);
+    const byId=new Map(horseJson.horses.map(h=>[h.id,h]));
+    const entries=[
+     ['Q11284092',2],['Q20047186',3],['Q11289428',1],
+     ['Q180387',1],['Q7514393',2],['Q5643313',0],
+     ['Q4309360',2],['Q7821904',0],['Q11325871',1],
+     ['Q730381',2],['Q11352062',3],['Q11288432',1]
+    ];
+    const selected=new Set(entries.map(([id])=>id));
+    const people=entries.map(([id,generation])=>{
+     const horse=byId.get(id);
+     return {id,name:horse.name,generation,parents:[horse.sire,horse.dam].filter(id=>selected.has(id)),spouses:[]};
+    });
+    const state={stage:{id:'review-photo',anchor:entries[0][0],people},placed:entries.map(([id])=>id)};
+    const run=opt=>{
+     const start=performance.now();
+     const positions=layout.layoutFamily(state,{minimizeCrossings:opt});
+     const actual=layout.renderGeometry(layout.buildDiagram({...state,positions})).crossings.length;
+     return {positions,actual,ms:performance.now()-start};
+    };
+    const before=run(false),after=run(true);
+    return {before:before.actual,after:after.actual,ms:after.ms,
+     topBefore:[before.positions['Q5643313'].x,before.positions['Q7821904'].x],
+     topAfter:[after.positions['Q5643313'].x,after.positions['Q7821904'].x]};
+   });
+   assert.ok(crossings.after<crossings.before,engine+' must reduce the screenshot crossings: '+JSON.stringify(crossings));
+   assert.ok(crossings.topBefore[0]<crossings.topBefore[1]&&
+    crossings.topAfter[1]<crossings.topAfter[0],
+    engine+' must exchange Halo and Tony Bin: '+JSON.stringify(crossings));
+   assert.ok(crossings.ms<2500,engine+' row optimization too slow: '+JSON.stringify(crossings));
+   console.log('HORSE_CROSSING_BROWSER_'+engine+'_'+width+' '+JSON.stringify(crossings));
+
    const dims=await page.evaluate(()=>{
     const button=document.querySelector('[data-random-start]').getBoundingClientRect();
     return {viewport:innerHeight,scrollWidth:document.documentElement.scrollWidth,
