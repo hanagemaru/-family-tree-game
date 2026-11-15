@@ -25,7 +25,7 @@ try{
    await page.goto(base,{waitUntil:'networkidle'});
    await page.locator('[data-random-start]').waitFor({state:'visible'});
    await page.waitForFunction(()=>!document.querySelector('[data-random-start]').disabled,{timeout:30000});
-   assert.equal(await page.locator('.home-preview-card').count(),3);
+   assert.equal(await page.locator('.home-preview-card').count(),0,'no decorative landing cards');
    const dims=await page.evaluate(()=>{
     const button=document.querySelector('[data-random-start]').getBoundingClientRect();
     return {viewport:innerHeight,scrollWidth:document.documentElement.scrollWidth,
