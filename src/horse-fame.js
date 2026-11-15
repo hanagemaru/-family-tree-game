@@ -1,11 +1,20 @@
 /** Source-attributed familiarity scores. Relative buckets, not factual fame labels. */
 
 export const HORSE_FAME_VERSION = 'horse-fame-v1';
+/** Frozen v3–v5 targets: never change when old seeds may be replayed. */
 export const HORSE_DIFFICULTIES = Object.freeze({
  easy: Object.freeze({label:'初級',highMin:7,highMax:10,highEdgesMin:2}),
  normal: Object.freeze({label:'中級',highMin:4,highMax:6,highEdgesMin:0}),
  hard: Object.freeze({label:'上級',highMin:1,highMax:3,highEdgesMin:0}),
 });
+
+/** New v6 selection targets; 12 horses across all modes. */
+export const HORSE_V6_DIFFICULTIES = Object.freeze({
+ easy: Object.freeze({label:'初級',highMin:12,highMax:12,highEdgesMin:0}),
+ normal: Object.freeze({label:'中級',highMin:6,highMax:8,highEdgesMin:0}),
+ hard: Object.freeze({label:'上級',highMin:3,highMax:5,highEdgesMin:0}),
+});
+export const EASY_V6_POOL_SHARE=.10;
 
 export function prepareHorseFame(snapshot, fameSnapshot, graph) {
  if (!fameSnapshot || fameSnapshot.version !== HORSE_FAME_VERSION ||
@@ -60,8 +69,8 @@ export function prepareHorseFame(snapshot, fameSnapshot, graph) {
   period:fameSnapshot.period,version:fameSnapshot.version};
 }
 
-export function assessHorseDifficulty(graph,selected,fame,difficulty) {
- const spec=HORSE_DIFFICULTIES[difficulty];
+export function assessHorseDifficulty(graph,selected,fame,difficulty,targets=HORSE_DIFFICULTIES) {
+ const spec=targets[difficulty];
  if(!spec)throw Error('Unknown horse difficulty');
  const chosen=new Set(selected);
  const high=selected.filter(id=>fame.byId.get(id).tier==='high');
