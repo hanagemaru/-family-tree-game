@@ -51,6 +51,28 @@ try{
   await page.locator('[data-random-start]').click();
   const restored=await page.evaluate(()=>JSON.parse(localStorage.getItem('family-tree-game:v1')).randomHorseByDifficulty.easy.stageId);
   assert.equal(restored,stages.easy);
+  // Mobile touch: tapping the dimmed backdrop exits relation selection without
+  // losing the selected card, changing placement, or charging a mistake.
+  await page.locator('#hand [data-card]').first().click();
+  const selectedId=await page.locator('#hand [data-card].selected').getAttribute('data-card');
+  assert.ok(selectedId,'hand-card selected via touch click');
+  await page.locator('#nodes [data-node]').first().click();
+  assert.equal(await page.locator('#modal').evaluate(dialog=>dialog.open),true);
+  await page.locator('#modal-content h2').click();
+  assert.equal(await page.locator('#modal').evaluate(dialog=>dialog.open),true,
+   'touching inside relation-picker content must not dismiss');
+  await page.touchscreen.tap(8,8);
+  assert.equal(await page.locator('#modal').evaluate(dialog=>dialog.open),false,
+   'touching backdrop must dismiss on '+engine);
+  assert.equal(await page.locator('#hand [data-card].selected').getAttribute('data-card'),selectedId,
+   'selected horse remains in hand after backdrop dismissal');
+  assert.equal(await page.locator('#placed-count').textContent(),'1');
+  assert.equal(await page.locator('#penalty-count').textContent(),'+0秒');
+  // The same pairing can still be chosen, and Cancel remains available.
+  await page.locator('#nodes [data-node]').first().click();
+  assert.equal(await page.locator('#modal').evaluate(dialog=>dialog.open),true);
+  await page.locator('#modal-close').click();
+  assert.equal(await page.locator('#modal').evaluate(dialog=>dialog.open),false);
   assert.deepEqual(errors,[],'browser errors for '+engine);
   console.log(engine+' difficulty smoke succeeded: '+JSON.stringify(stages));
   await page.close();await browser.close();browser=null;
