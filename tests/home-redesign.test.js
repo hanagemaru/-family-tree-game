@@ -41,6 +41,7 @@ test('difficulty selection updates compact text, remains accessible, and starts 
 });
 test('in-progress game offers resume and a confirmed new puzzle without wiping best score',async t=>{
  const app=await loadApp();t.after(()=>app.restore());
+ app.$('stage-list').querySelector('[data-random-level="easy"]').click();
  app.$('stage-list').querySelector('[data-random-start]').click();
  const first=app.storage().randomHorseByDifficulty.easy;
  app.$('menu-button').click();
