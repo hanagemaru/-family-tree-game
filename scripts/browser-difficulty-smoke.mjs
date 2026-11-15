@@ -35,10 +35,12 @@ try{
    assert.match(await page.locator('#stage-title').textContent(),new RegExp(label));
    assert.equal(await page.locator('#hand [data-card]').count(),5);
    assert.equal(await page.locator('#nodes [data-node]').count(),1);
+   assert.equal(await page.locator('#score-timer').count(),1);
+   assert.equal(await page.locator('#auto-place-button').count(),1);
    const descriptor=await page.evaluate(level=>JSON.parse(localStorage.getItem('family-tree-game:v1')).randomHorseByDifficulty[level],difficulty);
    assert.equal(descriptor.difficulty,difficulty);
-   assert.equal(descriptor.generatorVersion,difficulty==='easy'?'horse-stage-v4':'horse-stage-v3');
-   assert.equal(descriptor.cardIds.length,18);
+   assert.equal(descriptor.generatorVersion,'horse-stage-v5');
+   assert.equal(descriptor.cardIds.length,12);
    stages[difficulty]=descriptor.stageId;
    await page.screenshot({path:'artifacts/browser-difficulty/'+engine+'-'+difficulty+'.png',fullPage:true});
    await page.locator('#menu-button').click();
