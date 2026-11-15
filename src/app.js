@@ -45,9 +45,9 @@ function randomStageCard(){
  const ready=!!horseSnapshot&&!!fameSnapshot;
  const mode=HORSE_DIFFICULTIES[selectedDifficulty];
  const explanations={
-  easy:'知名度上位10%の馬が登場',
-  normal:'有名馬を中心に、血統馬も登場',
-  hard:'血統知識が必要な馬も登場'
+  easy:'有名な馬が中心',
+  normal:'名馬とその血統',
+  hard:'血統まで知っている人向け'
  };
  const choices=Object.entries(HORSE_DIFFICULTIES).map(([key,detail])=>
   '<button type="button" class="difficulty-option'+(selectedDifficulty===key?' active':'')+
@@ -69,16 +69,16 @@ function randomStageCard(){
  const bestText=best?formatTime(best.totalMs??best.elapsed):'--:--';
  return [
   '<div class="home-start-panel">',
-  '<div class="home-picker-label"><h2>難易度を選ぶ</h2><span>12頭・最大4世代</span></div>',
+  '<h2 class="home-picker-label">難易度を選ぶ</h2>',
   '<div class="difficulty-picker" role="group" aria-label="難易度を選ぶ">'+choices+'</div>',
   '<p class="difficulty-description" role="status">'+explanations[selectedDifficulty]+'</p>',
-  '<div class="home-best-row"><span>自己ベスト <small>'+mode.label+'</small></span><strong>'+bestText+'</strong></div>',
+  best?'<div class="home-best-row"><span>自己ベスト</span><strong>'+bestText+'</strong></div>':'',
   resume?'<p class="home-resume-note"><span class="resume-dot"></span>前回の続き：'+saved.placed.length+' / 12頭を配置済み</p>':'',
   randomHorseError?'<p class="home-load-error" role="alert">'+escape(randomHorseError)+'</p>':'',
   '<button type="button" class="home-primary-button" data-random-start '+(ready?'':'disabled')+'>'+
     (ready?(resume?'つづきから':mode.label+'を始める'):'問題を準備中…')+'<span aria-hidden="true">→</span></button>',
   resume?'<button type="button" class="home-new-button" data-new-random-start>新しい問題を始める</button>':'',
-  '<button type="button" class="home-ranking-button" data-rank-view><span aria-hidden="true">♛</span> ランキングを見る</button>',
+  '<button type="button" class="home-ranking-button" data-rank-view>ランキングを見る</button>',
   legacyActions?'<details class="home-legacy"><summary>以前の問題</summary>'+legacyActions+'</details>':'',
   '</div>'
  ].join('');
