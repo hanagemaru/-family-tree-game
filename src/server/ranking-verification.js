@@ -14,7 +14,7 @@ for(const h of named.values())for(const id of [h.sire,h.dam].filter(Boolean)){
  children.get(id).push(h.id);
 }
 const fame=prepareHorseFame(pedigree,fameSnapshot,{named,children});
-const rankLimit=Math.ceil(fame.byId.size*.15);
+const rankLimit=Math.ceil(fame.byId.size*.10);
 const allowedRelation=new Set(['parent','child','sibling']);
 const validSeed=seed=>typeof seed==='string'&&seed.length>0&&seed.length<=100&&/^[a-zA-Z0-9_-]+$/.test(seed);
 const error=reason=>({valid:false,reason});
