@@ -90,13 +90,15 @@ try{
  const refreshed=await api('rankings?difficulty=normal');
  assert.equal(refreshed.data.entries[0].name,'Tester2');
  const second=session('worker-smoke-2');
+ second.state.elapsed=14_000;
+ const secondScore=horseScore(second.state);
  const next=second.generated.descriptor;
  const started=await api('runs',{method:'POST',body:{stageId:next.stageId,seed:next.seed,difficulty:next.difficulty,horseIds:next.cardIds,generatorVersion:next.generatorVersion}});
  assert.equal(started.status,200);
  const slower=await api('records',{method:'POST',body:{
   submissionId:randomUUID(),displayName:'Tester2',runTicket:started.data.ticket,
   stageId:next.stageId,seed:next.seed,difficulty:next.difficulty,horseIds:next.cardIds,generatorVersion:next.generatorVersion,
-  elapsedMs:second.score.timeMs+15_000,scoreMs:second.score.totalMs+15_000,actions:second.state.actions
+  elapsedMs:secondScore.timeMs,scoreMs:secondScore.totalMs,actions:second.state.actions
  }});
  assert.equal(slower.status,200,JSON.stringify(slower.data));
  assert.equal(slower.data.newBest,false,'slower records must not replace own best');
