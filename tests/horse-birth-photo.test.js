@@ -53,8 +53,12 @@ test('card rendering displays birth year in hand and on board',async t=>{
 });
 test('no photo with an unverified image license is published',()=>{
  assert.equal(media.version,'horse-photo-v1');
+ const filenames=new Set();
  for(const [qid,p] of Object.entries(media.horses)){
   assert.ok(pedigree.horses.some(h=>h.id===qid&&h.named));
+  assert.doesNotMatch(p.filename,/request.?picture|placeholder|no.?photo|not.?available/i);
+  assert.equal(filenames.has(p.filename),false,'one horse photo should not represent multiple different animals');
+  filenames.add(p.filename);
   assert.match(p.photoUrl,/^https:\/\/(?:upload|thumb)\.wikimedia\.org\//);
   assert.ok(p.filePage.startsWith('https://commons.wikimedia.org/'));
   assert.match(p.license,/^(CC BY(?:-SA)? [234]\.0|CC0(?: 1\.0)?|Public domain)$/);
