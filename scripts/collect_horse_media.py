@@ -87,7 +87,7 @@ def main():
                 photo_url=info.get("thumburl") or info.get("url") or ""
                 allowed=bool(LICENSE.fullmatch(license_short) and
                     get("NonFree").lower() not in ("true","1") and
-                    photo_url.startswith("https://upload.wikimedia.org/") and
+                    photo_url.startswith(("https://upload.wikimedia.org/","https://thumb.wikimedia.org/")) and
                     info.get("mime") in ("image/jpeg","image/webp") and
                     (author or license_short.lower().startswith(("public domain","cc0"))))
                 by_filename[filename]={"filename":filename,"photoUrl":photo_url,
