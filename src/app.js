@@ -58,6 +58,16 @@ function openDialog(html,closeLabel='閉じる',kind='info'){dialogKind=kind;mod
 function closeDialog(){modal.close();lastTick=performance.now();}
 modal.addEventListener('close',()=>{lastTick=performance.now();if(state)renderCaption();});
 $('modal-close').addEventListener('click',closeDialog);
+// Tapping the dimmed area dismisses only the relation picker, exactly like Cancel.
+// Clicking the dialog's own padding must not dismiss it. Keep the hand selection
+// and do not create a placement action (therefore no mistake penalty).
+modal.addEventListener('click',event=>{
+ if(!modal.open||dialogKind!=='relation'||event.target!==modal)return;
+ const bounds=modal.getBoundingClientRect();
+ const outside=event.clientX<bounds.left||event.clientX>bounds.right||
+  event.clientY<bounds.top||event.clientY>bounds.bottom;
+ if(outside)closeDialog();
+});
 function help(){openDialog(`<p class="eyebrow">HOW TO PLAY</p><h2>手札を場につなぐ。</h2><ol><li>手札をタップし、場の相手をタップ。親・子・きょうだいなどを選ぶと配置します。</li><li>ドラッグ中は点線枠に位置マーカーを合わせ、少し止めて離すと直接配置できます。それ以外は関係を選ぶだけです。</li><li>同じ手札または盤面の余白をタップすると選択解除。ヒントは選択中の手札について表示されます。</li><li>相手が判別できないときは名前一覧から選べます。降参して答えを見る操作はメニュー内にあります。</li><li>●は実際の接続点、線の切れ目は非接続の交差。手札未選択で場のカードをタップすると関係線を強調します。</li><li>盤面をスワイプして移動。ピンチ、＋ / −で拡縮し、「全体」で見渡せます。</li></ol><p class="scope">${state?escape(state.stage.scope):'進行はこのブラウザへ自動保存されます。'}</p>`);}
 $('help-button').addEventListener('click',help);
 function showSources(){
