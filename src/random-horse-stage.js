@@ -10,6 +10,7 @@ export const HORSE_GENERATOR_VERSION='horse-stage-v2';
 export const LEGACY_HORSE_GENERATOR_VERSION='horse-stage-v1';
 export const FAME_HORSE_GENERATOR_VERSION='horse-stage-v3';
 export const EASIER_HORSE_GENERATOR_VERSION='horse-stage-v4';
+export const CURRENT_HORSE_GENERATOR_VERSION='horse-stage-v5';
 const graphCache=new WeakMap();
 const byId=stage=>new Map(stage.people.map(p=>[p.id,p]));
 
@@ -55,7 +56,7 @@ function relativeGeneration(candidate,anchor){
  if(c.some(id=>a.includes(id)))return 0;
  return null;
 }
-function attemptGraph(graph,anchorId,random,count,{strongOnly=false,fame=null,difficulty='normal',easierEasy=false,allowedIds=null}={}){
+function attemptGraph(graph,anchorId,random,count,{strongOnly=false,fame=null,difficulty='normal',easierEasy=false,allowedIds=null,maxGenerations=13}={}){
  const selected=[anchorId],selectedSet=new Set(selected),gens=new Map([[anchorId,0]]),names=new Set([graph.named.get(anchorId).name]);
  for(let step=1;step<count;step++){
   const frontier=new Set();for(const id of selected)for(const candidate of (strongOnly?graph.directLinks:graph.links).get(id))if(!selectedSet.has(candidate)&&(!allowedIds||allowedIds.has(candidate)))frontier.add(candidate);
@@ -78,6 +79,7 @@ function attemptGraph(graph,anchorId,random,count,{strongOnly=false,fame=null,di
    }
    if(!valid||generation===null||generation< -6||generation>6)continue;
    const generations=[...gens.values(),generation],spread=Math.max(...generations)-Math.min(...generations)+1;
+   if(spread>maxGenerations)continue;
    const parentSiblings=Math.max(0,...[horse.sire,horse.dam].filter(Boolean).map(parent=>selected.filter(x=>graph.parentSets.get(x)?.has(parent)).length));
    const parentConnection=[horse.sire,horse.dam].filter(x=>selectedSet.has(x)).length;
    const hasChildren=(graph.children.get(id)||[]).some(x=>selectedSet.has(x));
@@ -154,8 +156,8 @@ function toStage(snapshot,graph,selection,seed,version,difficulty='normal',fame=
    clues:[summary,detail],
    source};
  });
- const stage={id:`horse-generated:${snapshot.version}:${version}:${[FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE_GENERATOR_VERSION].includes(version)?fame.period.through+':'+difficulty+':' : ''}${String(seed)}`,title:[FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE_GENERATOR_VERSION].includes(version)?`競走馬の血統（${HORSE_DIFFICULTIES[difficulty].label}）`:'競走馬の血統（自動生成）',category:'競走馬',tag:'父母・産駒・きょうだい',symbol:'馬',anchor:selected[0],people,
-  summary:'父・母と産駒の関係をたどる18枚。',description:'登録済みの親子関係からシード固定で抽出。',
+ const stage={id:`horse-generated:${snapshot.version}:${version}:${[FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE_GENERATOR_VERSION,CURRENT_HORSE_GENERATOR_VERSION].includes(version)?fame.period.through+':'+difficulty+':' : ''}${String(seed)}`,title:[FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE_GENERATOR_VERSION,CURRENT_HORSE_GENERATOR_VERSION].includes(version)?`競走馬の血統（${HORSE_DIFFICULTIES[difficulty].label}）`:'競走馬の血統（自動生成）',category:'競走馬',tag:'父母・産駒・きょうだい',symbol:'馬',anchor:selected[0],people,
+  summary:`父・母と産駒の関係をたどる${people.length}枚。`,description:'登録済みの親子関係からシード固定で抽出。',
   scope:'Wikidataの親子IDを元に生成。日本語Wikipediaの記事と馬IDを照合して母馬名を補完しました。未収録は血統不明を意味しません。',sources:[{label:'Wikidata（CC0）',url:'https://www.wikidata.org/'},{label:'日本語Wikipedia（CC BY-SA 4.0・著者履歴は記事リンク先）',url:'https://ja.wikipedia.org/wiki/Wikipedia:%E8%91%97%E4%BD%9C%E6%A8%A9'},{label:'JRA（登録馬名の表記照合のみ）',url:'https://www.jra.go.jp/gallery/dendo/horse23/index.html'}]};
  return stage;
 }
@@ -184,16 +186,19 @@ export function replayHorseStage(stage,seed){
 }
 
 /** Return {stage,metrics,diagnostics}, or throw with stable reason after bounded retries. */
-export function generateRandomHorseStage(snapshot,{seed=1,count=18,attempts=48,version=HORSE_GENERATOR_VERSION,
+export function generateRandomHorseStage(snapshot,{seed=1,count=null,attempts=48,version=HORSE_GENERATOR_VERSION,
   fameSnapshot=null,difficulty='normal'}={}){
- if(![HORSE_GENERATOR_VERSION,LEGACY_HORSE_GENERATOR_VERSION,FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE_GENERATOR_VERSION].includes(version))throw Error('Unsupported generator version');
+ if(![HORSE_GENERATOR_VERSION,LEGACY_HORSE_GENERATOR_VERSION,FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE_GENERATOR_VERSION,CURRENT_HORSE_GENERATOR_VERSION].includes(version))throw Error('Unsupported generator version');
  if(version===EASIER_HORSE_GENERATOR_VERSION&&difficulty!=='easy')throw Error('v4 supports only beginner difficulty');
- if([FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE_GENERATOR_VERSION].includes(version)&&!HORSE_DIFFICULTIES[difficulty])throw Error('Invalid horse difficulty');
+ if([FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE_GENERATOR_VERSION,CURRENT_HORSE_GENERATOR_VERSION].includes(version)&&!HORSE_DIFFICULTIES[difficulty])throw Error('Invalid horse difficulty');
+ const current=version===CURRENT_HORSE_GENERATOR_VERSION;
+ count ??= current?12:18;
+ const maxGenerations=current?4:13;
  const strongOnly=version!==LEGACY_HORSE_GENERATOR_VERSION;
  if(!Number.isInteger(count)||count<2||count>64)throw Error('Invalid card count');
  if(!Number.isInteger(attempts)||attempts<1||attempts>200)throw Error('Invalid candidate count');
- const graph=prepareHorseGraph(snapshot),easierEasy=version===EASIER_HORSE_GENERATOR_VERSION;
- const fame=[FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE_GENERATOR_VERSION].includes(version)?prepareHorseFame(snapshot,fameSnapshot,graph):null;
+ const graph=prepareHorseGraph(snapshot),easierEasy=version===EASIER_HORSE_GENERATOR_VERSION||(current&&difficulty==='easy');
+ const fame=[FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE_GENERATOR_VERSION,CURRENT_HORSE_GENERATOR_VERSION].includes(version)?prepareHorseFame(snapshot,fameSnapshot,graph):null;
  const allowedIds=easierEasy?new Set([...fame.byId.values()].filter(row=>row.rank<=Math.ceil(fame.byId.size*EASY_V4_POOL_SHARE)).map(row=>row.id)):null;
  const random=seededRandom(`${version}:${snapshot.version}:${fame?difficulty+':':''}${seed}`);
  const eligible=[...graph.named.keys()].filter(id=>(!allowedIds||allowedIds.has(id))&&graph.sizes.get(graph.components.get(id))>=count&&graph.links.get(id).size>0);
@@ -216,7 +221,7 @@ export function generateRandomHorseStage(snapshot,{seed=1,count=18,attempts=48,v
    if(matches.length&&random()<.8)anchorPool=matches;
   }
   const anchor=anchorPool[Math.floor(random()*anchorPool.length)];
-  const candidate=attemptGraph(graph,anchor,random,count,{strongOnly,fame,difficulty,easierEasy,allowedIds});
+  const candidate=attemptGraph(graph,anchor,random,count,{strongOnly,fame,difficulty,easierEasy,allowedIds,maxGenerations});
   if(!candidate.selected){reject(candidate.reason);continue;}
   const metrics=analyzeSelection(graph,candidate.selected,candidate.gens);
   if(strongOnly){
@@ -227,6 +232,7 @@ export function generateRandomHorseStage(snapshot,{seed=1,count=18,attempts=48,v
    }));
    if(orphanPairs){reject('unresolved_sibling_links');continue;}
    if(metrics.parentEdges<count-1){reject('not_fully_connected_by_parent_child');continue;}
+   if(current&&(metrics.generations<3||metrics.generations>4)){reject('out_of_generation_range');continue;}
   }
   const familiarity=easierEasy?assessEasyV4Selection(graph,candidate.selected,fame):fame?assessHorseDifficulty(graph,candidate.selected,fame,difficulty):null;
   candidates.push({candidate,metrics:{...metrics,...(familiarity||{})},
