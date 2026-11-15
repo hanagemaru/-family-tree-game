@@ -1,6 +1,6 @@
 {
   "version": "horse-photo-v1",
-  "retrievedAtUTC": "2026-11-15T02:41:31Z",
+  "retrievedAtUTC": "2026-11-15T02:44:09Z",
   "datasetVersion": "wikidata-pedigree-v1",
   "licensePolicy": "Wikimedia Commons CC BY/CC BY-SA/CC0/Public domain; photograph association from Wikidata/Wikipedia, not individually visual-verified.",
   "horses": {
@@ -443,16 +443,6 @@
       "artist": "Cake6 ( talk )",
       "name": "アーネストリー",
       "source": "Wikidata P18"
-    },
-    "Q11286544": {
-      "filename": "IshinoSunday-1996-10-13.jpg",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/IshinoSunday-1996-10-13.jpg/330px-IshinoSunday-1996-10-13.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:IshinoSunday-1996-10-13.jpg",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-      "artist": "TRJN",
-      "name": "イシノサンデー",
-      "source": "jawiki pageimages"
     },
     "Q11288343": {
       "filename": "Winning Ticket 20070422P1.jpg",
@@ -994,26 +984,6 @@
       "name": "タニノギムレット",
       "source": "Wikidata P18"
     },
-    "Q11316382": {
-      "filename": "TayasuTsuyoshi-1995-11-5.jpg",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/TayasuTsuyoshi-1995-11-5.jpg/330px-TayasuTsuyoshi-1995-11-5.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:TayasuTsuyoshi-1995-11-5.jpg",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-      "artist": "TRJN",
-      "name": "タヤスツヨシ",
-      "source": "jawiki pageimages"
-    },
-    "Q11317053": {
-      "filename": "2004-4-11-DaiwaelCielo.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/2004-4-11-DaiwaelCielo.JPG/330px-2004-4-11-DaiwaelCielo.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:2004-4-11-DaiwaelCielo.JPG",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-      "artist": "TRJN",
-      "name": "ダイワエルシエーロ",
-      "source": "jawiki pageimages"
-    },
     "Q11317065": {
       "filename": "Daiwa Major 20051009.jpg",
       "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b6/Daiwa_Major_20051009.jpg/330px-Daiwa_Major_20051009.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
@@ -1053,16 +1023,6 @@
       "artist": "Ogiyoshisan",
       "name": "ダンスパートナー",
       "source": "Wikidata P18"
-    },
-    "Q11317516": {
-      "filename": "DantsuFlame-2003-5-4.jpg",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/DantsuFlame-2003-5-4.jpg/330px-DantsuFlame-2003-5-4.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:DantsuFlame-2003-5-4.jpg",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-      "artist": "TRJN",
-      "name": "ダンツフレーム",
-      "source": "jawiki pageimages"
     },
     "Q11317672": {
       "filename": "2004-6-27-DerbyRegno.JPG",
@@ -1253,16 +1213,6 @@
       "artist": "TRJN",
       "name": "ノースフライト",
       "source": "Wikidata P18"
-    },
-    "Q11325940": {
-      "filename": "2004-9-11-NoReason.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4a/2004-9-11-NoReason.JPG/330px-2004-9-11-NoReason.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:2004-9-11-NoReason.JPG",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-      "artist": "TRJN",
-      "name": "ノーリーズン",
-      "source": "jawiki pageimages"
     },
     "Q11325966": {
       "filename": "Higher Game.jpg",
@@ -1744,16 +1694,6 @@
       "name": "ロサード",
       "source": "jawiki pageimages"
     },
-    "Q11350837": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "ロンドンブリッジ",
-      "source": "jawiki pageimages"
-    },
     "Q11350927": {
       "filename": "Rose-Kingdom20100418.jpg",
       "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fd/Rose-Kingdom20100418.jpg/330px-Rose-Kingdom20100418.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
@@ -1862,16 +1802,6 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "artist": "TRJN",
       "name": "ボンボヤージ",
-      "source": "jawiki pageimages"
-    },
-    "Q114061600": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "ファルコニア",
       "source": "jawiki pageimages"
     },
     "Q114269769": {
@@ -2254,16 +2184,6 @@
       "name": "ママコチャ",
       "source": "Wikidata P18"
     },
-    "Q123408047": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "グリントオブホープ",
-      "source": "jawiki pageimages"
-    },
     "Q123408082": {
       "filename": "147th Tennosho spring (10 Meisho Kampaku) IMG 2598 20130428.JPG",
       "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/147th_Tennosho_spring_%2810_Meisho_Kampaku%29_IMG_2598_20130428.JPG/330px-147th_Tennosho_spring_%2810_Meisho_Kampaku%29_IMG_2598_20130428.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
@@ -2273,16 +2193,6 @@
       "artist": "Ogiyoshisan",
       "name": "メイショウカンパク",
       "source": "Wikidata P18"
-    },
-    "Q123408084": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "サクセッション",
-      "source": "jawiki pageimages"
     },
     "Q123408099": {
       "filename": "Hiraboku-King20120122.jpg",
@@ -2364,36 +2274,6 @@
       "name": "コスタノヴァ",
       "source": "Wikidata P18"
     },
-    "Q132434913": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "トウカイミステリー",
-      "source": "jawiki pageimages"
-    },
-    "Q135691891": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "オウケンビリーヴ",
-      "source": "jawiki pageimages"
-    },
-    "Q135691922": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "ダイアナブライト",
-      "source": "jawiki pageimages"
-    },
     "Q135691926": {
       "filename": "Argine-2025-4-12.jpg",
       "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Argine-2025-4-12.jpg/330px-Argine-2025-4-12.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
@@ -2402,36 +2282,6 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "artist": "TRJN",
       "name": "アルジーヌ",
-      "source": "jawiki pageimages"
-    },
-    "Q135691940": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "ナイスミーチュー",
-      "source": "jawiki pageimages"
-    },
-    "Q135691950": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "エーシンビートロン",
-      "source": "jawiki pageimages"
-    },
-    "Q135691978": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "コスモセンサー",
       "source": "jawiki pageimages"
     },
     "Q135691992": {
@@ -2444,26 +2294,6 @@
       "name": "シンティレーション",
       "source": "jawiki pageimages"
     },
-    "Q135692004": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "ストークアンドレイ",
-      "source": "jawiki pageimages"
-    },
-    "Q135692019": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "パワーストラグル",
-      "source": "jawiki pageimages"
-    },
     "Q135692023": {
       "filename": "VeilNebula-2025-3-15.jpg",
       "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/40/VeilNebula-2025-3-15.jpg/330px-VeilNebula-2025-3-15.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
@@ -2472,56 +2302,6 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "artist": "TRJN",
       "name": "ヴェイルネビュラ",
-      "source": "jawiki pageimages"
-    },
-    "Q135692024": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "トーホウシデン",
-      "source": "jawiki pageimages"
-    },
-    "Q135692052": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "サヨウナラ",
-      "source": "jawiki pageimages"
-    },
-    "Q135692080": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "ロードクロノス",
-      "source": "jawiki pageimages"
-    },
-    "Q135692084": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "ポートブライアンズ",
-      "source": "jawiki pageimages"
-    },
-    "Q135692089": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "ビッグプラネット",
       "source": "jawiki pageimages"
     },
     "Q135692090": {
@@ -2554,136 +2334,6 @@
       "name": "カナテープ",
       "source": "jawiki pageimages"
     },
-    "Q137708226": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "サクラヴィクトリア",
-      "source": "jawiki pageimages"
-    },
-    "Q139050314": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "トーセンシャナオー",
-      "source": "jawiki pageimages"
-    },
-    "Q140006818": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "ワールズエンド",
-      "source": "jawiki pageimages"
-    },
-    "Q140512357": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "エリモブライアン",
-      "source": "jawiki pageimages"
-    },
-    "Q140512362": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "トウカイワイルド",
-      "source": "jawiki pageimages"
-    },
-    "Q140512390": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "ナイキアースワーク",
-      "source": "jawiki pageimages"
-    },
-    "Q140512403": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "エアウイングス",
-      "source": "jawiki pageimages"
-    },
-    "Q140512407": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "チアズシュタルク",
-      "source": "jawiki pageimages"
-    },
-    "Q140512409": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "サンプレイス",
-      "source": "jawiki pageimages"
-    },
-    "Q140512412": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "トウカイオーザ",
-      "source": "jawiki pageimages"
-    },
-    "Q140512421": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "キョウワホウセキ",
-      "source": "jawiki pageimages"
-    },
-    "Q140512508": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "ボールドブライアン",
-      "source": "jawiki pageimages"
-    },
-    "Q141248819": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "ユウキビバーチェ",
-      "source": "jawiki pageimages"
-    },
     "Q141669337": {
       "filename": "Blanc Manger 7.jpg",
       "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Blanc_Manger_7.jpg/330px-Blanc_Manger_7.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
@@ -2702,76 +2352,6 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "artist": "TRJN",
       "name": "ギャラボーグ",
-      "source": "jawiki pageimages"
-    },
-    "Q141826109": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "ファッションショー",
-      "source": "jawiki pageimages"
-    },
-    "Q141826115": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "グローバルダイナ",
-      "source": "jawiki pageimages"
-    },
-    "Q141826151": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "ダイナシュガー",
-      "source": "jawiki pageimages"
-    },
-    "Q141826162": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "センリョウヤクシャ",
-      "source": "jawiki pageimages"
-    },
-    "Q141826166": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "セイリューオー",
-      "source": "jawiki pageimages"
-    },
-    "Q141826198": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "ダイナマイン",
-      "source": "jawiki pageimages"
-    },
-    "Q141947619": {
-      "filename": "Requestpicture.JPG",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Requestpicture.JPG/330px-Requestpicture.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Requestpicture.JPG",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
-      "artist": "No machine-readable author provided. Galopin~commonswiki assumed (based on copyright claims).",
-      "name": "スレイマン",
       "source": "jawiki pageimages"
     },
     "Q1457136": {
@@ -3973,16 +3553,6 @@
       "artist": "Goki ( talk )",
       "name": "サイレンススズカ",
       "source": "Wikidata P18"
-    },
-    "Q7595808": {
-      "filename": "Stacelita.jpg",
-      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Stacelita.jpg/330px-Stacelita.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "filePage": "https://commons.wikimedia.org/wiki/File:Stacelita.jpg",
-      "license": "Public domain",
-      "licenseUrl": "",
-      "artist": "Hipporit",
-      "name": "スタセリタ",
-      "source": "jawiki pageimages"
     },
     "Q76241407": {
       "filename": "Contrail 2019 hopeful stakes honbaba nyujyou.jpg",
