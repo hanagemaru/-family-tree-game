@@ -47,7 +47,12 @@ test('racehorse-style ancestors can be reordered without changing generations or
  for(const order of permutations){
   const stage={...screenshotLike,people:order},state=full(stage);
   const before=measured(state,false),after=measured(state,true);
-  console.log('SCREENSHOT_CROSSING_CASE '+JSON.stringify({order:order.map(p=>p.id),from:before.crosses,to:after.crosses,parents:order.filter(p=>p.generation===0).map(p=>({id:p.id,x0:before.positions[p.id].x,x1:after.positions[p.id].x}))}));
+  if(order===permutations[0]){
+   assert.ok(after.crosses<before.crosses,'the screenshot-like puzzle must eliminate avoidable crossings');
+   assert.ok(before.positions.halo.x<before.positions['tony-bin'].x,'reproduce original ancestor order');
+   assert.ok(after.positions['tony-bin'].x<after.positions.halo.x,'Tony Bin and Halo should reverse horizontal order');
+   console.log('SCREENSHOT_ANCESTOR_CROSSING_REDUCED '+JSON.stringify({from:before.crosses,to:after.crosses,ancestorOrder:['tony-bin','halo']}));
+  }
   assert.ok(after.crosses<=before.crosses,before.crosses+' -> '+after.crosses);
   assert.deepEqual(measured(state,true).positions,after.positions,'deterministic positioning');
   for(const p of stage.people)assert.equal(after.positions[p.id].y,before.positions[p.id].y,
