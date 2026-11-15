@@ -95,10 +95,15 @@ function goHome(){persist();cancelDrag();pointers.clear();pan=null;state=null;se
 function confirmAnswer(){openDialog('<h2>答えを見て終了しますか？</h2><p>残りのカードを正しい関係で配置し、完成図を表示します。通常のクリア記録には含まれません。</p><button class="button" data-action="give-up">答えを表示する</button>','プレイを続ける');}
 function menu(){if(!state){goHome();return;}const random=isRandomHorseStage(state.stage);openDialog(`<p class="eyebrow">${state.stage.category}</p><h2>${state.stage.title}</h2>${random?`<p class="random-seed">問題ID <code>${escape(randomDescriptorForStage(state.stage)?.seed||'')}</code></p>`:''}<p>進行は自動保存されています。</p><button class="button secondary" data-action="help">遊び方</button><button class="button secondary" data-action="sources">題材・出典</button><button class="button" data-action="home">ステージ選択へ</button><button class="button secondary" data-action="restart-confirm">${random?'同じ問題を最初から':'最初からやり直す'}</button>${random?'<button class="button secondary" data-action="random-retry-confirm">別の問題に挑戦</button>':''}${selected&&!state.complete?'<button class="button secondary" data-action="anchor-list">相手を一覧から選ぶ</button>':''}<button class="button secondary" data-action="board-expand">${board.classList.contains('expanded')?'盤面を元に戻す':'盤面を広く表示'}</button>${!state.complete?'<button class="button secondary" data-action="give-up-confirm">諦めて答えを見る</button>':''}${state.complete?`<button class="button secondary" data-action="result">${state.gaveUp?'答えの系譜を見る':'完成記録を見る'}</button>`:''}`);}
 $('menu-button').addEventListener('click',menu);$('home-button').addEventListener('click',()=>state?menu():goHome());
-modal.addEventListener('click',e=>{const action=e.target.closest('[data-action]')?.dataset.action;if(action==='home')goHome();if(action==='restart-confirm')openDialog('<h2>この系譜をやり直しますか？</h2><p>今の配置と記録をリセットして、同じカードで最初から始めます。</p><button class="button" data-action="restart">やり直す</button>','続ける');if(action==='random-retry-confirm')openDialog('<h2>別の問題に挑戦しますか？</h2><p>新しい問題IDで18頭を選び直します。今の問題の進行は終了します。</p><button class="button" data-action="random-retry">新しい問題を始める</button>','続ける');if(action==='restart'){const stage=state.stage;closeDialog();start(stage,true);}if(action==='random-retry'){closeDialog();startRandomHorse(true,randomDescriptorForStage(state.stage)?.difficulty||selectedDifficulty);}if(action==='give-up-confirm')confirmAnswer();if(action==='give-up')showAnswer();if(action==='result')results();if(action==='help')help();if(action==='sources')showSources();if(action==='anchor-list')chooseAnchor();if(action==='board-expand'){closeDialog();toggleBoardExpand();}});
+modal.addEventListener('click',e=>{const action=e.target.closest('[data-action]')?.dataset.action;if(action==='home')goHome();if(action==='auto-place-confirm')confirmAutoPlace();if(action==='restart-confirm')openDialog('<h2>この系譜をやり直しますか？</h2><p>今の配置と記録をリセットして、同じカードで最初から始めます。</p><button class="button" data-action="restart">やり直す</button>','続ける');if(action==='random-retry-confirm')openDialog('<h2>別の問題に挑戦しますか？</h2><p>新しい問題IDで18頭を選び直します。今の問題の進行は終了します。</p><button class="button" data-action="random-retry">新しい問題を始める</button>','続ける');if(action==='restart'){const stage=state.stage;closeDialog();start(stage,true);}if(action==='random-retry'){closeDialog();startRandomHorse(true,randomDescriptorForStage(state.stage)?.difficulty||selectedDifficulty);}if(action==='give-up-confirm')confirmAnswer();if(action==='give-up')showAnswer();if(action==='result')results();if(action==='help')help();if(action==='sources')showSources();if(action==='anchor-list')chooseAnchor();if(action==='board-expand'){closeDialog();toggleBoardExpand();}});
 function render(){renderBoard();renderHand();renderStats();renderHint();}
 function renderStats(){
- $('placed-count').textContent=state.placed.length;$('total-count').textContent=` / ${state.stage.people.length}`;$('timer').textContent=formatTime(state.elapsed);$('mistake-count').textContent=state.mistakes;$('hint-count').textContent=hintCount();$('progress-fill').style.width=`${state.placed.length/state.stage.people.length*100}%`;$('hand-count').textContent=`${state.hand.length}枚`;$('stock-count').textContent=`残り ${state.deck.length}`;$('stock-pile').classList.toggle('empty',!state.deck.length);
+ $('placed-count').textContent=state.placed.length;$('total-count').textContent=` / ${state.stage.people.length}`;
+ const score=horseScore(state);
+ $('timer').textContent=formatTime(state.elapsed);
+ $('score-timer').textContent=formatTime(score.totalMs);
+ $('penalty-count').textContent=`+${score.penaltyMs/1000}秒`;
+ $('mistake-count').textContent=state.mistakes;$('hint-count').textContent=hintCount();$('progress-fill').style.width=`${state.placed.length/state.stage.people.length*100}%`;$('hand-count').textContent=`${state.hand.length}枚`;$('stock-count').textContent=`残り ${state.deck.length}`;$('stock-pile').classList.toggle('empty',!state.deck.length);
  renderCaption();
  renderSelection();
 }
@@ -126,8 +131,12 @@ function renderSelection(){
  summary.textContent=selected?`選択中 · ${person(selected).name}`:'';
  summary.title=selected?'同じ手札か盤面の余白をタップして解除':'';
  const level=selected?(state.hints[selected]||0):0;
- hint.hidden=!selected||state.complete||level>=2||!!drag?.active;
- hint.querySelector('span').textContent=level===1?'ヒント 2':'ヒント';
+ const isRanked=rankedHorseStage(state.stage);
+ hint.hidden=!selected||state.complete||level>=(isRanked?1:2)||!!drag?.active;
+ hint.querySelector('span').textContent=isRanked?'ヒント +10秒':level===1?'ヒント 2':'ヒント';
+ const autoButton=$('auto-place-button');
+ autoButton.hidden=!isRanked||!selected||state.complete||!!drag?.active;
+ if(!autoButton.hidden)autoButton.disabled=!findCorrectPlacement(state,selected);
  positionHintButton();
 }
 function renderBoard(newId){
@@ -190,15 +199,42 @@ function renderHint(){
  const generated=isRandomHorseStage(state.stage);
  const clue=generated?horsePlacementHint(state,selected,level):person(selected).clues[level-1];
  box.hidden=!!drag?.active;
- box.innerHTML=`<strong>${escape(person(selected).name)}</strong> <small>ヒント ${level} / 2</small><br>${escape(clue)}`;
+ box.innerHTML=`<strong>${escape(person(selected).name)}</strong> <small>ヒント ${level} / ${rankedHorseStage(state.stage)?1:2}</small><br>${escape(clue)}`;
 }
 function revealHint(){
  if(!selected){say('ヒントを見るカードを、手札から選んでください。');return;}
 
- state.hints[selected]=Math.min(2,(state.hints[selected]||0)+1);
+ if(rankedHorseStage(state.stage)){if(!useHorseHint(state,selected))return;}
+ else state.hints[selected]=Math.min(2,(state.hints[selected]||0)+1);
  renderHint();renderStats();persist();
 }
 $('hint-button').addEventListener('click',revealHint);
+$('auto-place-button').addEventListener('click',()=>{
+ if(!selected||!rankedHorseStage(state.stage))return;
+ const move=findCorrectPlacement(state,selected);
+ if(!move){say('この馬はまだ場につながりません。別のカードを先に置いてください。');return;}
+ openDialog(`<h2>この馬を自動で配置しますか？</h2><p>${escape(person(selected).name)}を正しく配置します。補正タイムへの加算は合計+45秒です。</p><button class="button" data-action="auto-place-confirm">+45秒で配置</button>`,'戻る');
+});
+function confirmAutoPlace(){
+ if(!selected||!rankedHorseStage(state.stage))return;
+ const move=findCorrectPlacement(state,selected);
+ if(!move){closeDialog();say('この馬はまだ配置できません。',true);return;}
+ const beforeHand=[...state.hand];
+ const outcome=place(state,move.cardId,move.anchorId,move.relation,{auto:true});
+ if(!outcome.ok){closeDialog();say('自動配置に失敗しました。',true);return;}
+ state.positions=layoutFamily(state);selected=null;lineFocus=null;closeDialog();clearTargets();
+ renderBoard(move.cardId);renderHand();animateDraw(beforeHand);renderStats();renderHint();fit(true);persist();
+ say('正しく配置しました。補正タイム +45秒');
+ if(state.complete)completeGame();
+}
+function completeGame(){
+ const score=horseScore(state);
+ const difficulty=randomDescriptorForStage(state.stage)?.difficulty;
+ const key=rankedHorseStage(state.stage)?'v5:'+difficulty:state.stage.id;
+ const existing=records.best[key];
+ if(!existing||(existing.totalMs??existing.elapsed)>score.totalMs)records.best[key]={...score,elapsed:state.elapsed,difficulty};
+ persist();results();
+}
 // No voluntary hand exchange: playable cards are guaranteed by core.deal/ensurePlayable.
 function updateTransform(animate=false){board.classList.toggle('overview',camera.scale<.68);$('world').classList.toggle('following',animate);$('world').style.transform=`translate(${camera.x}px,${camera.y}px) scale(${camera.scale})`;renderLines();}
 function fit(animate=true){if(!state||board.clientWidth<=0||board.clientHeight<=0)return;camera=fitCamera(state.positions,board.clientWidth,board.clientHeight);updateTransform(animate);}
@@ -283,7 +319,7 @@ function attempt(relation){
  if(!outcome.ok){if(outcome.reason==='relation'){if(!modal.open)chooseRelations(anchor);const message=`${p.name}は${a.name}の「${relationName(relation)}」ではなさそうです。`;say(message,true);if($('placement-error'))$('placement-error').textContent=message;const button=$('modal-content').querySelector(`[data-place-relation="${relation}"]`);if(button)button.disabled=true;}renderStats();persist();return;}
  clearDragPreview();const oldAnchor=state.positions[anchor];state.positions=layoutFamily(state);camera.x+=(oldAnchor.x-state.positions[anchor].x)*camera.scale;camera.y+=(oldAnchor.y-state.positions[anchor].y)*camera.scale;lineFocus=null;
  selected=null;closeDialog();clearTargets();renderBoard(id);renderHand();animateDraw(beforeHand);renderStats();renderHint();fit(true);say(`${p.name}が、${a.name}の${relationName(relation)}としてつながりました。`);persist();
- if(state.complete){records.best[state.stage.id]={elapsed:state.elapsed,mistakes:state.mistakes,hints:hintCount()};persist();results();}
+ if(state.complete)completeGame();
 }
 function showAnswer(){
  const answer=completedAnswer(state);
@@ -348,7 +384,7 @@ $('nodes').addEventListener('click',e=>{if(e.detail!==0)return;const node=e.targ
 window.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.open&&state){cancelDrag();clearSelection();}});
 let previousWidth=0,previousHeight=0;
 new ResizeObserver(()=>{if(!state||!board.clientWidth||!board.clientHeight)return;if(!previousWidth||!previousHeight||camera.scale<=0){previousWidth=board.clientWidth;previousHeight=board.clientHeight;fit(false);return;}camera.x+=(board.clientWidth-previousWidth)/2;camera.y+=(board.clientHeight-previousHeight)/2;previousWidth=board.clientWidth;previousHeight=board.clientHeight;updateTransform();positionHintButton();}).observe(board);
-setInterval(()=>{const now=performance.now(),playingSheet=dialogKind==='relation'||dialogKind==='anchor';if(state&&!state.complete&&!document.hidden&&(!modal.open||playingSheet)){state.elapsed+=Math.max(0,Math.min(now-lastTick,1500));$('timer').textContent=formatTime(state.elapsed);if(now-lastSaved>10000){persist();lastSaved=now;}}lastTick=now;},500);
+setInterval(()=>{const now=performance.now(),playingSheet=dialogKind==='relation'||dialogKind==='anchor';if(state&&!state.complete&&!document.hidden&&(!modal.open||playingSheet)){state.elapsed+=Math.max(0,Math.min(now-lastTick,1500));$('timer').textContent=formatTime(state.elapsed);$('score-timer').textContent=formatTime(horseScore(state).totalMs);if(now-lastSaved>10000){persist();lastSaved=now;}}lastTick=now;},500);
 document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelDrag();pointers.clear();pan=null;persist();}lastTick=performance.now();});window.addEventListener('pagehide',persist);
 renderHome();
 const readGameJSON=async path=>{const response=await fetch(path);if(!response.ok)throw Error('Failed to load '+path);return response.json();};
