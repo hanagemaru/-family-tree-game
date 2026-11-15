@@ -60,7 +60,7 @@ export function buildDiagram(state){
  const [a,b]=parents,between=state.placed.some(id=>!g.parents.includes(id)&&positions[id].y===rowY&&positions[id].x>a.x&&positions[id].x<b.x);
  if(!between){joint={x:(a.x+b.x)/2,y:rowY};segment(network,{x:a.x+CARD_W/2,y:rowY},{x:b.x-CARD_W/2,y:rowY});}
  else{const ax=port(a.id,g),bx=port(b.id,g),y=channel(rowY,index,true);joint={x:(ax+bx)/2,y};polyline(network,[{x:ax,y:rowY+CARD_H/2},{x:ax,y},{x:bx,y},{x:bx,y:rowY+CARD_H/2}]);}
- network.label={x:joint.x,y:joint.y-10,text:g.spouse?'夫婦':'父母の組'};
+ network.label=state.stage.id?.includes(':horse-stage-v5:')?null:{x:joint.x,y:joint.y-10,text:g.spouse?'夫婦':'父母の組'};
  if(g.children.length)network.junctions.push(joint);
  }else joint={x:port(parents[0].id,g),y:rowY+CARD_H/2};
  if(g.children.length){const xs=g.children.map(id=>positions[id].x),min=Math.min(joint.x,...xs),max=Math.max(joint.x,...xs);segment(network,joint,{x:joint.x,y:busY});segment(network,{x:min,y:busY},{x:max,y:busY});for(const id of g.children){const p=positions[id];segment(network,{x:p.x,y:busY},{x:p.x,y:p.y-CARD_H/2});}
