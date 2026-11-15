@@ -1,0 +1,38 @@
+name: Collect licensed horse photos (Wikimedia)
+on:
+  push:
+    branches: ['feature/horse-fame-difficulty-20261115']
+    paths: ['.github/workflows/collect-horse-media.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  photos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Collect Wikidata P18, Wikipedia pageimages, and Commons licenses
+        run: python3 scripts/collect_horse_media.py
+      - name: Commit verified photo manifest to the development branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/horse-media.v1.json docs/horse-photo-collection-2026-11-15.md
+          if ! git diff --cached --quiet; then
+            git commit -m 'data: persist Commons licensed horse photo inventory'
+            git push origin HEAD:feature/horse-fame-difficulty-20261115
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: horse-photo-audit
+          path: |
+            data/horse-media.v1.json
+            docs/horse-photo-collection-2026-11-15.md
+          if-no-files-found: warn
