@@ -48,7 +48,7 @@ async function waitForServer(){
  }
  throw Error('Worker did not start: '+reason);
 }
-const child=spawn('npx',['--yes','wrangler@4.47.0','dev','--config','wrangler.test.jsonc','--local','--port',String(port),'--ip','127.0.0.1','--persist-to','.wrangler/state'],{stdio:'pipe',env:{...process.env,WRANGLER_SEND_METRICS:'false'}});
+const child=spawn('npx',['--yes','wrangler@4.47.0','dev','--config','wrangler.test.jsonc','--local','--port',String(port),'--ip','127.0.0.1','--persist-to','.wrangler/state'],{stdio:'pipe',detached:true,env:{...process.env,WRANGLER_SEND_METRICS:'false'}});
 let output='';
 child.stdout.on('data',chunk=>output+=chunk.toString());
 child.stderr.on('data',chunk=>output+=chunk.toString());
@@ -111,4 +111,4 @@ try{
  assert.equal(gone.data.entries.length,0);
  console.log('HORSE_RANKING_WORKER_SMOKE_SUCCESS: signed start, replay, score reject, origin/auth, unique best, rename, delete, static hub path');
 }catch(e){console.error(output.slice(-9000));throw e;}
-finally{child.kill('SIGTERM');}
+finally{try{process.kill(-child.pid,'SIGTERM');}catch{}child.stdout.destroy();child.stderr.destroy();child.unref();}
