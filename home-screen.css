@@ -125,7 +125,7 @@ body:not(.playing) .home-picker-label{
  margin:0 1px 9px;color:#ECF3FA;
 }
 body:not(.playing) .home-picker-label h2{
- margin:0;font:800 13px/1.5 inherit;letter-spacing:.01em;
+ margin:0;font-family:inherit;font-size:13px;font-weight:800;line-height:1.5;letter-spacing:.01em;
 }
 body:not(.playing) .home-picker-label>span{
  color:#A9C0D2;font-size:11px;white-space:nowrap;
