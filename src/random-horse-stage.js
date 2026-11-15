@@ -152,7 +152,7 @@ function toStage(snapshot,graph,selection,seed,version,difficulty='normal',fame=
   const summary=sireName?`父は${sireName}。`:damName?`母は${damName}。`:'父母の馬名は未取得です。';
   const detail=`父：${h.sire?sireName||'馬名未取得':'未収録'}／母：${damName||'未収録'}`;
   const source=extra?{label:`${extra.provider==='JRA'?'JRA（公式馬名表記）':'Wikipedia（母馬名）'}: ${h.name}`,url:extra.source}:{label:`Wikidata: ${h.name}`,url:h.source};
-  return {id,name:h.name,short:h.name,sex:horseSex(id,snapshot),generation:gens.get(id)-minimum,parents,spouses:[],
+  return {id,name:h.name,short:h.name,birthYear:Number.isInteger(h.birthYear)?h.birthYear:null,sex:horseSex(id,snapshot),generation:gens.get(id)-minimum,parents,spouses:[],
    clues:[summary,detail],
    source};
  });
