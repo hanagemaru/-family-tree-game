@@ -5,13 +5,21 @@ import {newGame,CARD_W,CARD_H} from '../src/core.js';
 import {layoutFamily,buildDiagram,renderGeometry} from '../src/diagram.js';
 import {generateRandomHorseStage,CURRENT_HORSE_GENERATOR_VERSION} from '../src/random-horse-stage.js';
 const node=(id,generation,parents=[])=>({id,name:id,generation,parents,spouses:[]});
-const screenshotLike={id:'screenshot-like',anchor:'sunday',people:[
- node('halo',0),node('tony-bin',0),
- node('air-groove',1,['tony-bin']),node('sunday',1,['halo']),
- node('wind-in-her-hair',1),node('north-flight',1,['tony-bin']),
- node('admire-groove',2,['air-groove']),node('silence-suzuka',2,['sunday']),
- node('heart-cry',2,['sunday']),node('deep-impact',2,['sunday','wind-in-her-hair']),
- node('duramente',3,['admire-groove']),node('last-child',3,['deep-impact'])
+// Mirrors the twelve named horses and two-parent combinations in the user's
+// completed-board screenshot (No.01 through No.12), not a generic sample.
+const screenshotLike={id:'screenshot-like',anchor:'admire-groove',people:[
+ node('admire-groove',2,['sunday','air-groove']),
+ node('duramente',3,['admire-groove']),
+ node('air-groove',1,['tony-bin']),
+ node('sunday',1,['halo']),
+ node('silence-suzuka',2,['sunday']),
+ node('halo',0),
+ node('heart-cry',2,['sunday']),
+ node('tony-bin',0),
+ node('north-flight',1,['tony-bin']),
+ node('deep-impact',2,['sunday','wind-in-her-hair']),
+ node('virsina',3,['deep-impact']),
+ node('wind-in-her-hair',1)
 ]};
 function full(stage,placed=stage.people.map(p=>p.id)){
  const state=newGame(stage,()=>0.5);state.placed=[...placed];state.positions={};return state;
