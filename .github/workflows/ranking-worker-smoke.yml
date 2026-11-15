@@ -1,0 +1,27 @@
+name: Horse leaderboard local Worker verification
+on:
+  push:
+    branches: ['feature/horse-fame-difficulty-20261115']
+    paths: ['.github/workflows/ranking-worker-smoke.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  worker-d1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build static assets
+        run: npm run build
+      - name: Apply local-only D1 migrations
+        run: npx --yes wrangler@4.47.0 d1 migrations apply horse-pedigree-ranking --local --config wrangler.test.jsonc --persist-to .wrangler/state
+        env:
+          WRANGLER_SEND_METRICS: 'false'
+      - name: Exercise signed leaderboard and static path
+        run: node scripts/ranking-worker-smoke.mjs
+        env:
+          WRANGLER_SEND_METRICS: 'false'
