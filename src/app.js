@@ -100,7 +100,7 @@ modal.addEventListener('click',event=>{
   event.clientY<bounds.top||event.clientY>bounds.bottom;
  if(outside)closeDialog();
 });
-function help(){openDialog(`<p class="eyebrow">HOW TO PLAY</p><h2>手札を場につなぐ。</h2><ol><li>手札をタップし、場の相手をタップ。親・子・きょうだいなどを選ぶと配置します。</li><li>ドラッグ中は点線枠に位置マーカーを合わせ、少し止めて離すと直接配置できます。それ以外は関係を選ぶだけです。</li><li>同じ手札または盤面の余白をタップすると選択解除。ヒントは選択中の手札について表示されます。</li><li>相手が判別できないときは名前一覧から選べます。降参して答えを見る操作はメニュー内にあります。</li><li>●は実際の接続点、線の切れ目は非接続の交差。手札未選択で場のカードをタップすると関係線を強調します。</li><li>盤面をスワイプして移動。ピンチ、＋ / −で拡縮し、「全体」で見渡せます。</li></ol><p class="scope">${state?escape(state.stage.scope):'進行はこのブラウザへ自動保存されます。'}</p>`);}
+function help(){openDialog(`<p class="eyebrow">HOW TO PLAY</p><h2>手札を場につなぐ。</h2><ol><li>手札をタップし、場の相手をタップ。親・子・きょうだいなどを選ぶと配置します。</li><li>ドラッグ中は点線枠に位置マーカーを合わせ、少し止めて離すと直接配置できます。それ以外は関係を選ぶだけです。</li><li>同じ手札または盤面の余白をタップすると選択解除。ヒントは選択中の手札について表示されます。</li><li>相手が判別できないときは名前一覧から選べます。降参して答えを見る操作はメニュー内にあります。</li><li>●は実際の接続点、線の切れ目は非接続の交差。手札未選択で場のカードをタップすると関係線を強調します。</li><li>盤面をスワイプして移動。ピンチ、＋ / −で拡縮し、「全体」で見渡せます。</li><li>記録はプレイ時間にペナルティを加えた補正タイムです。ヒント +10秒、ミス +15秒、自動配置 +45秒。</li></ol><p class="scope">${state?escape(state.stage.scope):'進行はこのブラウザへ自動保存されます。'}</p>`);}
 $('help-button').addEventListener('click',help);
 $('home-menu-button').addEventListener('click',()=>openDialog('<h2>メニュー</h2><div class="home-menu-actions"><a class="button secondary" href="https://hanage.app/games/horse-pedigree/">ゲーム紹介へ戻る</a><button type="button" class="button secondary" data-action="sources">題材・出典</button></div>'));
 function showSources(){
@@ -121,7 +121,7 @@ function showSources(){
     '</ul>'+photoCredits;
  }).join('');
  openDialog('<p class="eyebrow">DATA & IMAGE CREDITS</p><h2>題材・出典</h2>'+stagesHtml+
- '<p class="scope">生年はWikidataとJBIS等で照合。<a href="https://github.com/hanagemaru/-family-tree-game/blob/feature/horse-fame-difficulty-20261115/data/source/horse-birth-enrichment-2026-11-15.json" target="_blank" rel="noopener noreferrer">生年補完の出典</a>。写真のない馬はイラストを表示します。</p>');
+ '<p class="scope">生年はWikidataとJBIS等で照合。<a href="https://github.com/hanagemaru/-family-tree-game/blob/main/data/source/horse-birth-enrichment-2026-11-15.json" target="_blank" rel="noopener noreferrer">生年補完の出典</a>。写真のない馬はイラストを表示します。</p>');
 }
 $('sources-button').addEventListener('click',showSources);
 $('stage-list').addEventListener('click',e=>{
