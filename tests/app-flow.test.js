@@ -69,6 +69,37 @@ test('an unconnectable hand card is not automatically placed',async t=>{
  const blocked=saved.hand.find(id=>!saved.placed.some(anchor=>relations(saved.stage.people.find(x=>x.id===id),saved.stage.people.find(x=>x.id===anchor)).length));
  if(blocked){select(app,blocked);assert.equal(app.$('auto-place-button').disabled,true);}
 });
+test('outside tap dismisses only the relation picker, with selection and score unchanged',async t=>{
+ const app=await setup(t),m=move(app);select(app,m.cardId);
+ const node=app.$('nodes').querySelector('[data-node="'+m.anchorId+'"]');
+ node.click({detail:0});
+ const modal=app.$('modal');
+ assert.equal(modal.open,true);
+ assert.ok(app.$('modal-content').querySelector('[data-place-relation]'));
+ const initial=structuredClone(session(app));
+ // Dialog interior is 0–44 in the integration shim; clicking its padding
+ // or any descendant is not a backdrop click.
+ modal.fire('click',{clientX:20,clientY:20});
+ assert.equal(modal.open,true,'dialog interior must not close the picker');
+ app.$('modal-content').querySelector('h2').click();
+ assert.equal(modal.open,true,'inside content must not close the picker');
+ modal.fire('click',{clientX:80,clientY:80});
+ assert.equal(modal.open,false,'clicking outside its rectangle dismisses the picker');
+ assert.equal(app.$('hand').querySelector('[data-card="'+m.cardId+'"]').classList.contains('selected'),true);
+ assert.deepEqual(session(app),initial,'dismissal cannot place cards or add score penalties');
+ assert.equal(app.$('penalty-count').textContent,'+0秒');
+ assert.equal(app.$('placed-count').textContent,'1');
+ // The player can choose the same target again after dismissing.
+ node.click({detail:0});
+ assert.equal(modal.open,true);
+ app.$('modal-close').click();
+ assert.equal(modal.open,false,'existing Cancel action still works');
+ app.$('menu-button').click();
+ assert.equal(modal.open,true);
+ modal.fire('click',{clientX:80,clientY:80});
+ assert.equal(modal.open,true,'backdrop tap does not dismiss other dialogs');
+ app.$('modal-close').click();
+});
 test('timer pauses in menu and accrues while choosing a relation',async t=>{
  const app=await setup(t),m=move(app);select(app,m.cardId);
  app.$('nodes').querySelector('[data-node="'+m.anchorId+'"]').click({detail:0});
