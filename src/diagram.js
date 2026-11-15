@@ -45,8 +45,7 @@ export function layoutFamily(state,{minimizeCrossings=false}={}){
  // This opt-in pass changes only displayed coordinates, never the shuffled
  // cards, stage IDs, generator scoring, replay, or leaderboard verification.
  if(minimizeCrossings&&state.placed.length>=4){
-  const geometryCost=()=>{
-   const positions=coordinates();
+  const geometryCost=positions=>{
    const routed=buildDiagram({...state,positions});
    const crossings=renderGeometry(routed).crossings.length;
    const wireLength=routed.networks.reduce((sum,network)=>sum+network.segments.reduce(
@@ -54,16 +53,15 @@ export function layoutFamily(state,{minimizeCrossings=false}={}){
    return {crossings,wireLength};
   };
   const improves=(a,b)=>a.crossings<b.crossings||(a.crossings===b.crossings&&a.wireLength<b.wireLength-EPS);
-  // Best-improvement pair swaps can reverse a grandparent row, e.g. Halo and
-  // Tony Bin, without changing generation or pulling descendants from a block.
-  // Repeat until no swap improves line crossings; tie-break by total wire length.
-  let incumbent=geometryCost();
-  for(let pass=0;pass<4;pass++){
+  // First compact entire family blocks. This phase preserves the baseline
+  // non-overlapping subtree widths and uses the *actual* orthogonal wire routes.
+  let incumbent=geometryCost(coordinates());
+  for(let pass=0;pass<3;pass++){
    let nextBest=incumbent,choice=null;
    for(const order of orders){
     for(let i=0;i<order.length;i++)for(let j=i+1;j<order.length;j++){
      [order[i],order[j]]=[order[j],order[i]];
-     const candidate=geometryCost();
+     const candidate=geometryCost(coordinates());
      [order[i],order[j]]=[order[j],order[i]];
      if(improves(candidate,nextBest)){nextBest=candidate;choice={order,i,j};}
     }
@@ -72,8 +70,37 @@ export function layoutFamily(state,{minimizeCrossings=false}={}){
    const {order,i,j}=choice;
    [order[i],order[j]]=[order[j],order[i]];
    incumbent=nextBest;
-   if(incumbent.crossings===0&&pass>=1)break;
   }
+  // IMPORTANT: switching two complete subtrees also moves their descendants,
+  // leaving some diagonal wire crossings unchanged. Swapping *only* the X slots
+  // of ancestors on the same row (Halo <-> Tony Bin) corrects those crossings
+  // while every generation/Y coordinate, board extent and card gap stays fixed.
+  const points=coordinates(),rows=new Map();
+  for(const id of state.placed){
+   const y=points[id].y;
+   if(!rows.has(y))rows.set(y,[]);
+   rows.get(y).push(id);
+  }
+  const rowGroups=[...rows.values()].filter(ids=>ids.length>1);
+  incumbent=geometryCost(points);
+  for(let pass=0;pass<5;pass++){
+   let nextBest=incumbent,choice=null;
+   for(const ids of rowGroups){
+    for(let i=0;i<ids.length;i++)for(let j=i+1;j<ids.length;j++){
+     const [a,b]=[ids[i],ids[j]];
+     [points[a].x,points[b].x]=[points[b].x,points[a].x];
+     const candidate=geometryCost(points);
+     [points[a].x,points[b].x]=[points[b].x,points[a].x];
+     if(improves(candidate,nextBest)){nextBest=candidate;choice=[a,b];}
+    }
+   }
+   if(!choice)break;
+   const [a,b]=choice;
+   [points[a].x,points[b].x]=[points[b].x,points[a].x];
+   incumbent=nextBest;
+   if(incumbent.crossings===0&&pass>=2)break;
+  }
+  return points;
  }
  return coordinates();
 }
