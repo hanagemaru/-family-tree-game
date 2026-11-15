@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {loadApp} from './dom-harness.js';
 import {newGame,pack} from '../src/core.js';
 import {generateRandomHorseSession} from '../src/random-horse-session.js';
-import {seededRandom,HORSE_GENERATOR_VERSION,FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE_GENERATOR_VERSION,CURRENT_HORSE_GENERATOR_VERSION} from '../src/random-horse-stage.js';
+import {seededRandom,HORSE_GENERATOR_VERSION,FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE_GENERATOR_VERSION,PREVIOUS_HORSE_GENERATOR_VERSION,CURRENT_HORSE_GENERATOR_VERSION} from '../src/random-horse-stage.js';
 
 const pedigree=JSON.parse(readFileSync(new URL('../data/horse-pedigree.v1.json',import.meta.url),'utf8'));
 const levels=['easy','normal','hard'];
@@ -92,4 +92,28 @@ test('old v3 beginner save remains accessible after the beginner difficulty redu
  app.$('stage-list').querySelector('[data-old-easy-start]').click();
  assert.equal(app.$('stage-title').textContent,old.stage.title);
  assert.deepEqual(app.storage().sessions[old.stage.id],oldState);
+});
+
+test('v5 twelve-card saved game is accessible after the v6 difficulty adjustment',async t=>{
+ const fameSnapshot=JSON.parse(readFileSync(new URL('../data/horse-fame-2026-10.v1.json',import.meta.url),'utf8'));
+ const seed='legacy-v5-2026';
+ const old=generateRandomHorseSession(pedigree,seed,{version:PREVIOUS_HORSE_GENERATOR_VERSION,difficulty:'easy',fameSnapshot});
+ const saved=pack(newGame(old.stage,seededRandom('deck:'+seed)));
+ const app=await loadApp({sessions:{[old.stage.id]:saved},best:{'v5:easy':{totalMs:87000}},
+  randomHorseByDifficulty:{easy:old.descriptor},randomDifficulty:'easy'});
+ t.after(()=>app.restore());
+ assert.equal(app.$('stage-list').querySelector('[data-random-start]').textContent.includes('つづきから'),false);
+ app.$('stage-list').querySelector('[data-random-start]').click();
+ const next=app.storage();
+ assert.equal(next.randomHorseByDifficulty.easy.generatorVersion,CURRENT_HORSE_GENERATOR_VERSION);
+ assert.deepEqual(next.randomHorseLegacyV5ByDifficulty.easy,old.descriptor);
+ assert.equal(next.best['v5:easy'].totalMs,87000);
+ assert.equal(next.best['v6:easy'],undefined);
+ app.$('menu-button').click();
+ app.$('modal-content').querySelector('[data-action="home"]').click();
+ const previous=app.$('stage-list').querySelector('[data-old-v5-start]');
+ assert.ok(previous,'previous v5 game should stay accessible');
+ previous.click();
+ assert.deepEqual(app.storage().sessions[old.stage.id],saved);
+ assert.match(app.$('stage-title').textContent,/初級/);
 });
