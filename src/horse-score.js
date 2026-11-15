@@ -1,5 +1,5 @@
 /** All ranked runs use the same simple time-plus-penalty contract. */
-export const HORSE_SCORE_VERSION='horse-score-v1-12x4';
+export const HORSE_SCORE_VERSION='horse-score-v2-v6-12x4';
 export const HORSE_SCORE_PENALTIES=Object.freeze({hint:10_000,mistake:15_000,auto:45_000});
 
 export function horseScore(state){
@@ -21,5 +21,5 @@ export function useHorseHint(state,cardId){
  return true;
 }
 export function rankedHorseStage(stage){
- return stage?.id?.includes(':horse-stage-v5:')&&stage.people?.length===12;
+ return (stage?.id?.includes(':horse-stage-v5:')||stage?.id?.includes(':horse-stage-v6:'))&&stage.people?.length===12;
 }
