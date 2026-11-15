@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {generateRandomHorseSession} from '../src/random-horse-session.js';
-import {CURRENT_HORSE_GENERATOR_VERSION,seededRandom} from '../src/random-horse-stage.js';
+import {CURRENT_HORSE_GENERATOR_VERSION,PREVIOUS_HORSE_GENERATOR_VERSION,seededRandom} from '../src/random-horse-stage.js';
 import {newGame,place} from '../src/core.js';
 import {findPlayablePlacement} from '../src/game-assistance.js';
 import {horseScore,useHorseHint} from '../src/horse-score.js';
@@ -24,7 +24,7 @@ function sample(difficulty,seed){
  state.elapsed=22_000;
  return {generated,stage:v.stage,state};
 }
-test('server accepts replayed actual v5 games of all modes',()=>{
+test('server accepts replayed actual v6 games of all modes',()=>{
  for(const difficulty of ['easy','normal','hard']){
   const {generated,stage,state}=sample(difficulty,'server-'+difficulty);
   const score=horseScore(state);
@@ -54,4 +54,9 @@ test('hint is one-time and auto-placement supersedes its 10s, mistakes remain se
  assert.equal(place(state,move.cardId,move.anchorId,bad).ok,false);
  assert.equal(place(state,move.cardId,move.anchorId,move.relation,{auto:true}).ok,true);
  const score=horseScore(state);assert.equal(score.penaltyMs,60_000);assert.equal(score.hints,0);
+});
+
+test('v5 stage IDs cannot be registered in the v6 leaderboard',()=>{
+ const old=generateRandomHorseSession(pedigree,'server-old-v5',{version:PREVIOUS_HORSE_GENERATOR_VERSION,difficulty:'easy',fameSnapshot});
+ assert.equal(verifyHorseStage({...old.descriptor,horseIds:old.descriptor.cardIds}).valid,false);
 });
