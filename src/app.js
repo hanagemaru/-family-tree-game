@@ -5,16 +5,17 @@ import {placementLabels,directionalTarget,dragFrameScreen,insideDragFrame,dragDr
 import {layoutFamily,buildDiagram,diagramSvg} from './diagram.js';
 import {dragHotspot,screenNodes,pickDropCard,exactDropTarget,ambiguousNearbyDrop} from './interaction.js';
 import {createRandomSeed,generateRandomHorseSession,restoreRandomHorseSession} from './random-horse-session.js';
-import {seededRandom,prepareHorseGraph,FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE_GENERATOR_VERSION} from './random-horse-stage.js';
+import {seededRandom,prepareHorseGraph,FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE_GENERATOR_VERSION,CURRENT_HORSE_GENERATOR_VERSION} from './random-horse-stage.js';
 import {HORSE_DIFFICULTIES,prepareHorseFame} from './horse-fame.js';
 import {findCorrectPlacement,horsePlacementHint,completedAnswer} from './game-assistance.js';
+import {horseScore,useHorseHint,rankedHorseStage} from './horse-score.js';
 const $=id=>document.getElementById(id),storageKey='family-tree-game:v1';
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let records={sessions:{},best:{}};
-try{const parsed=JSON.parse(localStorage.getItem(storageKey));if(parsed&&typeof parsed==='object')records={sessions:parsed.sessions||{},best:parsed.best||{},randomHorse:parsed.randomHorse||null,randomHorseByDifficulty:parsed.randomHorseByDifficulty||{},randomDifficulty:parsed.randomDifficulty||'normal',randomHorseLegacyEasy:parsed.randomHorseLegacyEasy||null};}catch{}
+try{const parsed=JSON.parse(localStorage.getItem(storageKey));if(parsed&&typeof parsed==='object')records={sessions:parsed.sessions||{},best:parsed.best||{},randomHorse:parsed.randomHorse||null,randomHorseByDifficulty:parsed.randomHorseByDifficulty||{},randomDifficulty:parsed.randomDifficulty||'normal',randomHorseLegacyEasy:parsed.randomHorseLegacyEasy||null,randomHorseLegacyByDifficulty:parsed.randomHorseLegacyByDifficulty||{}};}catch{}
 if(!records.randomHorseLegacyEasy&&records.randomHorseByDifficulty?.easy?.generatorVersion===FAME_HORSE_GENERATOR_VERSION)
  records.randomHorseLegacyEasy=records.randomHorseByDifficulty.easy;
-let horseSnapshot=null,fameSnapshot=null,randomHorse=null,randomHorseError='',randomHorseByDifficulty={},randomHorseLegacyEasy=null;
+let horseSnapshot=null,fameSnapshot=null,randomHorse=null,randomHorseError='',randomHorseByDifficulty={},randomHorseLegacyEasy=null,randomHorseLegacyByDifficulty={};
 let selectedDifficulty=HORSE_DIFFICULTIES[records.randomDifficulty]?records.randomDifficulty:'normal';
 let state=null,selected=null,camera={x:0,y:0,scale:1},targetAnchor=null,hoverAnchor=null,drag=null,pan=null,frame=null,lastTick=performance.now(),lastSaved=0,diagram=null,lineFocus=null,lastLineDiagram=null,lastLineScale=null,lastLineFocus=null,dialogKind='info',dragPlacement=null;
 const board=$('board'),modal=$('modal'),pointers=new Map();
@@ -22,8 +23,8 @@ const person=id=>state.stage.people.find(p=>p.id===id);
 const sexTone=id=>{if(!isHorseStage(state.stage))return '';const p=person(id);return horseSexTone(p.sex||horseSex(id));};
 const isHorseStage=stage=>stage?.id==='thoroughbred'||stage?.category==='競走馬'||stage?.category==='競走馬の血統';
 const isRandomHorseStage=stage=>stage?.id?.startsWith('horse-generated:');
-const hintCount=()=>Object.values(state.hints).reduce((sum,n)=>sum+n,0);
-const randomDescriptorForStage=stage=>[records.randomHorse,records.randomHorseLegacyEasy,...Object.values(records.randomHorseByDifficulty||{})].find(record=>record?.stageId===stage?.id);
+const hintCount=()=>Object.values(state.hints).filter(n=>n>=1).length;
+const randomDescriptorForStage=stage=>[records.randomHorse,records.randomHorseLegacyEasy,...Object.values(records.randomHorseLegacyByDifficulty||{}),...Object.values(records.randomHorseByDifficulty||{})].find(record=>record?.stageId===stage?.id);
 const newStageGame=stage=>isRandomHorseStage(stage)?newGame(stage,seededRandom(`deck:${randomDescriptorForStage(stage)?.seed||''}`)):newGame(stage);
 function persist(){try{if(state)records.sessions[state.stage.id]=pack(state);localStorage.setItem(storageKey,JSON.stringify(records));}catch{}}
 function say(message,error=false){const box=$('status');box.textContent=message;box.classList.toggle('error',error);box.classList.remove('flash');void box.offsetWidth;if(message)box.classList.add('flash');}
@@ -31,21 +32,23 @@ function savedGame(stage){try{return restore(records.sessions[stage.id],stage);}
 function fixedStageCard(stage,index){const saved=savedGame(stage),resume=saved&&!saved.complete,best=records.best[stage.id],history=stage.id==='tokugawa';return `<article class="stage-card ${history?'history-theme':'horse-theme'}"><div class="stage-art" aria-hidden="true"><span class="art-index">COLLECTION 0${index+1}</span><div class="theme-emblem">${history?'<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="51"/><path d="M60 59C27 52 28 18 49 23C65 26 68 43 60 59ZM62 61C75 29 104 39 98 59C92 75 77 75 62 61ZM58 63C78 90 53 111 39 95C27 80 36 66 58 63Z"/><circle cx="60" cy="61" r="6"/></svg>':'<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="51"/><path d="M35 93C36 73 45 62 53 55L45 48L52 28L60 35L70 26L73 41C85 46 91 59 85 68L75 63L65 73L72 94Z"/></svg>'}</div><span class="art-caption">${history?'TOKUGAWA FAMILY':'THOROUGHBRED'}</span></div><div class="stage-content"><div class="stage-meta"><span>${stage.category}</span><span>${stage.people.length}${history?'人':'頭'}のカード</span></div><h3>${stage.title}</h3><p>${stage.summary}</p><span class="tag">${stage.tag}</span><div class="stage-bottom"><span class="best">${resume?`<span class="resume-dot"></span>${saved.placed.length} / ${stage.people.length} 配置済み`:best?`✓ クリア済み · ${formatTime(best.elapsed)}`:'いつでも、あなたのペースで'}</span><button class="button" data-start="${stage.id}">${resume?'つづきから':'はじめる'} <span aria-hidden="true">→</span></button></div></div></article>`;}
 function randomStageCard(){
  const generated=randomHorseByDifficulty[selectedDifficulty];
- const current=selectedDifficulty!=='easy'||generated?.descriptor.generatorVersion===EASIER_HORSE_GENERATOR_VERSION;
+ const current=generated?.descriptor.generatorVersion===CURRENT_HORSE_GENERATOR_VERSION;
  const saved=current&&generated&&savedGame(generated.stage);
  const resume=!!(saved&&!saved.complete),best=current&&generated&&records.best[generated.stage.id];
  const ready=!!horseSnapshot&&!!fameSnapshot,mode=HORSE_DIFFICULTIES[selectedDifficulty];
- const status=randomHorseError||(!ready?'難易度データを準備中…':resume?`${saved.placed.length} / 18 配置済み`:best?`✓ クリア済み · ${formatTime(best.elapsed)}`:'毎回ちがう18頭に挑戦');
+ const status=randomHorseError||(!ready?'難易度データを準備中…':resume?`${saved.placed.length} / 12 配置済み`:best?`自己ベスト ${formatTime(best.totalMs??best.elapsed)}`:'12頭・最大4世代');
  const explanations={easy:'知名度上位15%の馬だけが登場。名馬の親子関係をたどろう。',normal:'名馬とその血統。知名度が中程度の馬も登場。',hard:'繁殖馬や知名度が低めの産駒まで幅広く登場。'};
  const choices=Object.entries(HORSE_DIFFICULTIES).map(([key,detail])=>`<button type="button" class="difficulty-option ${selectedDifficulty===key?'active':''}" data-random-level="${key}" aria-pressed="${selectedDifficulty===key}">${detail.label}</button>`).join('');
  const legacySaved=randomHorse&&savedGame(randomHorse.stage);
  const legacyResume=legacySaved&&!legacySaved.complete?`<button type="button" class="text-button legacy-resume" data-legacy-random-start>以前の問題を再開（${legacySaved.placed.length} / 18）</button>`:'';
  const oldEasySaved=selectedDifficulty==='easy'&&randomHorseLegacyEasy&&savedGame(randomHorseLegacyEasy.stage);
+ const oldSaved=randomHorseLegacyByDifficulty[selectedDifficulty]&&savedGame(randomHorseLegacyByDifficulty[selectedDifficulty].stage);
+ const oldResume=oldSaved&&!oldSaved.complete?`<button type="button" class="text-button legacy-resume" data-old-stage-start>以前の問題を再開（${oldSaved.placed.length} / 18）</button>`:'';
  const oldEasyResume=oldEasySaved&&!oldEasySaved.complete?`<button type="button" class="text-button legacy-resume" data-old-easy-start>変更前の初級を再開（${oldEasySaved.placed.length} / 18）</button>`:'';
- return `<article class="stage-card horse-theme random-theme"><div class="stage-art" aria-hidden="true"><span class="art-index">COLLECTION 03 · RANDOM</span><div class="random-emblem">↻</div><span class="art-caption">SEEDED PEDIGREE CHALLENGE</span></div><div class="stage-content"><div class="stage-meta"><span>競走馬</span><span>18頭のカード</span></div><h3>ランダム血統チャレンジ</h3><p>つながる18頭を選び、血統を完成させよう。</p><div class="difficulty-picker" role="group" aria-label="難易度を選ぶ">${choices}</div><p class="difficulty-description">${explanations[selectedDifficulty]}</p><div class="stage-bottom"><span class="best">${resume?'<span class="resume-dot"></span>':''}${status}</span><button class="button" data-random-start ${ready?'':'disabled'}>${resume?'つづきから':`「${mode.label}」を始める`}</button></div>${legacyResume}${oldEasyResume}</div></article>`;
+ return `<article class="stage-card horse-theme random-theme"><div class="stage-art" aria-hidden="true"><span class="art-index">PEDIGREE CHALLENGE</span><div class="random-emblem">↻</div><span class="art-caption">SEEDED PEDIGREE CHALLENGE</span></div><div class="stage-content"><div class="stage-meta"><span>競走馬</span><span>12頭のカード</span></div><h3>競走馬血統ならべ</h3><p>12頭の親子関係をつないで血統図を完成させよう。</p><div class="difficulty-picker" role="group" aria-label="難易度を選ぶ">${choices}</div><p class="difficulty-description">${explanations[selectedDifficulty]}</p><div class="stage-bottom"><span class="best">${resume?'<span class="resume-dot"></span>':''}${status}</span><button class="button" data-random-start ${ready?'':'disabled'}>${resume?'つづきから':`「${mode.label}」を始める`}</button></div>${oldResume}${legacyResume}${oldEasyResume}</div></article>`;
 }
 function renderHome(){
- $('stage-list').innerHTML=stages.map(fixedStageCard).join('')+randomStageCard();
+ $('stage-list').innerHTML=randomStageCard();
 }
 function openDialog(html,closeLabel='閉じる',kind='info'){dialogKind=kind;modal.classList.toggle('placement-dialog',kind==='relation'||kind==='anchor');$('modal-content').innerHTML=html;const heading=$('modal-content').querySelector('h2');if(heading)heading.id='dialog-title';$('modal-close').textContent=closeLabel;if(!modal.open)modal.showModal();const first=$('modal-content').querySelector('button');if(first)first.focus({preventScroll:true});lastTick=performance.now();}
 function closeDialog(){modal.close();lastTick=performance.now();}
@@ -53,7 +56,7 @@ modal.addEventListener('close',()=>{lastTick=performance.now();if(state)renderCa
 $('modal-close').addEventListener('click',closeDialog);
 function help(){openDialog(`<p class="eyebrow">HOW TO PLAY</p><h2>手札を場につなぐ。</h2><ol><li>手札をタップし、場の相手をタップ。親・子・きょうだいなどを選ぶと配置します。</li><li>ドラッグ中は点線枠に位置マーカーを合わせ、少し止めて離すと直接配置できます。それ以外は関係を選ぶだけです。</li><li>同じ手札または盤面の余白をタップすると選択解除。ヒントは選択中の手札について表示されます。</li><li>相手が判別できないときは名前一覧から選べます。降参して答えを見る操作はメニュー内にあります。</li><li>●は実際の接続点、線の切れ目は非接続の交差。手札未選択で場のカードをタップすると関係線を強調します。</li><li>盤面をスワイプして移動。ピンチ、＋ / −で拡縮し、「全体」で見渡せます。</li></ol><p class="scope">${state?escape(state.stage.scope):'進行はこのブラウザへ自動保存されます。'}</p>`);}
 $('help-button').addEventListener('click',help);
-function showSources(){const list=state?[state.stage]:stages;openDialog(`<p class="eyebrow">ABOUT THE FAMILY TREES</p><h2>題材・出典</h2>${list.map(stage=>`<h3>${stage.title}</h3><p>${stage.description}</p><p class="scope">${stage.scope}</p><ul>${[...new Map([...stage.sources,...stage.people.map(p=>p.source)].map(s=>[s.url,s])).values()].map(s=>`<li><a href="${escape(s.url)}" target="_blank" rel="noopener noreferrer">${escape(s.label)}</a></li>`).join('')}</ul>`).join('')}<p class="scope">関係情報をもとに作成した選抜ステージです。人物・馬の肖像や写真は転載していません。</p>`);}
+function showSources(){const list=state?[state.stage]:randomHorseByDifficulty[selectedDifficulty]?[randomHorseByDifficulty[selectedDifficulty].stage]:[];openDialog(`<p class="eyebrow">ABOUT THE FAMILY TREES</p><h2>題材・出典</h2>${list.map(stage=>`<h3>${stage.title}</h3><p>${stage.description}</p><p class="scope">${stage.scope}</p><ul>${[...new Map([...stage.sources,...stage.people.map(p=>p.source)].map(s=>[s.url,s])).values()].map(s=>`<li><a href="${escape(s.url)}" target="_blank" rel="noopener noreferrer">${escape(s.label)}</a></li>`).join('')}</ul>`).join('')}<p class="scope">関係情報をもとに作成した選抜ステージです。人物・馬の肖像や写真は転載していません。</p>`);}
 $('sources-button').addEventListener('click',showSources);
 $('stage-list').addEventListener('click',e=>{
  const level=e.target.closest('[data-random-level]');
@@ -64,18 +67,20 @@ $('stage-list').addEventListener('click',e=>{
  if(button){start(stageById(button.dataset.start));return;}
  if(e.target.closest('[data-legacy-random-start]')&&randomHorse){start(randomHorse.stage);return;}
  if(e.target.closest('[data-old-easy-start]')&&randomHorseLegacyEasy){start(randomHorseLegacyEasy.stage);return;}
+ if(e.target.closest('[data-old-stage-start]')&&randomHorseLegacyByDifficulty[selectedDifficulty]){start(randomHorseLegacyByDifficulty[selectedDifficulty].stage);return;}
  if(e.target.closest('[data-random-start]'))startRandomHorse(false,selectedDifficulty);
 });
 function startRandomHorse(fresh,difficulty=selectedDifficulty){
  if(!horseSnapshot||!fameSnapshot||!HORSE_DIFFICULTIES[difficulty])return;
  try{
-  const existing=randomHorseByDifficulty[difficulty],useOld=difficulty==='easy'&&existing?.descriptor.generatorVersion!==EASIER_HORSE_GENERATOR_VERSION;
+  const existing=randomHorseByDifficulty[difficulty],useOld=!!existing&&existing.descriptor.generatorVersion!==CURRENT_HORSE_GENERATOR_VERSION;
   const saved=!fresh&&!useOld&&existing&&savedGame(existing.stage);
   if(saved&&!saved.complete){start(existing.stage);return;}
-  if(useOld&&existing&&(!records.randomHorseLegacyEasy||!randomHorseLegacyEasy)){
-   records.randomHorseLegacyEasy=existing.descriptor;randomHorseLegacyEasy=existing;
+  if(useOld&&existing){
+   records.randomHorseLegacyByDifficulty??={};
+   records.randomHorseLegacyByDifficulty[difficulty]=existing.descriptor;randomHorseLegacyByDifficulty[difficulty]=existing;
   }
-  const version=difficulty==='easy'?EASIER_HORSE_GENERATOR_VERSION:FAME_HORSE_GENERATOR_VERSION;
+  const version=CURRENT_HORSE_GENERATOR_VERSION;
   const generated=generateRandomHorseSession(horseSnapshot,createRandomSeed(),{version,difficulty,fameSnapshot});
   randomHorseByDifficulty[difficulty]=generated;records.randomHorseByDifficulty={...records.randomHorseByDifficulty,[difficulty]:generated.descriptor};
   selectedDifficulty=difficulty;records.randomDifficulty=difficulty;randomHorseError='';persist();start(generated.stage,true);
@@ -360,6 +365,8 @@ void Promise.all([readGameJSON('./data/horse-pedigree.v1.json'),readGameJSON('./
   catch(error){console.warn('Could not restore previous easy game',error);}
  }
  for(const level of Object.keys(HORSE_DIFFICULTIES)){
+  const old=records.randomHorseLegacyByDifficulty?.[level];
+  if(old)try{randomHorseLegacyByDifficulty[level]=restoreRandomHorseSession(snapshot,old,{fameSnapshot:fame});}catch(error){console.warn('Could not restore old '+level,error);}
   const descriptor=records.randomHorseByDifficulty?.[level];
   if(!descriptor)continue;
   try{randomHorseByDifficulty[level]=restoreRandomHorseSession(snapshot,descriptor,{fameSnapshot:fame});}
