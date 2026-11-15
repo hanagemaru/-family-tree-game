@@ -12,6 +12,8 @@ WIKIDATA="https://www.wikidata.org/w/api.php"
 COMMONS="https://commons.wikimedia.org/w/api.php"
 WIKIPEDIAS={"jawiki":"https://ja.wikipedia.org/w/api.php","enwiki":"https://en.wikipedia.org/w/api.php"}
 JPEG=re.compile(r"\.(?:jpe?g|webp)$",re.I)
+GENERIC=re.compile(r"request.?picture|placeholder|no.?photo|not.?available|image.?missing",re.I)
+def is_photo_candidate(filename):return bool(JPEG.search(filename) and not GENERIC.search(filename))
 LICENSE=re.compile(r"^(CC BY(?:-SA)? [234]\.0|CC0(?: 1\.0)?|Public domain)$",re.I)
 
 def batch(items,n):
@@ -50,7 +52,7 @@ def main():
     wiki_titles=collections.defaultdict(dict)
     for horse in horses:
         qid=horse["id"];entity=entities.get(qid,{})
-        choices[qid]+=[(filename,"Wikidata P18") for filename in photo_claims(entity) if JPEG.search(filename)]
+        choices[qid]+=[(filename,"Wikidata P18") for filename in photo_claims(entity) if is_photo_candidate(filename)]
         if not choices[qid]:
             for wiki in WIKIPEDIAS:
                 title=entity.get("sitelinks",{}).get(wiki,{}).get("title")
@@ -65,10 +67,17 @@ def main():
                 for redirect in result.get("query",{}).get("redirects",[]):
                     if redirect["to"] in found:found[redirect["from"]]=found[redirect["to"]]
                 for title,filename in found.items():
-                    if title in lookup and JPEG.search(filename):
+                    if title in lookup and is_photo_candidate(filename):
                         choices[lookup[title]].append((filename,wiki+" pageimages"))
             except Exception as e:errors.append(f"{wiki} {i}: {type(e).__name__}: {str(e)[:130]}")
             time.sleep(.12)
+    # A single generic or mixed-subject image used for multiple horse QIDs is not
+    # adequate proof of each animal's identity. Suppress shared images.
+    occurrence=collections.Counter(filename for values in choices.values()
+         for filename,origin in set(values))
+    shared={filename for filename,count in occurrence.items() if count>1}
+    for qid in choices:
+        choices[qid]=[(filename,origin) for filename,origin in choices[qid] if filename not in shared]
     filenames=sorted({filename for arr in choices.values() for filename,origin in arr})
     by_filename={}
     for i,part in enumerate(batch(filenames,6)):
@@ -115,11 +124,12 @@ def main():
     MEDIA.write_text(json.dumps(output,ensure_ascii=False,indent=2)+"\n","utf-8")
     debug=[{"file":k,"license":v["license"],"mime":v.get("mime"),"artist":bool(v["artist"]),"urlStart":v["photoUrl"][:75],"nonfree":v.get("nonfree")} for k,v in by_filename.items() if not v["allowed"]][:6]
     stats={"named":len(horses),"wikidataFound":len(entities),"photoFiles":len(filenames),"sampleRejected":debug,
-       "approved":len(approved),"coveragePercent":round(len(approved)*100/len(horses),1),
+       "approved":len(approved),"coveragePercent":round(len(approved)*100/len(horses),1),"sharedImagesExcluded":len(shared),
        "origin":dict(origin_stats),"licenseRejected":dict(rejected),"errors":errors}
     lines=["# 競走馬写真のライセンス照合（Wikimedia Commons）","",
       f"取得日時：{now}（UTC）","",f"- 対象：{len(horses)}頭",
       f"- Wikidata照合：{len(entities)}頭",f"- Commons候補：{len(filenames)}ファイル",
+      f"- 複数馬に使い回された画像：{len(shared)}ファイル除外（同一個体か検証できないため）",
       f"- **ライセンス確認済みの写真候補：{len(approved)}頭（{stats['coveragePercent']}%）**",
       f"- 取得経路：{dict(origin_stats)}",
       f"- 不適合・不明ライセンス：{dict(rejected)}","",
