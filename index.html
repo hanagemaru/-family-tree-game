@@ -8,19 +8,12 @@
 </head>
 <body>
 <div id="app">
-<header class="app-header"><button class="brand" id="home-button" aria-label="難易度選択へ"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M16 9v7M7 23v-7h18v7" stroke="currentColor" stroke-width="2"/><rect x="12" y="3" width="8" height="8" rx="2" fill="currentColor"/><rect x="3" y="21" width="8" height="8" rx="2" fill="currentColor"/><rect x="21" y="21" width="8" height="8" rx="2" fill="currentColor"/></svg></span><span>競走馬血統ならべ</span></button><nav class="home-header-actions" aria-label="ホームの操作"><button type="button" class="text-button help-nav" id="help-button" aria-label="遊び方"><span class="home-help-mark" aria-hidden="true">?</span><span>遊び方</span></button><button type="button" class="home-menu-button" id="home-menu-button" aria-label="その他のメニュー" aria-haspopup="dialog"><span aria-hidden="true">⋯</span></button></nav></header>
+<header class="app-header"><button class="brand" id="home-button" aria-label="難易度選択へ"><span class="home-title-stripe" aria-hidden="true"></span><span>競走馬血統ならべ</span></button><nav class="home-header-actions" aria-label="ホームの操作"><button type="button" class="text-button help-nav" id="help-button" aria-label="遊び方"><span class="home-help-mark" aria-hidden="true">?</span><span>遊び方</span></button><button type="button" class="home-menu-button" id="home-menu-button" aria-label="メニュー" aria-haspopup="dialog"><span aria-hidden="true">☰</span></button></nav></header>
 <main id="home-screen">
-<section class="home-pedigree-preview" aria-label="血統カードのイメージ">
-<p class="home-preview-kicker">HORSE PEDIGREE PUZZLE</p>
-<div class="home-preview-board" aria-hidden="true">
-<svg class="home-preview-links" viewBox="0 0 328 176" preserveAspectRatio="none"><path d="M62 81V93H266V81M164 93V101" fill="none" stroke="#B5C6D5" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="164" cy="93" r="3.2" fill="#F48B5B"/></svg>
-<div class="home-preview-card preview-father"><span class="preview-number">No.01</span><span class="preview-sex">牡</span><div class="preview-art"><svg viewBox="0 0 100 60"><path d="M16 52L22 35L22 23L35 16L42 23L61 23L74 31L78 51L69 51L64 37L49 37L44 51L35 51L36 36L29 31L28 51Z" fill="currentColor"/></svg><span class="preview-year">1986年生</span></div><span class="preview-name">サンデーサイレンス</span></div>
-<div class="home-preview-card preview-mother"><span class="preview-number">No.02</span><span class="preview-sex">牝</span><div class="preview-art"><svg viewBox="0 0 100 60"><path d="M16 52L22 35L22 23L35 16L42 23L61 23L74 31L78 51L69 51L64 37L49 37L44 51L35 51L36 36L29 31L28 51Z" fill="currentColor"/></svg><span class="preview-year">1991年生</span></div><span class="preview-name">ウインドインハーヘア</span></div>
-<div class="home-preview-card preview-child"><span class="preview-number">No.03</span><span class="preview-sex">牡</span><div class="preview-art"><svg viewBox="0 0 100 60"><path d="M16 52L22 35L22 23L35 16L42 23L61 23L74 31L78 51L69 51L64 37L49 37L44 51L35 51L36 36L29 31L28 51Z" fill="currentColor"/></svg><span class="preview-year">2002年生</span></div><span class="preview-name">ディープインパクト</span></div>
-</div>
-<h1 class="home-goal">12頭の血統を完成させよう</h1>
+<section class="home-launch" aria-label="難易度を選んでプレイ">
+<p class="home-rule">12頭の血統を完成させよう</p>
+<div id="stage-list"></div>
 </section>
-<section class="horse-home-stages" aria-label="難易度選択とゲーム開始"><div id="stage-list"></div></section>
 </main>
 <main id="game-screen" hidden>
 <div class="game-heading"><div><p class="eyebrow" id="stage-category"></p><h1 id="stage-title"></h1></div><button id="menu-button" class="text-button" aria-label="メニュー">☰</button></div>
