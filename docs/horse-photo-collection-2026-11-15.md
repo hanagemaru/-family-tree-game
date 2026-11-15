@@ -1,14 +1,14 @@
 # 競走馬写真のライセンス照合（Wikimedia Commons）
 
-取得日時：2026-11-15T02:44:09Z（UTC）
+取得日時：2026-11-15T02:46:12Z（UTC）
 
 - 対象：872頭
 - Wikidata照合：872頭
-- Commons候補：520ファイル
+- Commons候補：521ファイル
 - 複数馬に使い回された画像：15ファイル除外（同一個体か検証できないため）
-- **ライセンス確認済みの写真候補：370頭（42.4%）**
-- 取得経路：{'Wikidata P18': 330, 'jawiki pageimages': 40}
-- 不適合・不明ライセンス：{'CC BY-SA 3.0': 1, 'Copyrighted free use': 4}
+- **ライセンス確認済みの写真候補：371頭（42.5%）**
+- 取得経路：{'Wikidata P18': 330, 'jawiki pageimages': 40, 'Commons curated verified depicts': 1}
+- 不適合・不明ライセンス：{'CC BY-SA 3.0': 1, 'Copyrighted free use': 3}
 
 写真はCommonsのサムネイルURLを参照。各写真の撮影者・出典・ライセンスはゲーム内で明示する。
 馬との紐付けはWikidataのP18またはWikipediaのページ画像。**写っている馬の個体を目視で保証するものではありません。**

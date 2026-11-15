@@ -1,6 +1,6 @@
 {
   "version": "horse-photo-v1",
-  "retrievedAtUTC": "2026-11-15T02:44:09Z",
+  "retrievedAtUTC": "2026-11-15T02:46:12Z",
   "datasetVersion": "wikidata-pedigree-v1",
   "licensePolicy": "Wikimedia Commons CC BY/CC BY-SA/CC0/Public domain; photograph association from Wikidata/Wikipedia, not individually visual-verified.",
   "horses": {
@@ -1053,6 +1053,16 @@
       "artist": "Ogiyoshisan",
       "name": "ツルマルツヨシ",
       "source": "Wikidata P18"
+    },
+    "Q11319077": {
+      "filename": "TM Opera O 123rd Tennosho (crop).jpg",
+      "photoUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/TM_Opera_O_123rd_Tennosho_%28crop%29.jpg/330px-TM_Opera_O_123rd_Tennosho_%28crop%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "filePage": "https://commons.wikimedia.org/wiki/File:TM_Opera_O_123rd_Tennosho_(crop).jpg",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "artist": "Goki（原写真）／RandomEditsForWhenIRemember（トリミング）",
+      "name": "テイエムオペラオー",
+      "source": "Commons curated verified depicts"
     },
     "Q11319464": {
       "filename": "Telegnosis 20051009.jpg",
