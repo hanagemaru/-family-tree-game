@@ -1,7 +1,18 @@
 {
   "version": "horse-photo-v1",
-  "retrievedAtUTC": null,
+  "retrievedAtUTC": "2026-11-15T02:39:53Z",
   "datasetVersion": "wikidata-pedigree-v1",
-  "licensePolicy": "Wikimedia Commons: only verified freely reusable images with attribution",
-  "horses": {}
+  "licensePolicy": "Wikimedia Commons CC BY/CC BY-SA/CC0/Public domain; photograph association from Wikidata/Wikipedia, not individually visual-verified.",
+  "horses": {
+    "Q11304520": {
+      "filename": "Bakusin-o.jpg",
+      "photoUrl": "https://upload.wikimedia.org/wikipedia/commons/7/71/Bakusin-o.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "filePage": "https://commons.wikimedia.org/wiki/File:Bakusin-o.jpg",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "artist": "Sakurahighspeed",
+      "name": "サクラバクシンオー",
+      "source": "Wikidata P18"
+    }
+  }
 }
