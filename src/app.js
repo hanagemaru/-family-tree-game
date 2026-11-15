@@ -16,7 +16,7 @@ let records={sessions:{},best:{}};
 try{const parsed=JSON.parse(localStorage.getItem(storageKey));if(parsed&&typeof parsed==='object')records={sessions:parsed.sessions||{},best:parsed.best||{},randomHorse:parsed.randomHorse||null,randomHorseByDifficulty:parsed.randomHorseByDifficulty||{},randomDifficulty:parsed.randomDifficulty||'normal',randomHorseLegacyEasy:parsed.randomHorseLegacyEasy||null,randomHorseLegacyByDifficulty:parsed.randomHorseLegacyByDifficulty||{},rankedRunTickets:parsed.rankedRunTickets||{}};}catch{}
 if(!records.randomHorseLegacyEasy&&records.randomHorseByDifficulty?.easy?.generatorVersion===FAME_HORSE_GENERATOR_VERSION)
  records.randomHorseLegacyEasy=records.randomHorseByDifficulty.easy;
-let horseSnapshot=null,fameSnapshot=null,randomHorse=null,randomHorseError='',randomHorseByDifficulty={},randomHorseLegacyEasy=null,randomHorseLegacyByDifficulty={};
+let horseSnapshot=null,fameSnapshot=null,randomHorse=null,randomHorseError='',randomHorseByDifficulty={},randomHorseLegacyEasy=null,randomHorseLegacyByDifficulty={},horsePhotos={};
 let selectedDifficulty=HORSE_DIFFICULTIES[records.randomDifficulty]?records.randomDifficulty:'normal';
 const onlineRankingEnabled=globalThis.location?.pathname?.startsWith('/games/horse-pedigree/play/')||false;
 if(onlineRankingEnabled){const link=document.querySelector('.hub-back');if(link){link.href='https://hanage.app/games/horse-pedigree/';link.textContent='ゲーム紹介へ戻る';}}
@@ -166,7 +166,10 @@ function cardFace(id){
  const sex=horse?horseSexLabel(p.sex||horseSex(id)):null;
  const sexMarkup=horse?`<span class="card-sex" aria-label="性別：${sex}">${sex}</span>`:'';
  const art=horse?'<path d="M34 115C34 91 45 70 61 57L47 50L55 21L67 32L83 19L85 43C103 50 115 68 103 81L86 71L72 85L82 115Z"/><path d="M39 109C22 86 31 62 43 51L48 65L43 90Z" opacity=".5"/>':'<path d="M38 65L22 45L37 49L42 31L54 38L65 22L76 38L88 31L93 49L108 45L92 65Z"/><path d="M47 66H84L79 91L66 102L52 91Z"/><path d="M26 121L35 100L50 94L65 108L81 94L99 101L108 121Z"/><path d="M59 42L65 34L71 42L65 53Z" fill="#f0d69a"/>';
- return `<span class="card-corner" aria-hidden="true">No.${String(number).padStart(2,'0')}</span>${sexMarkup}<span class="card-art" aria-hidden="true"><span class="card-track-lines"></span><svg viewBox="0 0 130 135">${art}</svg></span><span class="card-name">${escape(p.name)}</span><small>${horse?'RACEHORSE':'HISTORY'}</small>`;
+ const photo=horse&&horsePhotos[id];
+ const image=photo?.photoUrl?.startsWith('https://upload.wikimedia.org/')?`<img class="horse-photo" loading="lazy" decoding="async" src="${escape(photo.photoUrl)}" alt="">`:'';
+ const birthYear=horse&&Number.isInteger(p.birthYear)?`<span class="card-birth-year" aria-label="${p.birthYear}年生まれ">${p.birthYear}年生</span>`:'';
+ return `<span class="card-corner" aria-hidden="true">No.${String(number).padStart(2,'0')}</span>${sexMarkup}<span class="card-art" aria-hidden="true"><span class="card-track-lines"></span><svg viewBox="0 0 130 135">${art}</svg>${image}${birthYear}</span><span class="card-name">${escape(p.name)}</span>`;
 }
 function renderHand(){
  $('hand').innerHTML=state.hand.map((id,index)=>`<button class="hand-card ${isHorseStage(state.stage)?'horse':''} ${sexTone(id)} ${id===selected?'selected':''}" style="--slot:${index};--tint:${(state.stage.people.findIndex(p=>p.id===id)*19)%70}deg" data-card="${id}" aria-pressed="${id===selected}" aria-label="${escape(person(id).name)}。ドラッグするか、選択して場のカードをタップ">${cardFace(id)}</button>`).join('');
@@ -490,9 +493,15 @@ let previousWidth=0,previousHeight=0;
 new ResizeObserver(()=>{if(!state||!board.clientWidth||!board.clientHeight)return;if(!previousWidth||!previousHeight||camera.scale<=0){previousWidth=board.clientWidth;previousHeight=board.clientHeight;fit(false);return;}camera.x+=(board.clientWidth-previousWidth)/2;camera.y+=(board.clientHeight-previousHeight)/2;previousWidth=board.clientWidth;previousHeight=board.clientHeight;updateTransform();positionHintButton();}).observe(board);
 setInterval(()=>{const now=performance.now(),playingSheet=dialogKind==='relation'||dialogKind==='anchor';if(state&&!state.complete&&!document.hidden&&(!modal.open||playingSheet)){state.elapsed+=Math.max(0,Math.min(now-lastTick,1500));$('timer').textContent=formatTime(state.elapsed);$('score-timer').textContent=formatTime(horseScore(state).totalMs);if(now-lastSaved>10000){persist();lastSaved=now;}}lastTick=now;},500);
 document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelDrag();pointers.clear();pan=null;persist();}lastTick=performance.now();});window.addEventListener('pagehide',persist);
+document.addEventListener('error',event=>{
+ if(event.target?.matches?.('img.horse-photo'))event.target.hidden=true;
+},true);
 renderHome();
 const readGameJSON=async path=>{const response=await fetch(path);if(!response.ok)throw Error('Failed to load '+path);return response.json();};
-void Promise.all([readGameJSON('./data/horse-pedigree.v1.json'),readGameJSON('./data/horse-fame-2026-10.v1.json')]).then(([snapshot,fame])=>{
+void Promise.all([readGameJSON('./data/horse-pedigree.v1.json'),readGameJSON('./data/horse-fame-2026-10.v1.json'),
+ readGameJSON('./data/horse-media.v1.json').catch(error=>{console.warn('Horse card photos unavailable, using illustrations',error);return {horses:{}};})
+]).then(([snapshot,fame,media])=>{
+ horsePhotos=media?.horses||{};
  // Validate that these scores belong to this exact pedigree data version.
  prepareHorseFame(snapshot,fame,prepareHorseGraph(snapshot));
  horseSnapshot=snapshot;fameSnapshot=fame;
