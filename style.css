@@ -428,3 +428,13 @@ body.playing .hand-footer .auto-place-button:disabled{opacity:.4}
  .horse-home-stages .random-theme{padding:19px 15px}
  .horse-home-stages .random-theme .stage-content{padding:0}
 }
+
+/* Cloud rankings keep the same quiet hierarchy as the score result. */
+.ranking-table{display:grid;gap:0;max-height:45vh;overflow:auto;margin:15px 0}
+.ranking-row{display:grid;grid-template-columns:50px minmax(0,1fr) auto;align-items:center;gap:12px;padding:11px 8px;border-bottom:1px solid var(--line);font-size:12px;font-variant-numeric:tabular-nums}
+.ranking-row>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ranking-row.is-you{background:#e4eddf;border-radius:5px}
+.ranking-delete{margin-top:16px;font-size:11px}
+.ranking-name-label{font-size:12px;display:block;margin:20px 0 7px;font-weight:600}
+#ranking-name{width:100%;min-height:46px;border:1px solid #b8c8b9;border-radius:8px;padding:10px;font:inherit;margin-bottom:12px}
+#ranking-name:focus{outline:2px solid #8da777}
