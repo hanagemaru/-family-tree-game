@@ -2,7 +2,7 @@ name: Collect licensed horse photos (Wikimedia)
 on:
   push:
     branches: ['feature/horse-fame-difficulty-20261115']
-    paths: ['.github/workflows/collect-horse-media.yml']
+    paths: ['.github/workflows/collect-horse-media.yml','scripts/collect_horse_media.py']
   workflow_dispatch:
 permissions:
   contents: write
@@ -26,6 +26,8 @@ jobs:
           git add data/horse-media.v1.json docs/horse-photo-collection-2026-11-15.md
           if ! git diff --cached --quiet; then
             git commit -m 'data: persist Commons licensed horse photo inventory'
+            git fetch origin feature/horse-fame-difficulty-20261115
+            git rebase origin/feature/horse-fame-difficulty-20261115
             git push origin HEAD:feature/horse-fame-difficulty-20261115
           fi
       - uses: actions/upload-artifact@v4
