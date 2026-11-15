@@ -11,7 +11,7 @@ const pedigree=JSON.parse(readFileSync(new URL('../data/horse-pedigree.v1.json',
 const fameSnapshot=JSON.parse(readFileSync(new URL('../data/horse-fame-2026-10.v1.json',import.meta.url),'utf8'));
 function sample(difficulty,seed){
  const generated=generateRandomHorseSession(pedigree,seed,{version:CURRENT_HORSE_GENERATOR_VERSION,difficulty,fameSnapshot});
- const v=verifyHorseStage(generated.descriptor);
+ const v=verifyHorseStage({...generated.descriptor,horseIds:generated.descriptor.cardIds});
  assert.equal(v.valid,true,JSON.stringify(v));
  const state=newGame(generated.stage,seededRandom('deck:'+seed));
  let elapsed=0,once=false;
@@ -37,7 +37,7 @@ test('server accepts replayed actual v5 games of all modes',()=>{
 test('server refuses fake stage, impossible run, inflated/hidden score',()=>{
  const {generated,stage,state}=sample('easy','security');
  const d=structuredClone(generated.descriptor);
- d.cardIds[1]=d.cardIds[0];assert.equal(verifyHorseStage(d).valid,false);
+ d.cardIds[1]=d.cardIds[0];assert.equal(verifyHorseStage({...d,horseIds:d.cardIds}).valid,false);
  const score=horseScore(state);
  assert.equal(verifyHorseActions(stage,'security',state.actions,22_000,score.totalMs-15_000).valid,false);
  assert.equal(verifyHorseActions(stage,'security',state.actions.slice(1),22_000,score.totalMs).valid,false);
