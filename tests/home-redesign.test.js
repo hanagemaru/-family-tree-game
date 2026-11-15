@@ -3,14 +3,15 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {loadApp} from './dom-harness.js';
 
-test('home uses the same horse cards and palette as gameplay without duplicate marketing copy',async t=>{
+test('home is a minimal start menu without decorative horse cards or duplicated copy',async t=>{
  const app=await loadApp();t.after(()=>app.restore());
- assert.ok(app.$('home-screen').querySelector('.home-preview-board'));
- assert.equal(app.$('home-screen').querySelectorAll('.home-preview-card').length,3);
+ assert.equal(app.$('home-screen').querySelector('.home-preview-board'),null);
+ assert.equal(app.$('home-screen').querySelectorAll('.home-preview-card').length,0);
+ assert.ok(app.$('home-screen').querySelector('.home-launch'));
  assert.match(app.$('home-screen').textContent,/12頭の血統を完成させよう/);
  assert.doesNotMatch(app.$('home-screen').textContent,/名馬の血統を、つなぐ。/);
  assert.ok(app.$('home-screen').querySelector('.home-primary-button'));
- assert.ok(app.$('home-screen').querySelector('.home-best-row'));
+ assert.equal(app.$('home-screen').querySelector('.home-best-row'),null,'no empty best-score widget on a new visit');
  assert.equal(app.$('stage-list').querySelectorAll('[data-random-level]').length,3);
  assert.equal(app.$('home-menu-button').getAttribute('aria-haspopup'),'dialog');
  const markup=readFileSync(new URL('../index.html',import.meta.url),'utf8');
@@ -23,7 +24,7 @@ test('home uses the same horse cards and palette as gameplay without duplicate m
 });
 test('difficulty selection updates compact text, remains accessible, and starts v6 unchanged',async t=>{
  const app=await loadApp();t.after(()=>app.restore());
- const labels={easy:'知名度上位10%',normal:'有名馬を中心',hard:'血統知識'};
+ const labels={easy:'有名な馬が中心',normal:'名馬とその血統',hard:'血統まで知っている人向け'};
  for(const [level,explanation] of Object.entries(labels)){
   const control=app.$('stage-list').querySelector('[data-random-level="'+level+'"]');
   control.click();
