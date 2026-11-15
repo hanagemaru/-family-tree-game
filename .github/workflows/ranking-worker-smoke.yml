@@ -2,7 +2,7 @@ name: Horse leaderboard local Worker verification
 on:
   push:
     branches: ['feature/horse-fame-difficulty-20261115']
-    paths: ['.github/workflows/ranking-worker-smoke.yml']
+    paths: ['.github/workflows/ranking-worker-smoke.yml', 'src/server/**', 'scripts/ranking-worker-smoke.mjs', 'src/ranking-client.js', 'src/horse-score.js']
   workflow_dispatch:
 permissions:
   contents: read
