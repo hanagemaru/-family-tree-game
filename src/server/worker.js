@@ -192,7 +192,7 @@ export async function handleRequest(request,env){
  if(request.method!=='GET'&&request.method!=='HEAD')return fail('Not found',404);
  if(!env.ASSETS)return new Response('Not Found',{status:404});
  const assetUrl=new URL(request.url);
- assetUrl.pathname=pathname==='/'?'/index.html':pathname;
+ assetUrl.pathname=pathname;
  const response=await env.ASSETS.fetch(new Request(assetUrl,request));
  return response;
 }
