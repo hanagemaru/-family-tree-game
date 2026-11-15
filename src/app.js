@@ -60,7 +60,26 @@ modal.addEventListener('close',()=>{lastTick=performance.now();if(state)renderCa
 $('modal-close').addEventListener('click',closeDialog);
 function help(){openDialog(`<p class="eyebrow">HOW TO PLAY</p><h2>手札を場につなぐ。</h2><ol><li>手札をタップし、場の相手をタップ。親・子・きょうだいなどを選ぶと配置します。</li><li>ドラッグ中は点線枠に位置マーカーを合わせ、少し止めて離すと直接配置できます。それ以外は関係を選ぶだけです。</li><li>同じ手札または盤面の余白をタップすると選択解除。ヒントは選択中の手札について表示されます。</li><li>相手が判別できないときは名前一覧から選べます。降参して答えを見る操作はメニュー内にあります。</li><li>●は実際の接続点、線の切れ目は非接続の交差。手札未選択で場のカードをタップすると関係線を強調します。</li><li>盤面をスワイプして移動。ピンチ、＋ / −で拡縮し、「全体」で見渡せます。</li></ol><p class="scope">${state?escape(state.stage.scope):'進行はこのブラウザへ自動保存されます。'}</p>`);}
 $('help-button').addEventListener('click',help);
-function showSources(){const list=state?[state.stage]:randomHorseByDifficulty[selectedDifficulty]?[randomHorseByDifficulty[selectedDifficulty].stage]:[];openDialog(`<p class="eyebrow">ABOUT THE FAMILY TREES</p><h2>題材・出典</h2>${list.map(stage=>`<h3>${stage.title}</h3><p>${stage.description}</p><p class="scope">${stage.scope}</p><ul>${[...new Map([...stage.sources,...stage.people.map(p=>p.source)].map(s=>[s.url,s])).values()].map(s=>`<li><a href="${escape(s.url)}" target="_blank" rel="noopener noreferrer">${escape(s.label)}</a></li>`).join('')}</ul>`).join('')}<p class="scope">関係情報をもとに作成した選抜ステージです。人物・馬の肖像や写真は転載していません。</p>`);}
+function showSources(){
+ const list=state?[state.stage]:randomHorseByDifficulty[selectedDifficulty]?[randomHorseByDifficulty[selectedDifficulty].stage]:[];
+ const stagesHtml=list.map(stage=>{
+  const references=[...new Map([...stage.sources,...stage.people.map(p=>p.source)].filter(Boolean).map(s=>[s.url,s])).values()];
+  const photos=stage.people.map(p=>({p,photo:horsePhotos[p.id]})).filter(x=>x.photo);
+  const photoCredits=photos.length?'<h3>カード写真・著作者・ライセンス</h3><ul class="photo-credits">'+photos.map(({p,photo})=>{
+   const filePage=photo.filePage?.startsWith('https://commons.wikimedia.org/')?photo.filePage:'https://commons.wikimedia.org/';
+   const licenseUrl=photo.licenseUrl?.startsWith('https://')?photo.licenseUrl:filePage;
+   return '<li><strong>'+escape(p.name)+'</strong>：'+escape(photo.artist||'著作者不詳')+
+    ' ／ <a href="'+escape(filePage)+'" target="_blank" rel="noopener noreferrer">元画像</a>'+
+    ' ／ <a href="'+escape(licenseUrl)+'" target="_blank" rel="noopener noreferrer">'+escape(photo.license)+'</a>'+
+    ' （カード表示では画像の一部を切り抜いて表示）</li>';
+  }).join('')+'</ul>':'<p>この問題のカードは、撮影写真の代わりにイラストを使用しています。</p>';
+  return '<h3>'+escape(stage.title)+'</h3><p>'+escape(stage.description)+'</p><p class="scope">'+escape(stage.scope)+
+    '</p><ul>'+references.map(s=>'<li><a href="'+escape(s.url)+'" target="_blank" rel="noopener noreferrer">'+escape(s.label)+'</a></li>').join('')+
+    '</ul>'+photoCredits;
+ }).join('');
+ openDialog('<p class="eyebrow">DATA & IMAGE CREDITS</p><h2>題材・出典</h2>'+stagesHtml+
+ '<p class="scope">生年はWikidataとJBIS等で照合。<a href="https://github.com/hanagemaru/-family-tree-game/blob/feature/horse-fame-difficulty-20261115/data/source/horse-birth-enrichment-2026-11-15.json" target="_blank" rel="noopener noreferrer">生年補完の出典</a>。写真のない馬はイラストを表示します。</p>');
+}
 $('sources-button').addEventListener('click',showSources);
 $('stage-list').addEventListener('click',e=>{
  const level=e.target.closest('[data-random-level]');
