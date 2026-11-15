@@ -11,6 +11,8 @@ REPORT=ROOT/"docs/horse-photo-collection-2026-11-15.md"
 WIKIDATA="https://www.wikidata.org/w/api.php"
 COMMONS="https://commons.wikimedia.org/w/api.php"
 WIKIPEDIAS={"jawiki":"https://ja.wikipedia.org/w/api.php","enwiki":"https://en.wikipedia.org/w/api.php"}
+# Commons file depicts T M Opera O (Q11319077); CC BY-SA 4.0, original Goki, crop by RandomEditsForWhenIRemember.
+CURATED={"Q11319077":("TM Opera O 123rd Tennosho (crop).jpg","Goki（原写真）／RandomEditsForWhenIRemember（トリミング）")}
 JPEG=re.compile(r"\.(?:jpe?g|webp)$",re.I)
 GENERIC=re.compile(r"request.?picture|placeholder|no.?photo|not.?available|image.?missing",re.I)
 def is_photo_candidate(filename):return bool(JPEG.search(filename) and not GENERIC.search(filename))
@@ -71,6 +73,8 @@ def main():
                         choices[lookup[title]].append((filename,wiki+" pageimages"))
             except Exception as e:errors.append(f"{wiki} {i}: {type(e).__name__}: {str(e)[:130]}")
             time.sleep(.12)
+    for qid,(filename,credit) in CURATED.items():
+        if qid in choices:choices[qid].insert(0,(filename,"Commons curated verified depicts"))
     # A single generic or mixed-subject image used for multiple horse QIDs is not
     # adequate proof of each animal's identity. Suppress shared images.
     occurrence=collections.Counter(filename for values in choices.values()
@@ -113,6 +117,7 @@ def main():
             if info and info["allowed"]:
                 approved[qid]={k:info[k] for k in ("filename","photoUrl","filePage","license","licenseUrl","artist")}
                 approved[qid].update(name=horse["name"],source=origin)
+                if qid in CURATED and filename==CURATED[qid][0]:approved[qid]["artist"]=CURATED[qid][1]
                 origin_stats[origin]+=1
                 break
             if info:rejected[info["license"] or "unknown license"]+=1
