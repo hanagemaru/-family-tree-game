@@ -9,7 +9,7 @@ function families(state){
 }
 // Adjacent-swap minimization of family separation, crossing inversions and wire length.
 // Only placed cards participate; unseen cards never affect ordering or reveal a clue.
-export function layoutFamily(state){
+export function layoutFamily(state,{minimizeCrossings=false}={}){
  const byId=new Map(state.stage.people.map(p=>[p.id,p])),groups=families(state),links=new Map(state.placed.map(id=>[id,id]));
  const root=id=>{while(links.get(id)!==id)id=links.get(id);return id;};
  // Partner cards form one block. Descendant blocks reserve enough horizontal
@@ -40,6 +40,41 @@ export function layoutFamily(state){
  for(let i=0;i<arms.length;i++)for(let j=i+1;j<arms.length;j++){const a=arms[i],b=arms[j];if(a.family!==b.family&&a.generation===b.generation&&(a.from-b.from)*(a.to-b.to)<0)sum+=150;}
  return sum;}
  let current=cost();for(let pass=0;pass<16;pass++){let changed=false;for(const order of orders)for(let i=0;i<order.length-1;i++){[order[i],order[i+1]]=[order[i+1],order[i]];const next=cost();if(next<current-EPS){current=next;changed=true;}else [order[i],order[i+1]]=[order[i+1],order[i]];}if(!changed)break;}
+ // Layout rendering can further optimize the actual orthogonal wires, whose
+ // crossings are not always captured by the parent/child inversion proxy above.
+ // This opt-in pass changes only displayed coordinates, never the shuffled
+ // cards, stage IDs, generator scoring, replay, or leaderboard verification.
+ if(minimizeCrossings&&state.placed.length>=4){
+  const geometryCost=()=>{
+   const positions=coordinates();
+   const routed=buildDiagram({...state,positions});
+   const crossings=renderGeometry(routed).crossings.length;
+   const wireLength=routed.networks.reduce((sum,network)=>sum+network.segments.reduce(
+    (length,segment)=>length+Math.abs(segment.a.x-segment.b.x)+Math.abs(segment.a.y-segment.b.y),0),0);
+   return {crossings,wireLength};
+  };
+  const improves=(a,b)=>a.crossings<b.crossings||(a.crossings===b.crossings&&a.wireLength<b.wireLength-EPS);
+  // Best-improvement pair swaps can reverse a grandparent row, e.g. Halo and
+  // Tony Bin, without changing generation or pulling descendants from a block.
+  // Repeat until no swap improves line crossings; tie-break by total wire length.
+  let incumbent=geometryCost();
+  for(let pass=0;pass<4;pass++){
+   let nextBest=incumbent,choice=null;
+   for(const order of orders){
+    for(let i=0;i<order.length;i++)for(let j=i+1;j<order.length;j++){
+     [order[i],order[j]]=[order[j],order[i]];
+     const candidate=geometryCost();
+     [order[i],order[j]]=[order[j],order[i]];
+     if(improves(candidate,nextBest)){nextBest=candidate;choice={order,i,j};}
+    }
+   }
+   if(!choice)break;
+   const {order,i,j}=choice;
+   [order[i],order[j]]=[order[j],order[i]];
+   incumbent=nextBest;
+   if(incumbent.crossings===0&&pass>=1)break;
+  }
+ }
  return coordinates();
 }
 function segment(network,a,b){if(!same(a,b))network.segments.push({a,b});}
