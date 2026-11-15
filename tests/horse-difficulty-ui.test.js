@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {loadApp} from './dom-harness.js';
 import {newGame,pack} from '../src/core.js';
 import {generateRandomHorseSession} from '../src/random-horse-session.js';
-import {seededRandom,HORSE_GENERATOR_VERSION,FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE_GENERATOR_VERSION} from '../src/random-horse-stage.js';
+import {seededRandom,HORSE_GENERATOR_VERSION,FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE_GENERATOR_VERSION,CURRENT_HORSE_GENERATOR_VERSION} from '../src/random-horse-stage.js';
 
 const pedigree=JSON.parse(readFileSync(new URL('../data/horse-pedigree.v1.json',import.meta.url),'utf8'));
 const levels=['easy','normal','hard'];
@@ -22,9 +22,9 @@ test('difficulty selector starts all three versions and saves them independently
   app.$('stage-list').querySelector('[data-random-start]').click();
   const saved=app.storage(),descriptor=saved.randomHorseByDifficulty[level];
   assert.ok(descriptor,level);
-  assert.equal(descriptor.generatorVersion,level==='easy'?EASIER_HORSE_GENERATOR_VERSION:FAME_HORSE_GENERATOR_VERSION);
+  assert.equal(descriptor.generatorVersion,CURRENT_HORSE_GENERATOR_VERSION);
   assert.equal(descriptor.difficulty,level);
-  assert.equal(descriptor.cardIds.length,18);
+  assert.equal(descriptor.cardIds.length,12);
   assert.ok(saved.sessions[descriptor.stageId],level);
   assert.match(app.$('stage-title').textContent,level==='easy'?/初級/:level==='normal'?/中級/:/上級/);
   generated[level]=descriptor;
@@ -84,8 +84,8 @@ test('old v3 beginner save remains accessible after the beginner difficulty redu
  assert.ok(app.$('stage-list').querySelector('[data-old-easy-start]'));
  app.$('stage-list').querySelector('[data-random-start]').click();
  const saved=app.storage();
- assert.equal(saved.randomHorseByDifficulty.easy.generatorVersion,EASIER_HORSE_GENERATOR_VERSION);
- assert.deepEqual(saved.randomHorseLegacyEasy,old.descriptor);
+ assert.equal(saved.randomHorseByDifficulty.easy.generatorVersion,CURRENT_HORSE_GENERATOR_VERSION);
+ assert.deepEqual(saved.randomHorseLegacyByDifficulty.easy,old.descriptor);
  assert.deepEqual(saved.sessions[old.stage.id],oldState);
  app.$('menu-button').click();
  app.$('modal-content').querySelector('[data-action="home"]').click();
