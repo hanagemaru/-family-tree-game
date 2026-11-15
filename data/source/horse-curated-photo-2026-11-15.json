@@ -1,0 +1,17 @@
+{
+  "retrievedAt": "2026-11-15",
+  "purpose": "Manual substitution for Wikidata P18 images with rights that are not clearly reusable commercially",
+  "overrides": [
+    {
+      "qid": "Q11319077",
+      "name": "テイエムオペラオー",
+      "filename": "TM Opera O 123rd Tennosho (crop).jpg",
+      "commons": "https://commons.wikimedia.org/wiki/File:TM_Opera_O_123rd_Tennosho_(crop).jpg",
+      "original": "https://commons.wikimedia.org/wiki/File:TM_Opera_O_123rd_Tennosho.jpg",
+      "originalAuthor": "Goki",
+      "cropAuthor": "RandomEditsForWhenIRemember",
+      "license": "CC BY-SA 4.0",
+      "reason": "Wikidata's primary image TM Opera O.jpg is labeled copyrighted free use and excluded; the chosen crop identifies the horse in its Commons Structured Data (depicts T.M. Opera O) and uses a commercial-reuse license."
+    }
+  ]
+}
