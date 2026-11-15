@@ -19,6 +19,7 @@ if(!records.randomHorseLegacyEasy&&records.randomHorseByDifficulty?.easy?.genera
 let horseSnapshot=null,fameSnapshot=null,randomHorse=null,randomHorseError='',randomHorseByDifficulty={},randomHorseLegacyEasy=null,randomHorseLegacyByDifficulty={};
 let selectedDifficulty=HORSE_DIFFICULTIES[records.randomDifficulty]?records.randomDifficulty:'normal';
 const onlineRankingEnabled=globalThis.location?.pathname?.startsWith('/games/horse-pedigree/play/')||false;
+if(onlineRankingEnabled){const link=document.querySelector('.hub-back');if(link){link.href='https://hanage.app/games/horse-pedigree/';link.textContent='ゲーム紹介へ戻る';}}
 let pendingRun=null,rankingError='';
 let state=null,selected=null,camera={x:0,y:0,scale:1},targetAnchor=null,hoverAnchor=null,drag=null,pan=null,frame=null,lastTick=performance.now(),lastSaved=0,diagram=null,lineFocus=null,lastLineDiagram=null,lastLineScale=null,lastLineFocus=null,dialogKind='info',dragPlacement=null;
 const board=$('board'),modal=$('modal'),pointers=new Map();
@@ -422,7 +423,7 @@ function results(){
    </div>
    <p class="score-subline">自己ベスト ${best?formatTime(best.totalMs):'--:--'}</p>
    <div class="score-result-actions">
-    <button class="button" data-action="ranking-submit">ランキングに登録</button>
+    <button class="button" data-action="ranking-submit" ${onlineRankingEnabled?'':'disabled'}>ランキングに登録</button>
     <button class="button secondary" data-action="ranking-view">ランキングを見る</button>
     <button class="button secondary" data-action="random-retry-confirm">別の問題に挑戦</button>
     <button class="text-button" data-action="home">難易度選択に戻る</button>
