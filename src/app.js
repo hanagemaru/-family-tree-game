@@ -107,7 +107,14 @@ $('home-menu-button').addEventListener('click',()=>openDialog('<h2>メニュー<
 function showSources(){
  const list=state?[state.stage]:randomHorseByDifficulty[selectedDifficulty]?[randomHorseByDifficulty[selectedDifficulty].stage]:[];
  const stagesHtml=list.map(stage=>{
-  const references=[...new Map([...stage.sources,...stage.people.map(p=>p.source)].filter(Boolean).map(s=>[s.url,s])).values()];
+  // Horse sources are public by publisher here; specific citations for unrevealed
+  // cards must never be included in stage-level references.
+  const references=isHorseStage(stage)?[
+   {label:'JRA（競走馬情報）',url:'https://www.jra.go.jp/'},
+   {label:'JBISサーチ（競走成績）',url:'https://www.jbis.or.jp/'},
+   {label:'Wikidata',url:'https://www.wikidata.org/'},
+   {label:'Wikipedia',url:'https://ja.wikipedia.org/'}
+  ]:[...new Map([...stage.sources,...stage.people.map(p=>p.source)].filter(Boolean).map(s=>[s.url,s])).values()];
   // Do not reveal horses still hidden in the stock by listing their credits.
   const visible=state?.stage.id===stage.id?new Set([...state.placed,...state.hand]):new Set();
   const placed=state?.stage.id===stage.id?new Set(state.placed):new Set();
