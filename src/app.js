@@ -87,15 +87,15 @@ function randomStageCard(){
 function renderHome(){
  $('stage-list').innerHTML=randomStageCard();
 }
-function openDialog(html,closeLabel='閉じる',kind='info'){dialogKind=kind;modal.classList.toggle('placement-dialog',kind==='relation'||kind==='anchor');$('modal-content').innerHTML=html;const heading=$('modal-content').querySelector('h2');if(heading)heading.id='dialog-title';$('modal-close').textContent=closeLabel;if(!modal.open)modal.showModal();const first=$('modal-content').querySelector('button');if(first)first.focus({preventScroll:true});lastTick=performance.now();}
+function openDialog(html,closeLabel='閉じる',kind='info'){dialogKind=kind;modal.classList.toggle('placement-dialog',kind==='relation'||kind==='anchor');modal.classList.toggle('horse-profile-dialog',kind==='horse-profile');$('modal-content').innerHTML=html;const heading=$('modal-content').querySelector('h2');if(heading)heading.id='dialog-title';$('modal-close').textContent=closeLabel;if(!modal.open)modal.showModal();const first=$('modal-content').querySelector('button');if(first)first.focus({preventScroll:true});else if(kind==='horse-profile')modal.focus({preventScroll:true});lastTick=performance.now();}
 function closeDialog(){modal.close();lastTick=performance.now();}
-modal.addEventListener('close',()=>{lastTick=performance.now();if(state)renderCaption();});
+modal.addEventListener('close',()=>{modal.classList.remove('horse-profile-dialog');lastTick=performance.now();if(state)renderCaption();});
 $('modal-close').addEventListener('click',closeDialog);
 // Tapping the dimmed area dismisses only the relation picker, exactly like Cancel.
 // Clicking the dialog's own padding must not dismiss it. Keep the hand selection
 // and do not create a placement action (therefore no mistake penalty).
 modal.addEventListener('click',event=>{
- if(!modal.open||dialogKind!=='relation'||event.target!==modal)return;
+ if(!modal.open||!['relation','horse-profile'].includes(dialogKind)||event.target!==modal)return;
  const bounds=modal.getBoundingClientRect();
  const outside=event.clientX<bounds.left||event.clientX>bounds.right||
   event.clientY<bounds.top||event.clientY>bounds.bottom;
