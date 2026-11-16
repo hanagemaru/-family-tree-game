@@ -279,9 +279,17 @@ def main():
                     if record and row["raceRecord"] is None:
                         row["raceRecord"]=record
                         infoboxRecords+=1
-                    if medals and not row["majorWins"]:
-                        row["majorWins"]=medals[:8]
-                        infoboxMedals+=1
+                    if medals:
+                        before=len(row["majorWins"])
+                        for medal in medals:
+                            existing=next((w for w in row["majorWins"]
+                                if w["race"]==medal["race"] and
+                                (w["year"]==medal["year"] or w["year"] is None)),None)
+                            if existing and existing["year"] is None:
+                                existing["year"]=medal["year"]
+                            elif existing is None and len(row["majorWins"])<8:
+                                row["majorWins"].append(medal)
+                        if len(row["majorWins"])>before:infoboxMedals+=1
                     if (record or medals) and articleUrl not in {x["url"] for x in row["sources"]}:
                         row["sources"].append({"label":"Wikipedia（競走馬情報欄）","url":articleUrl})
             except Exception as exc:
