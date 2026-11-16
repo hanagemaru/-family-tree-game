@@ -10,7 +10,7 @@ test('home is a minimal start menu without decorative horse cards or duplicated 
  assert.ok(app.$('home-screen').querySelector('.home-launch'));
  assert.equal(app.$('home-screen').querySelectorAll('[data-random-start]').length,1);
  const header=app.$('app').querySelector('.app-header');
- assert.equal(header.querySelectorAll('button:not([hidden])').length,2,'home brand and one menu control');
+ assert.equal([...header.querySelectorAll('button')].filter(button=>!button.hidden).length,2,'home brand and one menu control');
  assert.match(app.$('home-screen').textContent,/12頭の血統を完成させよう/);
  assert.doesNotMatch(app.$('home-screen').textContent,/名馬の血統を、つなぐ。/);
  assert.ok(app.$('home-screen').querySelector('.home-primary-button'));
