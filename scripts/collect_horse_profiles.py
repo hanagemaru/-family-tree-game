@@ -122,10 +122,13 @@ def wiki_infobox_facts(raw,language):
             race=re.sub(r"\[\[([^\]]+?)(?:\|([^\]]+))?\]\]",lambda m:m.group(2) or m.group(1),match[1])
             race=html.unescape(race).strip()
             if not race or len(race)>90 or re.search(r"[<>={}]",race):continue
-            year_match=re.search(r"(?:19|20)\d{2}",match[2])
-            year=int(year_match.group()) if year_match else None
-            fact={"race":race,"year":year}
-            if not any(x["race"]==race and x["year"]==year for x in medals):medals.append(fact)
+            # One medal template may name multiple wins (e.g. 2013 and 2014).
+            years=[int(x) for x in re.findall(r"(?:19|20)\d{2}",match[2])][:4] or [None]
+            for year in years:
+                fact={"race":race,"year":year}
+                if not any(x["race"]==race and x["year"]==year for x in medals):
+                    medals.append(fact)
+                if len(medals)>=8:break
             if len(medals)>=8:break
     return record,medals
 
@@ -305,8 +308,17 @@ def main():
         distinct=[]
         for item in profile["majorWins"]:
             candidate=dict(item)
-            if candidate["race"]=="日本ダービー":
-                candidate["race"]="東京優駿"
+            aliases={
+                "日本ダービー":"東京優駿",
+                "ジャパンC":"ジャパンカップ",
+                "ヴィクトリアM":"ヴィクトリアマイル",
+                "スプリングS":"スプリングステークス",
+                "天皇賞・春":"天皇賞（春）",
+                "天皇賞・秋":"天皇賞（秋）",
+                "天皇賞(春)":"天皇賞（春）",
+                "天皇賞(秋)":"天皇賞（秋）",
+            }
+            candidate["race"]=aliases.get(candidate["race"],candidate["race"])
             prior=next((w for w in distinct if w["race"]==candidate["race"]
                         and (w["year"]==candidate["year"] or
                              w["year"] is None or candidate["year"] is None)),None)
