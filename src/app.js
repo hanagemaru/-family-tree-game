@@ -9,6 +9,7 @@ import {seededRandom,prepareHorseGraph,FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE
 import {HORSE_DIFFICULTIES,prepareHorseFame} from './horse-fame.js';
 import {findCorrectPlacement,horsePlacementHint,completedAnswer} from './game-assistance.js';
 import {horseScore,useHorseHint,rankedHorseStage} from './horse-score.js';
+import {horseProfileHtml} from './horse-profile.js';
 import {playerIdentity,rankingName,saveRankingName,createRankedRun,loadRankings,submitRankedScore,updateRankingName,deleteRankingAccount} from './ranking-client.js';
 const $=id=>document.getElementById(id),storageKey='family-tree-game:v1';
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -16,7 +17,7 @@ let records={sessions:{},best:{}};
 try{const parsed=JSON.parse(localStorage.getItem(storageKey));if(parsed&&typeof parsed==='object')records={sessions:parsed.sessions||{},best:parsed.best||{},randomHorse:parsed.randomHorse||null,randomHorseByDifficulty:parsed.randomHorseByDifficulty||{},randomDifficulty:parsed.randomDifficulty||'normal',randomHorseLegacyEasy:parsed.randomHorseLegacyEasy||null,randomHorseLegacyByDifficulty:parsed.randomHorseLegacyByDifficulty||{},randomHorseLegacyV5ByDifficulty:parsed.randomHorseLegacyV5ByDifficulty||{},rankedRunTickets:parsed.rankedRunTickets||{}};}catch{}
 if(!records.randomHorseLegacyEasy&&records.randomHorseByDifficulty?.easy?.generatorVersion===FAME_HORSE_GENERATOR_VERSION)
  records.randomHorseLegacyEasy=records.randomHorseByDifficulty.easy;
-let horseSnapshot=null,fameSnapshot=null,randomHorse=null,randomHorseError='',randomHorseByDifficulty={},randomHorseLegacyEasy=null,randomHorseLegacyByDifficulty={},randomHorseLegacyV5ByDifficulty={},horsePhotos={};
+let horseSnapshot=null,fameSnapshot=null,randomHorse=null,randomHorseError='',randomHorseByDifficulty={},randomHorseLegacyEasy=null,randomHorseLegacyByDifficulty={},randomHorseLegacyV5ByDifficulty={},horsePhotos={},horseProfiles={};
 let selectedDifficulty=HORSE_DIFFICULTIES[records.randomDifficulty]?records.randomDifficulty:'normal';
 const onlineRankingEnabled=globalThis.location?.pathname?.startsWith('/games/horse-pedigree/play/')||false;
 if(onlineRankingEnabled){const link=document.querySelector('.hub-back');if(link){link.href='https://hanage.app/games/horse-pedigree/';link.textContent='ゲーム紹介へ戻る';}}
@@ -100,7 +101,7 @@ modal.addEventListener('click',event=>{
   event.clientY<bounds.top||event.clientY>bounds.bottom;
  if(outside)closeDialog();
 });
-function help(){openDialog(`<p class="eyebrow">HOW TO PLAY</p><h2>手札を場につなぐ。</h2><ol><li>手札をタップし、場の相手をタップ。親・子・きょうだいなどを選ぶと配置します。</li><li>ドラッグ中は点線枠に位置マーカーを合わせ、少し止めて離すと直接配置できます。それ以外は関係を選ぶだけです。</li><li>同じ手札または盤面の余白をタップすると選択解除。ヒントは選択中の手札について表示されます。</li><li>相手が判別できないときは名前一覧から選べます。降参して答えを見る操作はメニュー内にあります。</li><li>●は実際の接続点、線の切れ目は非接続の交差。手札未選択で場のカードをタップすると関係線を強調します。</li><li>盤面をスワイプして移動。ピンチ、＋ / −で拡縮し、「全体」で見渡せます。</li><li>記録はプレイ時間にペナルティを加えた補正タイムです。ヒント +10秒、ミス +15秒、自動配置 +45秒。</li></ol><p class="scope">${state?escape(state.stage.scope):'進行はこのブラウザへ自動保存されます。'}</p>`);}
+function help(){openDialog(`<p class="eyebrow">HOW TO PLAY</p><h2>手札を場につなぐ。</h2><ol><li>手札をタップし、場の相手をタップ。親・子・きょうだいなどを選ぶと配置します。</li><li>ドラッグ中は点線枠に位置マーカーを合わせ、少し止めて離すと直接配置できます。それ以外は関係を選ぶだけです。</li><li>同じ手札または盤面の余白をタップすると選択解除。ヒントは選択中の手札について表示されます。</li><li>相手が判別できないときは名前一覧から選べます。降参して答えを見る操作はメニュー内にあります。</li><li>●は実際の接続点、線の切れ目は非接続の交差。手札を選んでいないときは、場のカードをタップしてその馬の実績を読めます。</li><li>盤面をスワイプして移動。ピンチ、＋ / −で拡縮し、「全体」で見渡せます。</li><li>記録はプレイ時間にペナルティを加えた補正タイムです。ヒント +10秒、ミス +15秒、自動配置 +45秒。</li></ol><p class="scope">${state?escape(state.stage.scope):'進行はこのブラウザへ自動保存されます。'}</p>`);}
 $('help-button').addEventListener('click',help);
 $('home-menu-button').addEventListener('click',()=>openDialog('<h2>メニュー</h2><div class="home-menu-actions"><button type="button" class="button secondary" data-action="help">遊び方</button><a class="button secondary" href="https://hanage.app/games/horse-pedigree/">ゲーム紹介へ戻る</a><button type="button" class="button secondary" data-action="sources">題材・出典</button></div>'));
 function showSources(){
@@ -383,6 +384,14 @@ function updateDragPreview(point){
   say(`${relationName(hit.relation)}として配置できます。指を離してください。`);
  }
 }
+function showPlacedHorseProfile(id){
+ if(!state?.placed.includes(id)||selected)return;
+ if(!isHorseStage(state.stage)){focusLines(id);return;}
+ const horse=person(id),info=horseProfiles[id],photo=horsePhotos[id];
+ const articleUrl=fameSnapshot?.horses?.find(h=>h.id===id)?.articleUrl;
+ openDialog(horseProfileHtml(horse,{profile:info,photo,articleUrl,
+  sexLabel:horseSexLabel(horse.sex||horseSex(id))}),'閉じる','horse-profile');
+}
 function chooseRelations(id){
  if(!selected||!state.hand.includes(selected)||!state.placed.includes(id))return;
  clearDragPreview();targetAnchor=id;hoverAnchor=null;paintTarget();
@@ -555,16 +564,16 @@ window.addEventListener('pointerup',e=>{
  if(near&&camera.scale>=.55){chooseRelations(near);return;}
  say('場のカードに重ねると、相手を指定できます。');
  return;}
- if(!pointers.has(e.pointerId))return;pointers.delete(e.pointerId);if(pan&&pan.id===e.pointerId&&!pan.moved){if(selected){const point=pointOnBoard(e.clientX,e.clientY),id=pan.node||pickDropCard(point,screenNodes(state.positions,camera));if(id)chooseRelations(id);else clearSelection();}else if(pan.node)focusLines(pan.node);}
+ if(!pointers.has(e.pointerId))return;pointers.delete(e.pointerId);if(pan&&pan.id===e.pointerId&&!pan.moved){if(selected){const point=pointOnBoard(e.clientX,e.clientY),id=pan.node||pickDropCard(point,screenNodes(state.positions,camera));if(id)chooseRelations(id);else clearSelection();}else if(pan.node)showPlacedHorseProfile(pan.node);}
  if(pointers.size===1){const [id,p]=[...pointers.entries()][0];pan={id,x:p.x,y:p.y,startX:p.x,startY:p.y,moved:true};}else pan=null;
 });
 window.addEventListener('pointercancel',e=>{if(drag?.pointerId===e.pointerId){cancelDrag();clearTargets();}pointers.delete(e.pointerId);pan=null;});
 window.addEventListener('blur',()=>{cancelDrag();pointers.clear();pan=null;if(!(modal.open&&dialogKind==='relation'))clearTargets();persist();lastTick=performance.now();});
-$('nodes').addEventListener('click',e=>{if(e.detail!==0)return;const node=e.target.closest('[data-node]');if(node){if(selected)chooseRelations(node.dataset.node);else focusLines(node.dataset.node);}});
+$('nodes').addEventListener('click',e=>{if(e.detail!==0)return;const node=e.target.closest('[data-node]');if(node){if(selected)chooseRelations(node.dataset.node);else showPlacedHorseProfile(node.dataset.node);}});
 window.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.open&&state){cancelDrag();clearSelection();}});
 let previousWidth=0,previousHeight=0;
 new ResizeObserver(()=>{if(!state||!board.clientWidth||!board.clientHeight)return;if(!previousWidth||!previousHeight||camera.scale<=0){previousWidth=board.clientWidth;previousHeight=board.clientHeight;fit(false);return;}camera.x+=(board.clientWidth-previousWidth)/2;camera.y+=(board.clientHeight-previousHeight)/2;previousWidth=board.clientWidth;previousHeight=board.clientHeight;updateTransform();positionHintButton();}).observe(board);
-setInterval(()=>{const now=performance.now(),playingSheet=dialogKind==='relation'||dialogKind==='anchor';if(state&&!state.complete&&!document.hidden&&(!modal.open||playingSheet)){state.elapsed+=Math.max(0,Math.min(now-lastTick,1500));$('timer').textContent=formatTime(state.elapsed);$('score-timer').textContent=formatTime(horseScore(state).totalMs);if(now-lastSaved>10000){persist();lastSaved=now;}}lastTick=now;},500);
+setInterval(()=>{const now=performance.now(),playingSheet=dialogKind==='relation'||dialogKind==='anchor'||dialogKind==='horse-profile';if(state&&!state.complete&&!document.hidden&&(!modal.open||playingSheet)){state.elapsed+=Math.max(0,Math.min(now-lastTick,1500));$('timer').textContent=formatTime(state.elapsed);$('score-timer').textContent=formatTime(horseScore(state).totalMs);if(now-lastSaved>10000){persist();lastSaved=now;}}lastTick=now;},500);
 document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelDrag();pointers.clear();pan=null;persist();}lastTick=performance.now();});window.addEventListener('pagehide',persist);
 document.addEventListener('error',event=>{
  if(event.target?.matches?.('img.horse-photo'))event.target.hidden=true;
@@ -572,9 +581,11 @@ document.addEventListener('error',event=>{
 renderHome();
 const readGameJSON=async path=>{const response=await fetch(path);if(!response.ok)throw Error('Failed to load '+path);return response.json();};
 void Promise.all([readGameJSON('./data/horse-pedigree.v1.json'),readGameJSON('./data/horse-fame-2026-10.v1.json'),
- readGameJSON('./data/horse-media.v1.json').catch(error=>{console.warn('Horse card photos unavailable, using illustrations',error);return {horses:{}};})
-]).then(([snapshot,fame,media])=>{
+ readGameJSON('./data/horse-media.v1.json').catch(error=>{console.warn('Horse card photos unavailable, using illustrations',error);return {horses:{}};}),
+ readGameJSON('./data/horse-profiles.v1.json').catch(error=>{console.warn('Horse profiles unavailable, falling back to birth year',error);return {horses:{}};})
+]).then(([snapshot,fame,media,profiles])=>{
  horsePhotos=media?.horses||{};
+ horseProfiles=profiles?.horses||{};
  // Validate that these scores belong to this exact pedigree data version.
  prepareHorseFame(snapshot,fame,prepareHorseGraph(snapshot));
  horseSnapshot=snapshot;fameSnapshot=fame;
