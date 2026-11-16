@@ -31,7 +31,7 @@ try{
    const visual=await page.evaluate(()=>{
     const $=selector=>document.querySelector(selector);
     const rect=element=>element.getBoundingClientRect();
-    const rgb=color=>(color.match(/[\\d.]+/g)||[]).slice(0,3).map(Number);
+    const rgb=color=>(color.match(/[\d.]+/g)||[]).slice(0,3).map(Number);
     const luminance=color=>{
       const [r,g,b]=rgb(color).map(v=>{
        const x=v/255;return x<=.04045?x/12.92:((x+.055)/1.055)**2.4;
