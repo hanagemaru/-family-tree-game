@@ -20,6 +20,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Sync latest research branch before generating data
+        run: |
+          git fetch origin feature/horse-card-profiles-20261116
+          git checkout -B feature/horse-card-profiles-20261116 origin/feature/horse-card-profiles-20261116
       - name: Validate infobox parsing against explicit and adversarial samples
         run: python3 tests/test_horse_infobox.py
       - name: Audit all 872 QIDs via Wikidata and Wikipedia (explicit wins only)
