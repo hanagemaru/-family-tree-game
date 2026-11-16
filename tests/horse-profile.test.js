@@ -14,9 +14,10 @@ test('all 872 named horses were audited with stable QID and traceable facts',()=
  assert.equal(manifest.version,'horse-profiles-v1');
  assert.deepEqual(Object.keys(manifest.horses).sort(),named.map(h=>h.id).sort());
  assert.ok(manifest.coverage.articleLeads>=750,'all possible article leads should be audited');
- assert.ok(manifest.coverage.withProfileFacts>=318,'source-backed facts must be present, not an empty placeholder');
+ assert.ok(manifest.coverage.withProfileFacts>=500,'at least 500 horses need confirmed profile facts');
  assert.equal(manifest.coverage.named,872);
- assert.ok(manifest.coverage.withRaceRecord>=49);
+ assert.ok(manifest.coverage.withRaceRecord>=500,'explicit lifetime records should be broadly present');
+ assert.ok(manifest.coverage.withWins>=500,'sourced winning achievements need broad coverage');
  assert.ok(manifest.coverage.editoriallyCorroborated>=45);
  for(const h of named){
   const row=manifest.horses[h.id];
@@ -35,8 +36,15 @@ test('all 872 named horses were audited with stable QID and traceable facts',()=
  const derby=Object.values(manifest.horses).filter(p=>p.majorWins.some(w=>w.race==='日本ダービー')&&p.majorWins.some(w=>w.race==='東京優駿'));
  assert.equal(derby.length,0,'synonymous Japan Derby race names must not double-count');
  // Partial-season 8 starts / 6 wins is not Gold Ship's all-time record.
+ const teio=Object.values(manifest.horses).find(x=>x.name==='トウカイテイオー');
+ assert.equal(teio.majorWins.filter(w=>w.race==='ジャパンカップ').length,1,'Japan Cup aliases should not double-count');
+ const deep=Object.values(manifest.horses).find(x=>x.name==='ディープインパクト');
+ assert.ok(deep.raceRecord?.starts>=14,'well-known horses gain their explicit lifetime record');
  const gold=Object.values(manifest.horses).find(x=>x.name==='ゴールドシップ');
- if(gold)assert.notDeepEqual(gold.raceRecord,{starts:8,wins:6});
+ if(gold){
+  assert.notDeepEqual(gold.raceRecord,{starts:8,wins:6});
+  assert.deepEqual(gold.majorWins.filter(w=>w.race==='宝塚記念').map(w=>w.year).sort(),[2013,2014]);
+ }
 });
 test('single placed horse shows achievements without per-card sources or photo credits',()=>{
  const horse=named.find(h=>h.name==='ディープインパクト');
