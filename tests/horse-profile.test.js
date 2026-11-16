@@ -14,10 +14,10 @@ test('all 872 named horses were audited with stable QID and traceable facts',()=
  assert.equal(manifest.version,'horse-profiles-v1');
  assert.deepEqual(Object.keys(manifest.horses).sort(),named.map(h=>h.id).sort());
  assert.ok(manifest.coverage.articleLeads>=750,'all possible article leads should be audited');
- assert.ok(manifest.coverage.withProfileFacts>=308,'source-backed facts must be present, not an empty placeholder');
+ assert.ok(manifest.coverage.withProfileFacts>=318,'source-backed facts must be present, not an empty placeholder');
  assert.equal(manifest.coverage.named,872);
- assert.ok(manifest.coverage.withRaceRecord>=39);
- assert.ok(manifest.coverage.editoriallyCorroborated>=35);
+ assert.ok(manifest.coverage.withRaceRecord>=49);
+ assert.ok(manifest.coverage.editoriallyCorroborated>=45);
  for(const h of named){
   const row=manifest.horses[h.id];
   assert.equal(row.name,h.name);
@@ -64,6 +64,13 @@ test('new JBIS-reviewed horses include correctly scoped race records and non-spo
   ['デアリングバード',1,0,null],
   ['センテリュオ',18,5,'オールカマー'],
   ['ホッコータルマエ',39,17,'東京大賞典'],
+  ['ダンツフレーム',26,6,'宝塚記念'],
+  ['ブチコ',16,4,null],
+  ['ビワハイジ',10,4,'阪神3歳牝馬ステークス'],
+  ['デアリングハート',26,4,'府中牝馬ステークス'],
+  ['ポイントフラッグ',15,1,null],
+  ['マツリダゴッホ',27,10,'有馬記念'],
+  ['サクラユタカオー',12,6,'天皇賞（秋）'],
  ];
  for(const [name,starts,wins,race] of checks){
   const p=Object.values(manifest.horses).find(h=>h.name===name);
