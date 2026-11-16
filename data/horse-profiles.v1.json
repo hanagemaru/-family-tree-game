@@ -7,12 +7,12 @@
     "named": 872,
     "articleLeads": 815,
     "leadVictoryFacts": 220,
-    "withWins": 296,
-    "withProfileFacts": 308,
+    "withWins": 303,
+    "withProfileFacts": 318,
     "wikidataVictoryQids": 85,
-    "withRaceRecord": 39,
-    "withDescription": 50,
-    "editoriallyCorroborated": 35
+    "withRaceRecord": 49,
+    "withDescription": 60,
+    "editoriallyCorroborated": 45
   },
   "horses": {
     "Q100450928": {
@@ -298,9 +298,17 @@
     "Q109260575": {
       "name": "ブチコ",
       "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "raceRecord": {
+        "starts": 16,
+        "wins": 4
+      },
+      "description": "白毛の牝馬。ダートを中心に16戦4勝。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0001149492/"
+        }
+      ]
     },
     "Q109260579": {
       "name": "サトノレイナス",
@@ -1073,10 +1081,23 @@
     },
     "Q11284097": {
       "name": "アドマイヤジャパン",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "京成杯",
+          "year": 2005
+        }
+      ],
+      "raceRecord": {
+        "starts": 10,
+        "wins": 2
+      },
+      "description": "2005年菊花賞で2着、同年京成杯に優勝。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000737164/"
+        }
+      ]
     },
     "Q11284100": {
       "name": "アドマイヤビッグ",
@@ -1477,9 +1498,17 @@
     "Q11292547": {
       "name": "オリエンタルアート",
       "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "raceRecord": {
+        "starts": 23,
+        "wins": 3
+      },
+      "description": "現役時代は23戦3勝。引退後は繁殖牝馬となった。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000316406/"
+        }
+      ]
     },
     "Q11292907": {
       "name": "オレハマッテルゼ",
@@ -1920,10 +1949,27 @@
     },
     "Q11304515": {
       "name": "サクラチトセオー",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "天皇賞（秋）",
+          "year": 1995
+        },
+        {
+          "race": "中山記念",
+          "year": 1994
+        }
+      ],
+      "raceRecord": {
+        "starts": 21,
+        "wins": 9
+      },
+      "description": "1995年の天皇賞（秋）を制覇。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000237393/"
+        }
+      ]
     },
     "Q11304520": {
       "name": "サクラバクシンオー",
@@ -1980,10 +2026,27 @@
     },
     "Q11304531": {
       "name": "サクラユタカオー",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "天皇賞（秋）",
+          "year": 1986
+        },
+        {
+          "race": "毎日王冠",
+          "year": 1986
+        }
+      ],
+      "raceRecord": {
+        "starts": 12,
+        "wins": 6
+      },
+      "description": "1986年の天皇賞（秋）を制した。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000145106/"
+        }
+      ]
     },
     "Q11304765": {
       "name": "サッカーボーイ",
@@ -3015,10 +3078,27 @@
     },
     "Q11317516": {
       "name": "ダンツフレーム",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "宝塚記念",
+          "year": 2002
+        },
+        {
+          "race": "新潟大賞典",
+          "year": 2003
+        }
+      ],
+      "raceRecord": {
+        "starts": 26,
+        "wins": 6
+      },
+      "description": "2002年宝塚記念を制し、皐月賞・日本ダービーでも2着。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000326421/"
+        }
+      ]
     },
     "Q11317672": {
       "name": "ダービーレグノ",
@@ -3143,10 +3223,31 @@
     },
     "Q11319948": {
       "name": "デアリングハート",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "府中牝馬ステークス",
+          "year": 2006
+        },
+        {
+          "race": "府中牝馬ステークス",
+          "year": 2007
+        },
+        {
+          "race": "クイーンステークス",
+          "year": 2006
+        }
+      ],
+      "raceRecord": {
+        "starts": 26,
+        "wins": 4
+      },
+      "description": "府中牝馬ステークスを2006年と2007年に連覇。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000750310/"
+        }
+      ]
     },
     "Q11319958": {
       "name": "ディアデラノビア",
@@ -3664,10 +3765,27 @@
     },
     "Q11331056": {
       "name": "ビワハイジ",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "阪神3歳牝馬ステークス",
+          "year": 1995
+        },
+        {
+          "race": "京都牝馬特別",
+          "year": 1998
+        }
+      ],
+      "raceRecord": {
+        "starts": 10,
+        "wins": 4
+      },
+      "description": "1995年の阪神3歳牝馬ステークスを制した。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000275176/"
+        }
+      ]
     },
     "Q11331732": {
       "name": "ピースオブワールド",
@@ -4136,10 +4254,27 @@
     },
     "Q11340626": {
       "name": "マツリダゴッホ",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "有馬記念",
+          "year": 2007
+        },
+        {
+          "race": "オールカマー",
+          "year": 2009
+        }
+      ],
+      "raceRecord": {
+        "starts": 27,
+        "wins": 10
+      },
+      "description": "2007年有馬記念を制し、オールカマーでも複数回優勝。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000762445/"
+        }
+      ]
     },
     "Q11341206": {
       "name": "マルカシェンク",
@@ -4959,9 +5094,17 @@
     "Q114798021": {
       "name": "ポイントフラッグ",
       "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "raceRecord": {
+        "starts": 15,
+        "wins": 1
+      },
+      "description": "2001年チューリップ賞で2着。現役時は15戦1勝。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000329411/"
+        }
+      ]
     },
     "Q114798197": {
       "name": "プリンセスオリビア",
