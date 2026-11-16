@@ -9,7 +9,7 @@ import {seededRandom,prepareHorseGraph,FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE
 import {HORSE_DIFFICULTIES,prepareHorseFame} from './horse-fame.js';
 import {findCorrectPlacement,horsePlacementHint,completedAnswer} from './game-assistance.js';
 import {horseScore,useHorseHint,rankedHorseStage} from './horse-score.js';
-import {horseProfileHtml} from './horse-profile.js';
+import {horseProfileHtml,horseProfileSources} from './horse-profile.js';
 import {playerIdentity,rankingName,saveRankingName,createRankedRun,loadRankings,submitRankedScore,updateRankingName,deleteRankingAccount} from './ranking-client.js';
 const $=id=>document.getElementById(id),storageKey='family-tree-game:v1';
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -101,27 +101,40 @@ modal.addEventListener('click',event=>{
   event.clientY<bounds.top||event.clientY>bounds.bottom;
  if(outside)closeDialog();
 });
-function help(){openDialog(`<p class="eyebrow">HOW TO PLAY</p><h2>手札を場につなぐ。</h2><ol><li>手札をタップし、場の相手をタップ。親・子・きょうだいなどを選ぶと配置します。</li><li>ドラッグ中は点線枠に位置マーカーを合わせ、少し止めて離すと直接配置できます。それ以外は関係を選ぶだけです。</li><li>同じ手札または盤面の余白をタップすると選択解除。ヒントは選択中の手札について表示されます。</li><li>相手が判別できないときは名前一覧から選べます。降参して答えを見る操作はメニュー内にあります。</li><li>●は実際の接続点、線の切れ目は非接続の交差。手札を選んでいないときは、場のカードをタップしてその馬の実績を読めます。</li><li>盤面をスワイプして移動。ピンチ、＋ / −で拡縮し、「全体」で見渡せます。</li><li>記録はプレイ時間にペナルティを加えた補正タイムです。ヒント +10秒、ミス +15秒、自動配置 +45秒。</li></ol><p class="scope">${state?escape(state.stage.scope):'進行はこのブラウザへ自動保存されます。'}</p>`);}
+function help(){openDialog(`<p class="eyebrow">HOW TO PLAY</p><h2>手札を場につなぐ。</h2><ol><li>手札をタップし、場の相手をタップ。親・子・きょうだいなどを選ぶと配置します。</li><li>ドラッグ中は点線枠に位置マーカーを合わせ、少し止めて離すと直接配置できます。それ以外は関係を選ぶだけです。</li><li>同じ手札または盤面の余白をタップすると選択解除。ヒントは選択中の手札について表示されます。</li><li>相手が判別できないときは名前一覧から選べます。降参して答えを見る操作はメニュー内にあります。</li><li>●は実際の接続点、線の切れ目は非接続の交差。手札を選んでいないときは、場のカードをタップしてその馬の実績を読めます。各馬の実績と写真の出典は、メニューの「題材・出典」にまとめています。</li><li>盤面をスワイプして移動。ピンチ、＋ / −で拡縮し、「全体」で見渡せます。</li><li>記録はプレイ時間にペナルティを加えた補正タイムです。ヒント +10秒、ミス +15秒、自動配置 +45秒。</li></ol><p class="scope">${state?escape(state.stage.scope):'進行はこのブラウザへ自動保存されます。'}</p>`);}
 $('help-button').addEventListener('click',help);
 $('home-menu-button').addEventListener('click',()=>openDialog('<h2>メニュー</h2><div class="home-menu-actions"><button type="button" class="button secondary" data-action="help">遊び方</button><a class="button secondary" href="https://hanage.app/games/horse-pedigree/">ゲーム紹介へ戻る</a><button type="button" class="button secondary" data-action="sources">題材・出典</button></div>'));
 function showSources(){
  const list=state?[state.stage]:randomHorseByDifficulty[selectedDifficulty]?[randomHorseByDifficulty[selectedDifficulty].stage]:[];
  const stagesHtml=list.map(stage=>{
   const references=[...new Map([...stage.sources,...stage.people.map(p=>p.source)].filter(Boolean).map(s=>[s.url,s])).values()];
-  const photos=stage.people.map(p=>({p,photo:horsePhotos[p.id]})).filter(x=>x.photo);
-  const photoCredits=photos.length?'<h3>カード写真・著作者・ライセンス</h3><ul class="photo-credits">'+photos.map(({p,photo})=>{
+  // Do not reveal horses still hidden in the stock by listing their credits.
+  const visible=state?.stage.id===stage.id?new Set([...state.placed,...state.hand]):new Set();
+  const placed=state?.stage.id===stage.id?new Set(state.placed):new Set();
+  const profileEntries=stage.people.filter(p=>placed.has(p.id)).map(p=>{
+   const links=horseProfileSources(horseProfiles[p.id],p.source?.url);
+   if(!links.length)return '';
+   return '<li><strong>'+escape(p.name)+'</strong>：'+links.map(src=>
+    '<a href="'+escape(src.url)+'" target="_blank" rel="noopener noreferrer">'+escape(src.label)+'</a>').join(' ／ ')+'</li>';
+  }).filter(Boolean);
+  const profileCredits=profileEntries.length?
+   '<h3>配置済みの馬のプロフィール資料</h3><ul class="profile-credits">'+profileEntries.join('')+'</ul>':'';
+  const photos=stage.people.map(p=>({p,photo:horsePhotos[p.id]})).filter(x=>visible.has(x.p.id)&&x.photo);
+  const photoCredits=photos.length?'<h3>表示中のカード写真・著作者・ライセンス</h3><ul class="photo-credits">'+photos.map(({p,photo})=>{
    const filePage=photo.filePage?.startsWith('https://commons.wikimedia.org/')?photo.filePage:'https://commons.wikimedia.org/';
    const licenseUrl=photo.licenseUrl?.startsWith('https://')?photo.licenseUrl:filePage;
    return '<li><strong>'+escape(p.name)+'</strong>：'+escape(photo.artist||'著作者不詳')+
     ' ／ <a href="'+escape(filePage)+'" target="_blank" rel="noopener noreferrer">元画像</a>'+
-    ' ／ <a href="'+escape(licenseUrl)+'" target="_blank" rel="noopener noreferrer">'+escape(photo.license)+'</a>'+
-    ' （カード表示では画像の一部を切り抜いて表示）</li>';
-  }).join('')+'</ul>':'<p>この問題のカードは、撮影写真の代わりにイラストを使用しています。</p>';
+    ' ／ <a href="'+escape(licenseUrl)+'" target="_blank" rel="noopener noreferrer">'+escape(photo.license||'ライセンス情報')+'</a>'+
+    ' （カード・プロフィールでは画像の一部を切り抜いて表示）</li>';
+  }).join('')+'</ul>':'';
   return '<h3>'+escape(stage.title)+'</h3><p>'+escape(stage.description)+'</p><p class="scope">'+escape(stage.scope)+
-    '</p><ul>'+references.map(s=>'<li><a href="'+escape(s.url)+'" target="_blank" rel="noopener noreferrer">'+escape(s.label)+'</a></li>').join('')+
-    '</ul>'+photoCredits;
+   '</p><ul>'+references.map(s=>'<li><a href="'+escape(s.url)+'" target="_blank" rel="noopener noreferrer">'+escape(s.label)+'</a></li>').join('')+
+   '</ul>'+profileCredits+photoCredits;
  }).join('');
- openDialog('<p class="eyebrow">DATA & IMAGE CREDITS</p><h2>題材・出典</h2>'+stagesHtml+
+ openDialog('<p class="eyebrow">DATA & IMAGE CREDITS</p><h2>題材・出典</h2>'+
+ '<p class="scope">競走成績・勝ち鞍・紹介文はJRA、JBISサーチ、Wikidata、Wikipedia等の資料で照合しています。個別資料と写真のクレジットは、ゲーム中に表示した馬について下に掲載します。</p>'+
+ stagesHtml+
  '<p class="scope">生年はWikidataとJBIS等で照合。<a href="https://github.com/hanagemaru/-family-tree-game/blob/main/data/source/horse-birth-enrichment-2026-11-15.json" target="_blank" rel="noopener noreferrer">生年補完の出典</a>。写真のない馬はイラストを表示します。</p>');
 }
 $('sources-button').addEventListener('click',showSources);
