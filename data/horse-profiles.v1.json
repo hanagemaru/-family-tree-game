@@ -1,0 +1,14 @@
+{
+  "version": "horse-profiles-v1",
+  "retrievedAtUTC": null,
+  "pedigreeVersion": "wikidata-pedigree-v1",
+  "sourceMethod": "Pending source audit; only explicit facts are published",
+  "coverage": {
+    "named": 872,
+    "withWins": 0,
+    "withRaceRecord": 0,
+    "withDescription": 0,
+    "withProfileFacts": 0
+  },
+  "horses": {}
+}
