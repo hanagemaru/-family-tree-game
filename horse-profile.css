@@ -65,3 +65,25 @@ dialog .horse-profile-sources a:focus-visible,dialog .horse-profile-photo-credit
  dialog .horse-profile-visual{max-height:168px}
  dialog .horse-profile-sources{font-size:10px}
 }
+
+/* Compact tap-to-dismiss sheet; native Escape/back behavior remains available. */
+dialog.horse-profile-dialog{
+ width:min(348px,calc(100% - 36px));max-width:348px;
+ padding:14px 15px;max-height:min(72dvh,590px);
+ border-radius:16px;
+}
+dialog.horse-profile-dialog #modal-close{display:none!important}
+dialog.horse-profile-dialog .horse-profile-visual{margin:0 0 9px;max-height:128px;border-radius:9px}
+dialog.horse-profile-dialog .horse-profile-photo{height:128px}
+dialog.horse-profile-dialog .horse-profile-heading h2{font-size:clamp(19px,5vw,23px);margin-bottom:4px}
+dialog.horse-profile-dialog .horse-profile-description{font-size:12px;margin-top:7px;line-height:1.5}
+dialog.horse-profile-dialog .horse-profile-record{margin-top:11px;padding-top:9px}
+dialog.horse-profile-dialog .horse-profile-achievements{margin-top:11px;padding-top:9px}
+dialog.horse-profile-dialog .horse-profile-achievements h3{margin-bottom:7px}
+dialog.horse-profile-dialog .horse-profile-achievements li{font-size:11px;padding:5px 7px}
+dialog.horse-profile-dialog .horse-profile-empty{margin-top:10px}
+@media(max-width:620px){
+ dialog.horse-profile-dialog{width:min(330px,calc(100% - 42px));padding:12px 13px;max-height:70dvh}
+ dialog.horse-profile-dialog .horse-profile-visual{max-height:106px}
+ dialog.horse-profile-dialog .horse-profile-photo{height:106px}
+}
