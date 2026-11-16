@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {horseProfileHtml} from '../src/horse-profile.js';
+import {horseProfileHtml,horseProfileSources} from '../src/horse-profile.js';
 import {loadApp} from './dom-harness.js';
 const load=path=>JSON.parse(readFileSync(new URL(path,import.meta.url),'utf8'));
 const pedigree=load('../data/horse-pedigree.v1.json');
@@ -14,8 +14,10 @@ test('all 872 named horses were audited with stable QID and traceable facts',()=
  assert.equal(manifest.version,'horse-profiles-v1');
  assert.deepEqual(Object.keys(manifest.horses).sort(),named.map(h=>h.id).sort());
  assert.ok(manifest.coverage.articleLeads>=750,'all possible article leads should be audited');
- assert.ok(manifest.coverage.withProfileFacts>=250,'source-backed facts must be present, not an empty placeholder');
+ assert.ok(manifest.coverage.withProfileFacts>=308,'source-backed facts must be present, not an empty placeholder');
  assert.equal(manifest.coverage.named,872);
+ assert.ok(manifest.coverage.withRaceRecord>=39);
+ assert.ok(manifest.coverage.editoriallyCorroborated>=35);
  for(const h of named){
   const row=manifest.horses[h.id];
   assert.equal(row.name,h.name);
@@ -30,11 +32,13 @@ test('all 872 named horses were audited with stable QID and traceable facts',()=
  // A regional "Hyogo Kikuka Sho" is NOT the national Japanese St Leger.
  const jingi=Object.values(manifest.horses).find(x=>x.name==='ジンギ');
  if(jingi)assert.equal(jingi.majorWins.some(x=>x.race==='菊花賞'),false);
+ const derby=Object.values(manifest.horses).filter(p=>p.majorWins.some(w=>w.race==='日本ダービー')&&p.majorWins.some(w=>w.race==='東京優駿'));
+ assert.equal(derby.length,0,'synonymous Japan Derby race names must not double-count');
  // Partial-season 8 starts / 6 wins is not Gold Ship's all-time record.
  const gold=Object.values(manifest.horses).find(x=>x.name==='ゴールドシップ');
  if(gold)assert.notDeepEqual(gold.raceRecord,{starts:8,wins:6});
 });
-test('single placed horse shows only achievements, race record, photo credit and sources',()=>{
+test('single placed horse shows achievements without per-card sources or photo credits',()=>{
  const horse=named.find(h=>h.name==='ディープインパクト');
  assert.ok(horse);
  const data=manifest.horses[horse.id],photo=media.horses[horse.id];
@@ -45,10 +49,30 @@ test('single placed horse shows only achievements, race record, photo credit and
  assert.match(output,/主な勝ち鞍/);
  assert.match(output,/東京優駿/);
  assert.match(output,/JRA顕彰馬/);
- assert.match(output,/出典：/);
+ assert.doesNotMatch(output,/出典：|horse-profile-sources|horse-profile-photo-credit/);
+ assert.ok(horseProfileSources(data).length,'source data is still retained for centralized credits');
  assert.ok(!output.includes('parent')&&!output.includes('父：')&&!output.includes('母：'));
  assert.ok(output.includes('commons.wikimedia.org')&&output.includes('horse-profile-photo'));
  assert.ok(!output.includes('関係を見る'),'remove redundant relationship-highlighting button');
+});
+test('new JBIS-reviewed horses include correctly scoped race records and non-spoiler facts',()=>{
+ const checks=[
+  ['キングヘイロー',27,6,'高松宮記念'],
+  ['ヴィルシーナ',21,5,'ヴィクトリアマイル'],
+  ['カレンブーケドール',17,2,null],
+  ['フジキセキ',4,4,'朝日杯3歳ステークス'],
+  ['デアリングバード',1,0,null],
+  ['センテリュオ',18,5,'オールカマー'],
+  ['ホッコータルマエ',39,17,'東京大賞典'],
+ ];
+ for(const [name,starts,wins,race] of checks){
+  const p=Object.values(manifest.horses).find(h=>h.name===name);
+  assert.ok(p,name+' should be indexed');
+  assert.deepEqual(p.raceRecord,{starts,wins},name);
+  assert.ok(p.description.length,name);
+  assert.ok(p.sources.some(s=>s.url.startsWith('https://www.jbis.or.jp/horse/')),name);
+  if(race)assert.ok(p.majorWins.some(w=>w.race===race),name);
+ }
 });
 test('source-free horses do not receive invented race records or wins',()=>{
  const horse={id:'Q9999',name:'確認中の馬',birthYear:2001,parents:['Q1111']};
@@ -66,7 +90,8 @@ test('HTML labels, descriptions and remote URLs are escaped or rejected',()=>{
  });
  assert.doesNotMatch(html,/<(?:script|img)\b|(?:href|src)="javascript:/, "escaped text may contain an inert onerror= string");
  assert.match(html,/&lt;script&gt;/);
- assert.match(html,/https:\/\/www\.wikidata\.org\/wiki\/Q1/);
+ assert.doesNotMatch(html,/https:\/\/www\.wikidata\.org\/wiki\/Q1/);
+ assert.deepEqual(horseProfileSources({sources:[{label:'bad',url:'javascript:alert(1)'},{label:'Wikidata',url:'https://www.wikidata.org/wiki/Q1'}]}),[{label:'Wikidata',url:'https://www.wikidata.org/wiki/Q1'}]);
 });
 test('tapping a placed card opens profile, no penalty; selecting a hand card keeps the existing relation picker',async t=>{
  const app=await loadApp();t.after(()=>app.restore());
@@ -80,9 +105,16 @@ test('tapping a placed card opens profile, no penalty; selecting a hand card kee
  assert.ok(sheet.querySelector('.horse-profile'));
  assert.equal(sheet.querySelector('[data-place-relation]'),null);
  assert.ok(sheet.textContent.includes('年生')||sheet.textContent.includes('競走成績'));
- assert.equal(sheet.querySelector('.horse-profile-sources')!==null||sheet.querySelector('.horse-profile-empty')!==null,true);
+ assert.equal(sheet.querySelector('.horse-profile-sources'),null);
  app.advance(1000);
  assert.equal(app.$('timer').textContent,'0:01','reading time counts toward ranked score');
+ app.$('modal-close').click();
+ app.$('menu-button').click();
+ const sourceAction=app.$('modal-content').querySelector('[data-action="sources"]');
+ assert.ok(sourceAction);
+ sourceAction.click();
+ assert.match(app.$('modal-content').textContent,/題材・出典/);
+ assert.ok(app.$('modal-content').querySelector('.profile-credits'),'placed horse sources are available in the global credits');
  app.$('modal-close').click();
  // Opening/closing does not mutate actions, placed cards or mistakes.
  assert.deepEqual(app.storage().sessions, before.sessions);
