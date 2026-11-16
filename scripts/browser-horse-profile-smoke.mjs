@@ -27,6 +27,7 @@ try{
    await node.click();
    await page.locator('.horse-profile').waitFor({state:'visible'});
    assert.ok(await page.locator('.horse-profile-heading h2').textContent());
+   assert.equal(await page.locator('dialog.horse-profile-dialog #modal-close').isVisible(),false,'profile close button must be hidden');
    assert.equal(await page.locator('.horse-profile-sources').count(),0,'per-card bibliography should not be shown');
    assert.equal(await page.locator('.horse-profile [data-place-relation]').count(),0);
    const meta=await page.locator('.horse-profile-meta').textContent();
@@ -35,9 +36,10 @@ try{
    assert.equal(await dialog.evaluate(x=>x.open),true);
    const rect=await dialog.boundingBox();
    assert.ok(rect&&rect.x>=0&&rect.x+rect.width<=width+2&&rect.height<844,engine+' dialog overflow');
+   assert.ok(rect.width<=348&&rect.height<=844*.75,engine+' compact profile dimensions');
    await page.screenshot({path:'artifacts/horse-profiles/'+engine+'-'+width+'-profile.png',fullPage:true});
-   await page.locator('#modal-close').click();
-   assert.equal(await dialog.evaluate(x=>x.open),false);
+   await page.mouse.click(5,5);
+   assert.equal(await dialog.evaluate(x=>x.open),false,'backdrop tap closes the profile');
    await page.locator('#menu-button').click();
    await page.locator('[data-action="sources"]').click();
    assert.ok(await page.locator('.profile-credits').count(),'profile evidence must be available in centralized credits');
