@@ -202,16 +202,35 @@ def main():
         if qid not in namedIds:raise ValueError("Unknown editorial horse QID: "+qid)
         profile=profiles[qid]
         if fix.get("description"):profile["description"]=fix["description"]
-        known={w["race"] for w in profile["majorWins"]}
         for w in fix.get("majorWins",[]):
-            if w["race"] not in known:
+            # A horse may win the same race in two distinct years.
+            existing=next((x for x in profile["majorWins"] if x["race"]==w["race"]
+                           and (x["year"]==w["year"] or x["year"] is None)),None)
+            if existing and existing["year"] is None and w["year"] is not None:
+                existing["year"]=w["year"]
+            elif existing is None:
                 profile["majorWins"].append(w)
-                known.add(w["race"])
         profile["majorWins"]=profile["majorWins"][:8]
         if fix.get("raceRecord"):profile["raceRecord"]=fix["raceRecord"]
         for src in fix["sources"]:
             if src["url"] not in {s["url"] for s in profile["sources"]}:
                 profile["sources"].append(src)
+    # The Japan Derby is also called Tokyo Yushun. Never list it twice.
+    for profile in profiles.values():
+        distinct=[]
+        for item in profile["majorWins"]:
+            candidate=dict(item)
+            if candidate["race"]=="日本ダービー":
+                candidate["race"]="東京優駿"
+            prior=next((w for w in distinct if w["race"]==candidate["race"]
+                        and (w["year"]==candidate["year"] or
+                             w["year"] is None or candidate["year"] is None)),None)
+            if prior:
+                if prior["year"] is None and candidate["year"] is not None:
+                    prior["year"]=candidate["year"]
+            else:
+                distinct.append(candidate)
+        profile["majorWins"]=distinct[:8]
     for key,check in [
         ("withWins",lambda p:bool(p["majorWins"])),
         ("withRaceRecord",lambda p:bool(p["raceRecord"])),
