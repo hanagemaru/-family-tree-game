@@ -1,8 +1,8 @@
 {
   "version": "horse-profiles-v1",
-  "retrievedAtUTC": "2026-11-16T11:41:38+00:00",
+  "retrievedAtUTC": "2026-11-16T12:05:23+00:00",
   "pedigreeVersion": "wikidata-pedigree-v1",
-  "sourceMethod": "Wikidata P2522 victory claims, Wikipedia exintro explicitly stated wins/total career, editorial additions sourced from JRA/JBIS, JRA Hall flag from existing fame snapshot. No copied article prose.",
+  "sourceMethod": "Wikidata P2522 victory claims, Wikipedia exintro and explicit infobox race records / medal awards, JRA/JBIS editorial facts and Hall flag. No copied article prose.",
   "coverage": {
     "named": 872,
     "articleLeads": 815,
@@ -12,6 +12,9 @@
     "wikidataVictoryQids": 85,
     "withRaceRecord": 49,
     "withDescription": 60,
+    "wikiInfoboxChecked": 549,
+    "wikiInfoboxRecordsAdded": 0,
+    "wikiInfoboxMedalWinsAdded": 0,
     "editoriallyCorroborated": 45
   },
   "horses": {
