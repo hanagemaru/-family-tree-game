@@ -668,6 +668,209 @@
           "url": "https://www.jbis.or.jp/horse/0001154658/"
         }
       ]
+    },
+    "Q11317516": {
+      "description": "2002年宝塚記念を制し、皐月賞・日本ダービーでも2着。",
+      "majorWins": [
+        {
+          "race": "宝塚記念",
+          "year": 2002
+        },
+        {
+          "race": "新潟大賞典",
+          "year": 2003
+        }
+      ],
+      "raceRecord": {
+        "starts": 26,
+        "wins": 6
+      },
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000326421/"
+        }
+      ]
+    },
+    "Q109260575": {
+      "description": "白毛の牝馬。ダートを中心に16戦4勝。",
+      "majorWins": [],
+      "raceRecord": {
+        "starts": 16,
+        "wins": 4
+      },
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0001149492/"
+        }
+      ]
+    },
+    "Q11331056": {
+      "description": "1995年の阪神3歳牝馬ステークスを制した。",
+      "majorWins": [
+        {
+          "race": "阪神3歳牝馬ステークス",
+          "year": 1995
+        },
+        {
+          "race": "京都牝馬特別",
+          "year": 1998
+        }
+      ],
+      "raceRecord": {
+        "starts": 10,
+        "wins": 4
+      },
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000275176/"
+        }
+      ]
+    },
+    "Q11319948": {
+      "description": "府中牝馬ステークスを2006年と2007年に連覇。",
+      "majorWins": [
+        {
+          "race": "府中牝馬ステークス",
+          "year": 2006
+        },
+        {
+          "race": "府中牝馬ステークス",
+          "year": 2007
+        },
+        {
+          "race": "クイーンステークス",
+          "year": 2006
+        }
+      ],
+      "raceRecord": {
+        "starts": 26,
+        "wins": 4
+      },
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000750310/"
+        }
+      ]
+    },
+    "Q114798021": {
+      "description": "2001年チューリップ賞で2着。現役時は15戦1勝。",
+      "majorWins": [],
+      "raceRecord": {
+        "starts": 15,
+        "wins": 1
+      },
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000329411/"
+        }
+      ]
+    },
+    "Q11292547": {
+      "description": "現役時代は23戦3勝。引退後は繁殖牝馬となった。",
+      "majorWins": [],
+      "raceRecord": {
+        "starts": 23,
+        "wins": 3
+      },
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000316406/"
+        }
+      ]
+    },
+    "Q11340626": {
+      "description": "2007年有馬記念を制し、オールカマーでも複数回優勝。",
+      "majorWins": [
+        {
+          "race": "有馬記念",
+          "year": 2007
+        },
+        {
+          "race": "オールカマー",
+          "year": 2009
+        }
+      ],
+      "raceRecord": {
+        "starts": 27,
+        "wins": 10
+      },
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000762445/"
+        }
+      ]
+    },
+    "Q11304531": {
+      "description": "1986年の天皇賞（秋）を制した。",
+      "majorWins": [
+        {
+          "race": "天皇賞（秋）",
+          "year": 1986
+        },
+        {
+          "race": "毎日王冠",
+          "year": 1986
+        }
+      ],
+      "raceRecord": {
+        "starts": 12,
+        "wins": 6
+      },
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000145106/"
+        }
+      ]
+    },
+    "Q11284097": {
+      "description": "2005年菊花賞で2着、同年京成杯に優勝。",
+      "majorWins": [
+        {
+          "race": "京成杯",
+          "year": 2005
+        }
+      ],
+      "raceRecord": {
+        "starts": 10,
+        "wins": 2
+      },
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000737164/"
+        }
+      ]
+    },
+    "Q11304515": {
+      "description": "1995年の天皇賞（秋）を制覇。",
+      "majorWins": [
+        {
+          "race": "天皇賞（秋）",
+          "year": 1995
+        },
+        {
+          "race": "中山記念",
+          "year": 1994
+        }
+      ],
+      "raceRecord": {
+        "starts": 21,
+        "wins": 9
+      },
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000237393/"
+        }
+      ]
     }
   },
   "reviewed": "2026-11-16"
