@@ -7,48 +7,112 @@
     "named": 872,
     "articleLeads": 815,
     "leadVictoryFacts": 220,
-    "withWins": 279,
-    "withProfileFacts": 289,
+    "withWins": 296,
+    "withProfileFacts": 308,
     "wikidataVictoryQids": 85,
-    "withRaceRecord": 20,
-    "withDescription": 31,
-    "editoriallyCorroborated": 16
+    "withRaceRecord": 39,
+    "withDescription": 50,
+    "editoriallyCorroborated": 35
   },
   "horses": {
     "Q100450928": {
       "name": "センテリュオ",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "オールカマー",
+          "year": 2020
+        }
+      ],
+      "raceRecord": {
+        "starts": 18,
+        "wins": 5
+      },
+      "description": "2020年のオールカマーを制した。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0001202812/"
+        }
+      ]
     },
     "Q100450939": {
       "name": "センチュリオン",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "マーチステークス",
+          "year": 2018
+        }
+      ],
+      "raceRecord": {
+        "starts": 47,
+        "wins": 10
+      },
+      "description": "2018年のマーチステークスで優勝。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0001153731/"
+        }
+      ]
     },
     "Q100450961": {
       "name": "クルーガー",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "マイラーズカップ",
+          "year": 2016
+        },
+        {
+          "race": "ダービー卿チャレンジトロフィー",
+          "year": 2020
+        }
+      ],
+      "raceRecord": {
+        "starts": 27,
+        "wins": 6
+      },
+      "description": "2016年のマイラーズカップと2020年のダービー卿チャレンジトロフィーを制覇。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0001157765/"
+        }
+      ]
     },
     "Q101192043": {
       "name": "ミュゼスルタン",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "新潟2歳ステークス",
+          "year": 2014
+        }
+      ],
+      "raceRecord": {
+        "starts": 7,
+        "wins": 3
+      },
+      "description": "2014年の新潟2歳ステークスで優勝。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0001154658/"
+        }
+      ]
     },
     "Q101192470": {
       "name": "デアリングバード",
       "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "raceRecord": {
+        "starts": 1,
+        "wins": 0
+      },
+      "description": "現役時代は1戦未勝利で、引退後は繁殖牝馬となった。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0001139178/"
+        }
+      ]
     },
     "Q101192716": {
       "name": "キングオブコージ",
@@ -497,10 +561,31 @@
     },
     "Q10932646": {
       "name": "デュランダル",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "マイルチャンピオンシップ",
+          "year": 2003
+        },
+        {
+          "race": "マイルチャンピオンシップ",
+          "year": 2004
+        },
+        {
+          "race": "スプリンターズステークス",
+          "year": 2003
+        }
+      ],
+      "raceRecord": {
+        "starts": 17,
+        "wins": 8
+      },
+      "description": "マイルチャンピオンシップを2003年と2004年に連覇。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000619835/"
+        }
+      ]
     },
     "Q109599095": {
       "name": "サトノラーゼン",
@@ -1460,10 +1545,27 @@
     },
     "Q11295262": {
       "name": "カレンチャン",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "スプリンターズステークス",
+          "year": 2011
+        },
+        {
+          "race": "高松宮記念",
+          "year": 2012
+        }
+      ],
+      "raceRecord": {
+        "starts": 18,
+        "wins": 9
+      },
+      "description": "スプリンターズステークスと高松宮記念を制した短距離馬。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0001044299/"
+        }
+      ]
     },
     "Q11295519": {
       "name": "カンパラ",
@@ -1565,10 +1667,27 @@
     },
     "Q11297913": {
       "name": "キングヘイロー",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "高松宮記念",
+          "year": 2000
+        },
+        {
+          "race": "中山記念",
+          "year": 1999
+        }
+      ],
+      "raceRecord": {
+        "starts": 27,
+        "wins": 6
+      },
+      "description": "2000年の高松宮記念を制し、GⅠ馬となった。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000294840/"
+        }
+      ]
     },
     "Q11298246": {
       "name": "ギャロップダイナ",
@@ -2250,10 +2369,31 @@
     },
     "Q11311170": {
       "name": "スイープトウショウ",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "秋華賞",
+          "year": 2004
+        },
+        {
+          "race": "宝塚記念",
+          "year": 2005
+        },
+        {
+          "race": "エリザベス女王杯",
+          "year": 2005
+        }
+      ],
+      "raceRecord": {
+        "starts": 24,
+        "wins": 8
+      },
+      "description": "2005年の宝塚記念では牡馬を相手に優勝。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000726199/"
+        }
+      ]
     },
     "Q11311176": {
       "name": "スウィフトカレント",
@@ -3097,10 +3237,6 @@
           "year": 1991
         },
         {
-          "race": "日本ダービー",
-          "year": null
-        },
-        {
           "race": "ジャパンカップ",
           "year": null
         },
@@ -3296,10 +3432,27 @@
     },
     "Q11325871": {
       "name": "ノースフライト",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "安田記念",
+          "year": 1994
+        },
+        {
+          "race": "マイルチャンピオンシップ",
+          "year": 1994
+        }
+      ],
+      "raceRecord": {
+        "starts": 11,
+        "wins": 8
+      },
+      "description": "1994年の安田記念とマイルチャンピオンシップを制覇。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000229403/"
+        }
+      ]
     },
     "Q11325940": {
       "name": "ノーリーズン",
@@ -3379,10 +3532,27 @@
     },
     "Q11328013": {
       "name": "バブルガムフェロー",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "朝日杯3歳ステークス",
+          "year": 1995
+        },
+        {
+          "race": "天皇賞（秋）",
+          "year": 1996
+        }
+      ],
+      "raceRecord": {
+        "starts": 13,
+        "wins": 7
+      },
+      "description": "1996年の天皇賞（秋）を制し、翌年は同レースで2着。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000274914/"
+        }
+      ]
     },
     "Q11328548": {
       "name": "バーディバーディ",
@@ -3615,10 +3785,27 @@
     },
     "Q11333106": {
       "name": "フジキセキ",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "朝日杯3歳ステークス",
+          "year": 1994
+        },
+        {
+          "race": "弥生賞",
+          "year": 1995
+        }
+      ],
+      "raceRecord": {
+        "starts": 4,
+        "wins": 4
+      },
+      "description": "無敗の4戦4勝で競走生活を終えた。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000262443/"
+        }
+      ]
     },
     "Q11333572": {
       "name": "フラムドパシオン",
@@ -3785,10 +3972,35 @@
     },
     "Q11337753": {
       "name": "ホッコータルマエ",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "チャンピオンズカップ",
+          "year": 2014
+        },
+        {
+          "race": "東京大賞典",
+          "year": 2013
+        },
+        {
+          "race": "東京大賞典",
+          "year": 2014
+        },
+        {
+          "race": "川崎記念",
+          "year": 2016
+        }
+      ],
+      "raceRecord": {
+        "starts": 39,
+        "wins": 17
+      },
+      "description": "2013年と2014年の東京大賞典を連覇。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0001107477/"
+        }
+      ]
     },
     "Q11338122": {
       "name": "ホワイトベッセル",
@@ -4479,10 +4691,31 @@
     },
     "Q11352062": {
       "name": "ヴィルシーナ",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "ヴィクトリアマイル",
+          "year": 2013
+        },
+        {
+          "race": "ヴィクトリアマイル",
+          "year": 2014
+        },
+        {
+          "race": "クイーンカップ",
+          "year": 2012
+        }
+      ],
+      "raceRecord": {
+        "starts": 21,
+        "wins": 5
+      },
+      "description": "ヴィクトリアマイルを2013年と2014年に連覇。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0001107937/"
+        }
+      ]
     },
     "Q11352101": {
       "name": "ヴィータローザ",
@@ -8114,10 +8347,27 @@
     },
     "Q4962908": {
       "name": "ブライアンズタイム",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "フロリダダービー",
+          "year": 1988
+        },
+        {
+          "race": "ペガサスハンデキャップ",
+          "year": 1988
+        }
+      ],
+      "raceRecord": {
+        "starts": 21,
+        "wins": 5
+      },
+      "description": "米国のフロリダダービーとペガサスハンデキャップで優勝。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000333844/"
+        }
+      ]
     },
     "Q5002109": {
       "name": "バステッド",
@@ -9289,10 +9539,23 @@
     },
     "Q7059024": {
       "name": "ノーザンテースト",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "フォレ賞",
+          "year": 1974
+        }
+      ],
+      "raceRecord": {
+        "starts": 20,
+        "wins": 5
+      },
+      "description": "フランスのフォレ賞を制し、日本で種牡馬となった。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000333544/"
+        }
+      ]
     },
     "Q707462": {
       "name": "ロイヤルスキー",
@@ -9610,9 +9873,17 @@
     "Q76958236": {
       "name": "カレンブーケドール",
       "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "raceRecord": {
+        "starts": 17,
+        "wins": 2
+      },
+      "description": "オークス、秋華賞、ジャパンカップで2着。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0001221953/"
+        }
+      ]
     },
     "Q76958806": {
       "name": "サトノティターン",
@@ -9637,10 +9908,31 @@
     },
     "Q7821904": {
       "name": "トニービン",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "凱旋門賞",
+          "year": 1988
+        },
+        {
+          "race": "ミラノ大賞",
+          "year": 1988
+        },
+        {
+          "race": "伊ジョッキークラブ大賞",
+          "year": 1987
+        }
+      ],
+      "raceRecord": {
+        "starts": 27,
+        "wins": 15
+      },
+      "description": "1988年の凱旋門賞を制し、のちに日本で種牡馬となった。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000161740/"
+        }
+      ]
     },
     "Q7848413": {
       "name": "トライマイベスト",
@@ -9707,10 +9999,31 @@
     },
     "Q8069153": {
       "name": "ゼンノロブロイ",
-      "majorWins": [],
-      "raceRecord": null,
-      "description": null,
-      "sources": []
+      "majorWins": [
+        {
+          "race": "天皇賞（秋）",
+          "year": 2004
+        },
+        {
+          "race": "ジャパンカップ",
+          "year": 2004
+        },
+        {
+          "race": "有馬記念",
+          "year": 2004
+        }
+      ],
+      "raceRecord": {
+        "starts": 20,
+        "wins": 7
+      },
+      "description": "2004年秋の天皇賞・ジャパンカップ・有馬記念を制覇。",
+      "sources": [
+        {
+          "label": "JBISサーチ（競走成績）",
+          "url": "https://www.jbis.or.jp/horse/0000701668/"
+        }
+      ]
     },
     "Q83671678": {
       "name": "スマイルカナ",
@@ -9943,5 +10256,6 @@
         }
       ]
     }
-  }
+  },
+  "curatedUpdatedAt": "2026-11-16"
 }
