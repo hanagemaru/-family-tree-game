@@ -38,8 +38,12 @@ try{
    assert.ok(rect&&rect.x>=0&&rect.x+rect.width<=width+2&&rect.height<844,engine+' dialog overflow');
    assert.ok(rect.width<=348&&rect.height<=844*.75,engine+' compact profile dimensions');
    await page.screenshot({path:'artifacts/horse-profiles/'+engine+'-'+width+'-profile.png',fullPage:true});
+   await page.locator('.horse-profile-heading h2').click();
+   assert.equal(await dialog.evaluate(x=>x.open),false,'tapping inside the profile closes it');
+   await node.click();
+   await page.locator('.horse-profile').waitFor({state:'visible'});
    await page.mouse.click(5,5);
-   assert.equal(await dialog.evaluate(x=>x.open),false,'backdrop tap closes the profile');
+   assert.equal(await dialog.evaluate(x=>x.open),false,'backdrop tap still closes the profile');
    await page.locator('#menu-button').click();
    await page.locator('[data-action="sources"]').click();
    assert.ok(await page.locator('.profile-credits').count(),'profile evidence must be available in centralized credits');
