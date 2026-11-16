@@ -556,7 +556,7 @@ $('hand').addEventListener('click',e=>{
 // Anchor two-finger movement to one starting snapshot, without per-event drift.
 function beginPinch(){
  if(pointers.size!==2){pinch=null;return;}
- pinch={camera:{...camera},fingers:new Map([...pointers].map(([id,p])=>[id,{...p}]))};
+ pinch={camera:{...camera},fingers:new Map([...pointers].map(([id,p])=>[id,{...p}])),rect:board.getBoundingClientRect()};
  if(pan)pan.moved=true;
 }
 function drawPinch(){
@@ -565,7 +565,7 @@ function drawPinch(){
  const a=pinch.fingers.get(ids[0]),b=pinch.fingers.get(ids[1]);
  const currentA=pointers.get(ids[0]),currentB=pointers.get(ids[1]);
  if(!currentA||!currentB)return;
- const r=board.getBoundingClientRect(),local=p=>({x:p.x-r.left,y:p.y-r.top});
+ const r=pinch.rect,local=p=>({x:p.x-r.left,y:p.y-r.top});
  camera=pinchCamera(pinch.camera,local(a),local(b),local(currentA),local(currentB));
  // Do not rebuild the (potentially expensive) SVG network every pointer event.
  updateTransform(false,false);
@@ -622,7 +622,7 @@ window.addEventListener('pointerup',e=>{
  return;}
  if(!pointers.has(e.pointerId))return;
  const wasPinching=!!pinch;
- if(wasPinching)finishPinch();
+ if(wasPinching){pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});finishPinch();}
  pointers.delete(e.pointerId);
  if(!wasPinching&&pan&&pan.id===e.pointerId&&!pan.moved){
   if(selected){const point=pointOnBoard(e.clientX,e.clientY),id=pan.node||pickDropCard(point,screenNodes(state.positions,camera));if(id)chooseRelations(id);else clearSelection();}
