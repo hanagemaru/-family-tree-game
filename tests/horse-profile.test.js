@@ -64,7 +64,7 @@ test('HTML labels, descriptions and remote URLs are escaped or rejected',()=>{
    description:'<b>テスト</b>',sources:[{label:'bad',url:'javascript:alert(1)'},{label:'Wikidata',url:'https://www.wikidata.org/wiki/Q1'}]},
   photo:{photoUrl:'javascript:alert(1)',filePage:'javascript:alert(2)'}
  });
- assert.doesNotMatch(html,/<script|onerror=|href="javascript:|src="javascript:/);
+ assert.doesNotMatch(html,/<(?:script|img)\b|(?:href|src)="javascript:/, "escaped text may contain an inert onerror= string");
  assert.match(html,/&lt;script&gt;/);
  assert.match(html,/https:\/\/www\.wikidata\.org\/wiki\/Q1/);
 });
