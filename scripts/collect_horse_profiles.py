@@ -42,7 +42,7 @@ RACES=[
 # Longer names must be recognized before their shorter prefix.
 RACES=sorted(set(RACES),key=len,reverse=True)
 RACE_PATTERN=re.compile("|".join(map(re.escape,RACES)))
-RECORD_PATTERN=re.compile(r"(?:通算|競走)?(?:成績|戦績)?[：:\sは]*([0-9]{1,3})戦([0-9]{1,3})勝")
+RECORD_PATTERN=re.compile(r"(?:通算(?:成績|戦績)?|競走成績|生涯成績|全成績)[：:\sは、]*([0-9]{1,3})戦([0-9]{1,3})勝")
 CLAUSE_PATTERN=re.compile(r"(?:主な勝ち鞍|主な勝鞍|おもな勝ち鞍|主な優勝|主な勝利)(?:として)?(?:は|に|：|:)?(.{0,500}?)(?:。|\n|$)")
 QID_PATTERN=re.compile(r"^Q[1-9][0-9]*$")
 def batches(items,n):
@@ -86,6 +86,10 @@ def wiki_lead(text):
         # Prefer exact race name matches; do not infer first place from prose.
         for m in RACE_PATTERN.finditer(clause):
             name=m.group()
+            # Avoid turning a different named local prize (e.g. 兵庫菊花賞)
+            # into the national classic 菊花賞 just because of a substring.
+            if m.start() and re.match(r"[ぁ-んァ-ヴ一-龠]",clause[m.start()-1]) and clause[m.start()-1] not in ("年","の","回"):
+                continue
             if not any(x["race"]==name for x in wins):wins.append({"race":name,"year":None})
         wins=wins[:8]
     record=RECORD_PATTERN.search(text[:1150])
