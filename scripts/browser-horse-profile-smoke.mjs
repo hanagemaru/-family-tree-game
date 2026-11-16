@@ -27,7 +27,7 @@ try{
    await node.click();
    await page.locator('.horse-profile').waitFor({state:'visible'});
    assert.ok(await page.locator('.horse-profile-heading h2').textContent());
-   assert.equal(await page.locator('.horse-profile-sources').count()+await page.locator('.horse-profile-empty').count()>=1,true);
+   assert.equal(await page.locator('.horse-profile-sources').count(),0,'per-card bibliography should not be shown');
    assert.equal(await page.locator('.horse-profile [data-place-relation]').count(),0);
    const meta=await page.locator('.horse-profile-meta').textContent();
    assert.match(meta,/\d{4}年生/);
@@ -38,6 +38,11 @@ try{
    await page.screenshot({path:'artifacts/horse-profiles/'+engine+'-'+width+'-profile.png',fullPage:true});
    await page.locator('#modal-close').click();
    assert.equal(await dialog.evaluate(x=>x.open),false);
+   await page.locator('#menu-button').click();
+   await page.locator('[data-action="sources"]').click();
+   assert.ok(await page.locator('.profile-credits').count(),'profile evidence must be available in centralized credits');
+   assert.match(await page.locator('#modal-content').textContent(),/題材・出典/);
+   await page.locator('#modal-close').click();
    await page.locator('#hand [data-card]').first().click();
    await page.locator('#nodes [data-node]').first().click();
    assert.equal(await dialog.evaluate(x=>x.open),true,'selected card must open relation picker');
