@@ -7,14 +7,14 @@
 | 指標 | 頭数 |
 | --- | ---: |
 | articleLeads | 815 |
-| editoriallyCorroborated | 35 |
+| editoriallyCorroborated | 45 |
 | leadVictoryFacts | 220 |
 | named | 872 |
 | wikidataVictoryQids | 85 |
-| withDescription | 50 |
-| withProfileFacts | 308 |
-| withRaceRecord | 39 |
-| withWins | 296 |
+| withDescription | 60 |
+| withProfileFacts | 318 |
+| withRaceRecord | 49 |
+| withWins | 303 |
 
 ## 著作権と根拠
 
@@ -69,6 +69,10 @@
 | オジュウチョウサン | 中山グランドジャンプ、中山大障害 | 40戦20勝 | 中山グランドジャンプを6回制した障害の名馬。 |
 | ラヴズオンリーユー | 優駿牝馬、クイーンエリザベス2世カップ、香港カップ | 未収録 | 日本調教馬として初めてブリーダーズカップで優勝。 |
 | グラスワンダー | 未収録 | 15戦9勝 | — |
+
+## 追加のJBIS一次資料（第2回）
+
+ダンツフレーム、ブチコ、ビワハイジ、デアリングハート、ポイントフラッグ、オリエンタルアート、マツリダゴッホ、サクラユタカオー、アドマイヤジャパン、サクラチトセオーについて個別競走成績を照合して補完。日本の中央・地方にまたがる出走はJBIS合算値を採用。
 
 ## API取得エラー（最大30件）
 
