@@ -1,0 +1,198 @@
+/* Game menu only: the gameplay HUD and cards remain unchanged. */
+body:not(.playing){
+ background:#172A3D;
+ color:#F6F8F9;
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",sans-serif;
+}
+body:not(.playing) #app{
+ display:flex;flex-direction:column;
+ min-height:100dvh;width:100%;
+ max-width:none;padding:0 clamp(15px,4vw,28px);
+}
+body:not(.playing) .app-header{
+ width:min(100%,620px);height:64px;flex:0 0 64px;
+ margin:0 auto;display:flex;align-items:center;gap:8px;
+ border-bottom:1px solid #354B60;
+}
+body:not(.playing) .brand{
+ display:flex;align-items:center;gap:13px;flex:1;
+ min-width:0;margin:0;padding:0;border:0;
+ background:transparent;color:#F5F7FA;
+ text-decoration:none;text-align:left;
+ font-family:inherit;font-weight:850;
+}
+body:not(.playing) .home-title-stripe{
+ flex:0 0 6px;display:block;width:6px;height:30px;
+ background:#F48B5B;transform:skewX(-12deg);
+}
+body:not(.playing) .app-header .brand>span:last-child{
+ color:#F7FAFC;
+ font:850 clamp(16px,4.4vw,19px)/1.3 -apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;
+ min-width:0;white-space:nowrap;letter-spacing:-.045em;
+}
+body:not(.playing) .home-header-actions{
+ display:flex;align-items:center;justify-content:flex-end;gap:0;flex:0 0 auto;
+}
+body:not(.playing) .help-nav{
+ display:flex;align-items:center;gap:5px;min-height:40px;
+ margin:0;padding:5px 5px;border:0;background:transparent;
+ color:#D9E5F0;font-size:12px;font-weight:750;
+ text-decoration:none;white-space:nowrap;
+}
+body:not(.playing) .home-help-mark{
+ display:grid;place-items:center;width:21px;height:21px;
+ border:1.5px solid #ADC0D0;border-radius:50%;
+ font-size:12px;font-weight:850;
+}
+body:not(.playing) .home-menu-button{
+ display:grid;place-items:center;width:44px;height:44px;
+ margin:0;border:1px solid #65849D;border-radius:11px;
+ background:#213A51;color:#F8FBFD;
+ font-size:20px;font-weight:800;line-height:1;
+}
+body:not(.playing) #home-screen{
+ display:flex;flex:1;align-items:center;justify-content:center;
+ width:100%;max-width:none;min-height:0;
+ padding:24px 0 max(46px,env(safe-area-inset-bottom));
+}
+body:not(.playing) .home-launch{
+ width:min(100%,402px);margin:0 auto;
+}
+body:not(.playing) .home-rule{
+ margin:0 0 42px;text-align:center;
+ color:#F4F7FA;font:800 clamp(18px,4.8vw,23px)/1.45 -apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;
+ letter-spacing:-.04em;
+}
+body:not(.playing) .horse-home-stages,
+body:not(.playing) .horse-home-stages #stage-list{
+ width:100%;max-width:none;display:block!important;
+ margin:0;padding:0;min-width:0;
+}
+body:not(.playing) .home-start-panel{padding:0;margin:0}
+body:not(.playing) .home-picker-label{
+ display:block;margin:0 0 12px;
+ color:#ADC2D3;font-size:12px;line-height:1.45;font-weight:800;
+ letter-spacing:.015em;
+}
+body:not(.playing) .home-start-panel .difficulty-picker{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:9px;margin:0;
+}
+body:not(.playing) .home-start-panel .difficulty-option{
+ min-width:0;min-height:54px;padding:9px 4px;
+ background:#243D53;color:#E9F1F7;border:1px solid #536C83;
+ border-radius:10px;font-size:16px;font-weight:850;line-height:1.2;
+ font-family:inherit;touch-action:manipulation;box-shadow:none;
+}
+body:not(.playing) .home-start-panel .difficulty-option.active{
+ background:#2D6394;border-color:#9FC5E4;color:#fff;
+ box-shadow:inset 0 0 0 1px #B2D8F346,0 3px 0 #0C1E30;
+}
+body:not(.playing) .home-start-panel .difficulty-option:hover:not(.active){
+ background:#32506B;border-color:#86A9C6;
+}
+body:not(.playing) .home-start-panel .difficulty-description{
+ display:block;min-height:25px;margin:10px 0 22px;
+ padding:0;color:#BACDDD;text-align:center;
+ font-size:12px;line-height:1.8;
+}
+body:not(.playing) .home-best-row{
+ display:flex;align-items:center;justify-content:space-between;
+ padding:12px 4px;margin:0 0 16px;
+ border-top:1px solid #3E5468;
+ border-bottom:1px solid #3E5468;
+}
+body:not(.playing) .home-best-row>span{
+ color:#C7D8E5;font-size:13px;font-weight:700;
+}
+body:not(.playing) .home-best-row strong{
+ color:#fff;font:850 23px/1.1 system-ui,sans-serif;
+ letter-spacing:-.03em;font-variant-numeric:tabular-nums;
+}
+body:not(.playing) .home-resume-note{
+ display:flex;align-items:center;gap:7px;
+ margin:0 0 10px;font-size:12px;color:#DCEAF5;
+}
+body:not(.playing) .home-resume-note .resume-dot{
+ display:block;flex:0 0 7px;width:7px;height:7px;
+ border-radius:50%;background:#F48B5B;
+}
+body:not(.playing) .home-load-error{
+ margin:0 0 10px;color:#FFCFB5;font-size:12px;
+}
+body:not(.playing) .home-primary-button{
+ display:flex;align-items:center;justify-content:center;gap:14px;
+ width:100%;min-height:62px;padding:12px;
+ border:1px solid #FFA67E;border-bottom:4px solid #AB5033;
+ border-radius:11px;background:#F48B5B;color:#172A3D;
+ font-size:18px;font-weight:850;line-height:1.3;
+ box-shadow:0 7px 18px #0C1C2D7B;touch-action:manipulation;
+}
+body:not(.playing) .home-primary-button span{font-size:20px}
+body:not(.playing) .home-primary-button:disabled{opacity:.6}
+body:not(.playing) .home-primary-button:active:not(:disabled){
+ transform:translateY(2px);border-bottom-width:2px;
+}
+body:not(.playing) .home-new-button{
+ display:block;width:max-content;min-height:38px;
+ margin:5px auto 0;padding:8px 13px;border:0;
+ background:none;color:#BDCFDC;font-size:12px;
+ text-decoration:underline;text-underline-offset:3px;
+}
+body:not(.playing) .home-ranking-button{
+ display:block;width:100%;min-height:47px;margin:13px 0 0;
+ padding:10px;background:transparent;border:0;color:#E4EEF6;
+ font-size:14px;font-weight:800;text-decoration:underline;
+ text-decoration-color:#829AAD;text-underline-offset:5px;
+}
+body:not(.playing) .home-legacy{
+ border-top:1px solid #3B5267;margin:13px 0 0;padding:9px 0;
+ color:#BAC9D6;font-size:12px;
+}
+body:not(.playing) .home-legacy summary{
+ padding:6px 0;cursor:pointer;font-weight:700;
+}
+body:not(.playing) .home-legacy .legacy-resume{
+ display:block;width:100%;min-height:36px;margin:3px 0;
+ padding:5px 0;border:0;background:transparent;color:#E3EEF6;
+ font-size:12px;text-align:left;text-decoration:underline;
+}
+body:not(.playing) .app-footer{display:none}
+body:not(.playing) dialog{
+ background:#F6F8F9;color:#172C41;border:1px solid #C0CFDC;
+}
+body:not(.playing) dialog h2{
+ color:#172C41;font-family:inherit;font-size:21px;font-weight:800;
+}
+body:not(.playing) dialog p,
+body:not(.playing) dialog li{color:#39536A}
+body:not(.playing) .home-menu-actions{display:grid;gap:10px}
+body:not(.playing) .home-menu-actions .button{
+ display:block;min-height:44px;width:100%;padding:12px;
+ background:#E2EAF0;color:#1C3548;
+ font-size:14px;font-weight:750;text-decoration:none;
+}
+body:not(.playing) button:focus-visible,
+body:not(.playing) summary:focus-visible,
+body:not(.playing) a:focus-visible{
+ outline:3px solid #F7BE84;outline-offset:3px;
+}
+@media(max-width:360px){
+ body:not(.playing) .app-header .brand>span:last-child{font-size:15px}
+ body:not(.playing) .help-nav{font-size:11px}
+ body:not(.playing) .home-header-actions{gap:2px}
+ body:not(.playing) .home-rule{font-size:18px}
+}
+@media(max-height:640px){
+ body:not(.playing) #home-screen{
+  align-items:flex-start;padding-top:25px;padding-bottom:15px;
+ }
+ body:not(.playing) .home-rule{margin-bottom:23px}
+ body:not(.playing) .home-start-panel .difficulty-description{margin-bottom:12px}
+}
+@media(min-width:750px){
+ body:not(.playing) .home-rule{margin-bottom:52px}
+}
+
+/* Contrast regression protection: older sport theme had a dark .brand>span rule. */
+body:not(.playing) .app-header .brand>span:last-child{color:#F7FAFC}

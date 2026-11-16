@@ -4,15 +4,16 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#17283c"><meta name="description" content="名馬の親子関係をならべる競走馬血統パズル。12頭・最大4世代、3段階の難易度。">
 <title>競走馬血統ならべ | hanage.app</title>
-<link rel="icon" href="./favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./sports-card.css">
+<link rel="icon" href="./favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./sports-card.css"><link rel="stylesheet" href="./home-screen.css">
 </head>
 <body>
 <div id="app">
-<header class="app-header"><button class="brand" id="home-button" aria-label="難易度選択へ"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M16 9v7M7 23v-7h18v7" stroke="currentColor" stroke-width="2"/><rect x="12" y="3" width="8" height="8" rx="2" fill="currentColor"/><rect x="3" y="21" width="8" height="8" rx="2" fill="currentColor"/><rect x="21" y="21" width="8" height="8" rx="2" fill="currentColor"/></svg></span><span>競走馬血統ならべ<small>HORSE PEDIGREE PUZZLE</small></span></button><a class="text-button hub-back" href="https://hanage.app/" rel="noopener">hanage.app に戻る</a><button class="text-button help-nav" id="help-button" aria-label="遊び方"><span aria-hidden="true">?</span> 遊び方</button></header>
+<header class="app-header"><button class="brand" id="home-button" aria-label="難易度選択へ"><span class="home-title-stripe" aria-hidden="true"></span><span>競走馬血統ならべ</span></button><nav class="home-header-actions" aria-label="ホームの操作"><button type="button" class="home-menu-button" id="home-menu-button" aria-label="メニューを開く" aria-haspopup="dialog"><span aria-hidden="true">☰</span></button></nav><button type="button" id="help-button" hidden tabindex="-1">遊び方</button></header>
 <main id="home-screen">
-<section class="horse-home-intro"><p class="eyebrow">HORSE PEDIGREE PUZZLE</p><h1>名馬の血統を、つなぐ。</h1><p>12頭のカードで親子関係を完成させよう。最大4世代のランダム出題。</p></section>
-<section class="stages horse-home-stages" aria-label="競走馬の難易度選択"><div id="stage-list"></div></section>
-<p class="home-score-guide">ヒント +10秒 ／ ミス +15秒 ／ 自動配置 +45秒。記録は補正タイムで競います。</p>
+<section class="home-launch" aria-label="難易度を選んでプレイ">
+<p class="home-rule">12頭の血統を完成させよう</p>
+<div id="stage-list"></div>
+</section>
 </main>
 <main id="game-screen" hidden>
 <div class="game-heading"><div><p class="eyebrow" id="stage-category"></p><h1 id="stage-title"></h1></div><button id="menu-button" class="text-button" aria-label="メニュー">☰</button></div>

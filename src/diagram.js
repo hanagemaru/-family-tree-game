@@ -9,7 +9,7 @@ function families(state){
 }
 // Adjacent-swap minimization of family separation, crossing inversions and wire length.
 // Only placed cards participate; unseen cards never affect ordering or reveal a clue.
-export function layoutFamily(state){
+export function layoutFamily(state,{minimizeCrossings=false}={}){
  const byId=new Map(state.stage.people.map(p=>[p.id,p])),groups=families(state),links=new Map(state.placed.map(id=>[id,id]));
  const root=id=>{while(links.get(id)!==id)id=links.get(id);return id;};
  // Partner cards form one block. Descendant blocks reserve enough horizontal
@@ -40,6 +40,68 @@ export function layoutFamily(state){
  for(let i=0;i<arms.length;i++)for(let j=i+1;j<arms.length;j++){const a=arms[i],b=arms[j];if(a.family!==b.family&&a.generation===b.generation&&(a.from-b.from)*(a.to-b.to)<0)sum+=150;}
  return sum;}
  let current=cost();for(let pass=0;pass<16;pass++){let changed=false;for(const order of orders)for(let i=0;i<order.length-1;i++){[order[i],order[i+1]]=[order[i+1],order[i]];const next=cost();if(next<current-EPS){current=next;changed=true;}else [order[i],order[i+1]]=[order[i+1],order[i]];}if(!changed)break;}
+ // Layout rendering can further optimize the actual orthogonal wires, whose
+ // crossings are not always captured by the parent/child inversion proxy above.
+ // This opt-in pass changes only displayed coordinates, never the shuffled
+ // cards, stage IDs, generator scoring, replay, or leaderboard verification.
+ if(minimizeCrossings&&state.placed.length>=4){
+  const geometryCost=positions=>{
+   const routed=buildDiagram({...state,positions});
+   const crossings=renderGeometry(routed).crossings.length;
+   const wireLength=routed.networks.reduce((sum,network)=>sum+network.segments.reduce(
+    (length,segment)=>length+Math.abs(segment.a.x-segment.b.x)+Math.abs(segment.a.y-segment.b.y),0),0);
+   return {crossings,wireLength};
+  };
+  const improves=(a,b)=>a.crossings<b.crossings||(a.crossings===b.crossings&&a.wireLength<b.wireLength-EPS);
+  // First compact entire family blocks. This phase preserves the baseline
+  // non-overlapping subtree widths and uses the *actual* orthogonal wire routes.
+  let incumbent=geometryCost(coordinates());
+  for(let pass=0;pass<3;pass++){
+   let nextBest=incumbent,choice=null;
+   for(const order of orders){
+    for(let i=0;i<order.length;i++)for(let j=i+1;j<order.length;j++){
+     [order[i],order[j]]=[order[j],order[i]];
+     const candidate=geometryCost(coordinates());
+     [order[i],order[j]]=[order[j],order[i]];
+     if(improves(candidate,nextBest)){nextBest=candidate;choice={order,i,j};}
+    }
+   }
+   if(!choice)break;
+   const {order,i,j}=choice;
+   [order[i],order[j]]=[order[j],order[i]];
+   incumbent=nextBest;
+  }
+  // IMPORTANT: switching two complete subtrees also moves their descendants,
+  // leaving some diagonal wire crossings unchanged. Swapping *only* the X slots
+  // of ancestors on the same row (Halo <-> Tony Bin) corrects those crossings
+  // while every generation/Y coordinate, board extent and card gap stays fixed.
+  const points=coordinates(),rows=new Map();
+  for(const id of state.placed){
+   const y=points[id].y;
+   if(!rows.has(y))rows.set(y,[]);
+   rows.get(y).push(id);
+  }
+  const rowGroups=[...rows.values()].filter(ids=>ids.length>1);
+  incumbent=geometryCost(points);
+  for(let pass=0;pass<5;pass++){
+   let nextBest=incumbent,choice=null;
+   for(const ids of rowGroups){
+    for(let i=0;i<ids.length;i++)for(let j=i+1;j<ids.length;j++){
+     const [a,b]=[ids[i],ids[j]];
+     [points[a].x,points[b].x]=[points[b].x,points[a].x];
+     const candidate=geometryCost(points);
+     [points[a].x,points[b].x]=[points[b].x,points[a].x];
+     if(improves(candidate,nextBest)){nextBest=candidate;choice=[a,b];}
+    }
+   }
+   if(!choice)break;
+   const [a,b]=choice;
+   [points[a].x,points[b].x]=[points[b].x,points[a].x];
+   incumbent=nextBest;
+   if(incumbent.crossings===0&&pass>=2)break;
+  }
+  return points;
+ }
  return coordinates();
 }
 function segment(network,a,b){if(!same(a,b))network.segments.push({a,b});}
