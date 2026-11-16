@@ -2,7 +2,7 @@
 const esc=value=>String(value??'').replace(/[&<>"']/g,x=>({
  '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
 })[x]);
-const HTTPS=/^https:\/\/(?:www\.)?(?:wikidata\.org|ja\.wikipedia\.org|en\.wikipedia\.org|www\.jra\.go\.jp|commons\.wikimedia\.org)\//;
+const HTTPS=/^https:\/\/(?:www\.wikidata\.org|ja\.wikipedia\.org|en\.wikipedia\.org|www\.jra\.go\.jp|jra\.jp|www\.jbis\.or\.jp|www\.jbis\.jp|prc\.jp|www\.breeders\.co\.jp|world\.jra-van\.jp|commons\.wikimedia\.org)\//;
 const IMAGE=/^https:\/\/(?:upload|thumb)\.wikimedia\.org\//;
 
 /** Return only source-checked, user-useful content. No parents/descendants. */
