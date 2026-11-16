@@ -1,16 +1,16 @@
 {
   "version": "horse-profiles-v1",
-  "retrievedAtUTC": "2026-11-16T04:01:28+00:00",
+  "retrievedAtUTC": "2026-11-16T04:05:42+00:00",
   "pedigreeVersion": "wikidata-pedigree-v1",
   "sourceMethod": "Wikidata P2522 qualified winner items, Wikipedia exintro explicitly marked principal wins / career record; JRA honor from existing fame snapshot. No copied article prose.",
   "coverage": {
     "named": 872,
     "articleLeads": 815,
-    "leadVictoryFacts": 231,
-    "withWins": 285,
-    "withProfileFacts": 307,
+    "leadVictoryFacts": 220,
+    "withWins": 274,
+    "withProfileFacts": 285,
     "wikidataVictoryQids": 85,
-    "withRaceRecord": 28,
+    "withRaceRecord": 15,
     "withDescription": 16
   },
   "horses": {
@@ -148,20 +148,10 @@
     },
     "Q105669284": {
       "name": "ジンギ",
-      "majorWins": [
-        {
-          "race": "菊花賞",
-          "year": null
-        }
-      ],
+      "majorWins": [],
       "raceRecord": null,
       "description": null,
-      "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%82%B8%E3%83%B3%E3%82%AE"
-        }
-      ]
+      "sources": []
     },
     "Q105669288": {
       "name": "サラキア",
@@ -531,32 +521,16 @@
     "Q11034408": {
       "name": "ユキチャン",
       "majorWins": [],
-      "raceRecord": {
-        "starts": 17,
-        "wins": 5
-      },
+      "raceRecord": null,
       "description": null,
-      "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%83%A6%E3%82%AD%E3%83%81%E3%83%A3%E3%83%B3"
-        }
-      ]
+      "sources": []
     },
     "Q1104636": {
       "name": "サドラーズウェルズ",
       "majorWins": [],
-      "raceRecord": {
-        "starts": 2,
-        "wins": 2
-      },
+      "raceRecord": null,
       "description": null,
-      "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%82%B5%E3%83%89%E3%83%A9%E3%83%BC%E3%82%BA%E3%82%A6%E3%82%A7%E3%83%AB%E3%82%BA"
-        }
-      ]
+      "sources": []
     },
     "Q1104649": {
       "name": "ミスタープロスペクター",
@@ -1465,20 +1439,10 @@
     },
     "Q11295179": {
       "name": "カルラネイチャー",
-      "majorWins": [
-        {
-          "race": "弥生賞",
-          "year": null
-        }
-      ],
+      "majorWins": [],
       "raceRecord": null,
       "description": null,
-      "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AB%E3%83%A9%E3%83%8D%E3%82%A4%E3%83%81%E3%83%A3%E3%83%BC"
-        }
-      ]
+      "sources": []
     },
     "Q11295262": {
       "name": "カレンチャン",
@@ -1769,17 +1733,9 @@
     "Q11304252": {
       "name": "サイレントネーム",
       "majorWins": [],
-      "raceRecord": {
-        "starts": 15,
-        "wins": 4
-      },
+      "raceRecord": null,
       "description": null,
-      "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%82%B5%E3%82%A4%E3%83%AC%E3%83%B3%E3%83%88%E3%83%8D%E3%83%BC%E3%83%A0"
-        }
-      ]
+      "sources": []
     },
     "Q11304254": {
       "name": "サイレントハピネス",
@@ -1801,10 +1757,6 @@
     "Q11304256": {
       "name": "サイレントハンター",
       "majorWins": [
-        {
-          "race": "大阪杯",
-          "year": null
-        },
         {
           "race": "中山金杯",
           "year": null
@@ -2389,17 +2341,9 @@
     "Q11312651": {
       "name": "スパイキュール",
       "majorWins": [],
-      "raceRecord": {
-        "starts": 7,
-        "wins": 7
-      },
+      "raceRecord": null,
       "description": null,
-      "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%82%B9%E3%83%91%E3%82%A4%E3%82%AD%E3%83%A5%E3%83%BC%E3%83%AB"
-        }
-      ]
+      "sources": []
     },
     "Q11312941": {
       "name": "スペシャルウィーク",
@@ -3037,20 +2981,10 @@
     },
     "Q11320185": {
       "name": "ディヴァインライト",
-      "majorWins": [
-        {
-          "race": "高松宮記念",
-          "year": null
-        }
-      ],
+      "majorWins": [],
       "raceRecord": null,
       "description": null,
-      "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%83%87%E3%82%A3%E3%83%B4%E3%82%A1%E3%82%A4%E3%83%B3%E3%83%A9%E3%82%A4%E3%83%88"
-        }
-      ]
+      "sources": []
     },
     "Q11320231": {
       "name": "ディープサイレンス",
@@ -3266,16 +3200,9 @@
           "year": 1999
         }
       ],
-      "raceRecord": {
-        "starts": 30,
-        "wins": 8
-      },
+      "raceRecord": null,
       "description": null,
       "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%83%8A%E3%83%AA%E3%82%BF%E3%83%88%E3%83%83%E3%83%97%E3%83%AD%E3%83%BC%E3%83%89"
-        },
         {
           "label": "Wikidata（優勝歴）",
           "url": "https://www.wikidata.org/wiki/Q11324060"
@@ -3511,17 +3438,9 @@
     "Q11330997": {
       "name": "ビリーヴ",
       "majorWins": [],
-      "raceRecord": {
-        "starts": 18,
-        "wins": 10
-      },
+      "raceRecord": null,
       "description": null,
-      "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%83%93%E3%83%AA%E3%83%BC%E3%83%B4_(%E7%AB%B6%E8%B5%B0%E9%A6%AC)"
-        }
-      ]
+      "sources": []
     },
     "Q11331054": {
       "name": "ビワタケヒデ",
@@ -3837,20 +3756,10 @@
     },
     "Q11338127": {
       "name": "ホワイトメロディー",
-      "majorWins": [
-        {
-          "race": "オークス",
-          "year": null
-        }
-      ],
+      "majorWins": [],
       "raceRecord": null,
       "description": null,
-      "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%83%9B%E3%83%AF%E3%82%A4%E3%83%88%E3%83%A1%E3%83%AD%E3%83%87%E3%82%A3%E3%83%BC"
-        }
-      ]
+      "sources": []
     },
     "Q11338810": {
       "name": "ボレアス",
@@ -3954,10 +3863,6 @@
       "majorWins": [
         {
           "race": "目黒記念",
-          "year": null
-        },
-        {
-          "race": "ダイヤモンドステークス",
           "year": null
         },
         {
@@ -4109,10 +4014,6 @@
     "Q11343349": {
       "name": "メイショウオウドウ",
       "majorWins": [
-        {
-          "race": "大阪杯",
-          "year": null
-        },
         {
           "race": "鳴尾記念",
           "year": null
@@ -4287,17 +4188,9 @@
     "Q11349325": {
       "name": "レイズアネイティヴ",
       "majorWins": [],
-      "raceRecord": {
-        "starts": 4,
-        "wins": 4
-      },
+      "raceRecord": null,
       "description": null,
-      "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%83%AC%E3%82%A4%E3%82%BA%E3%82%A2%E3%83%8D%E3%82%A4%E3%83%86%E3%82%A3%E3%83%B4"
-        }
-      ]
+      "sources": []
     },
     "Q11349398": {
       "name": "レインボーダリア",
@@ -4793,17 +4686,9 @@
     "Q114798197": {
       "name": "プリンセスオリビア",
       "majorWins": [],
-      "raceRecord": {
-        "starts": 24,
-        "wins": 3
-      },
+      "raceRecord": null,
       "description": null,
-      "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%83%97%E3%83%AA%E3%83%B3%E3%82%BB%E3%82%B9%E3%82%AA%E3%83%AA%E3%83%93%E3%82%A2"
-        }
-      ]
+      "sources": []
     },
     "Q114837014": {
       "name": "オーギュストロダン",
@@ -5318,20 +5203,10 @@
     },
     "Q123231703": {
       "name": "パシフィックプリンセス (競走馬)",
-      "majorWins": [
-        {
-          "race": "オークス",
-          "year": null
-        }
-      ],
+      "majorWins": [],
       "raceRecord": null,
       "description": null,
-      "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%83%91%E3%82%B7%E3%83%95%E3%82%A3%E3%83%83%E3%82%AF%E3%83%97%E3%83%AA%E3%83%B3%E3%82%BB%E3%82%B9_(%E7%AB%B6%E8%B5%B0%E9%A6%AC)"
-        }
-      ]
+      "sources": []
     },
     "Q123231710": {
       "name": "キャットクイル",
@@ -5342,20 +5217,10 @@
     },
     "Q123408047": {
       "name": "グリントオブホープ",
-      "majorWins": [
-        {
-          "race": "オークス",
-          "year": null
-        }
-      ],
+      "majorWins": [],
       "raceRecord": null,
       "description": null,
-      "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%82%B0%E3%83%AA%E3%83%B3%E3%83%88%E3%82%AA%E3%83%96%E3%83%9B%E3%83%BC%E3%83%97"
-        }
-      ]
+      "sources": []
     },
     "Q123408049": {
       "name": "ダストアンドダイヤモンズ",
@@ -5705,20 +5570,10 @@
     },
     "Q132434830": {
       "name": "タガノジンガロ",
-      "majorWins": [
-        {
-          "race": "菊花賞",
-          "year": null
-        }
-      ],
+      "majorWins": [],
       "raceRecord": null,
       "description": null,
-      "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%82%BF%E3%82%AC%E3%83%8E%E3%82%B8%E3%83%B3%E3%82%AC%E3%83%AD"
-        }
-      ]
+      "sources": []
     },
     "Q132434913": {
       "name": "トウカイミステリー",
@@ -5957,20 +5812,10 @@
     },
     "Q137708226": {
       "name": "サクラヴィクトリア",
-      "majorWins": [
-        {
-          "race": "オークス",
-          "year": null
-        }
-      ],
+      "majorWins": [],
       "raceRecord": null,
       "description": null,
-      "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%82%B5%E3%82%AF%E3%83%A9%E3%83%B4%E3%82%A3%E3%82%AF%E3%83%88%E3%83%AA%E3%82%A2"
-        }
-      ]
+      "sources": []
     },
     "Q137767359": {
       "name": "デビットバローズ",
@@ -6560,17 +6405,9 @@
     "Q141826162": {
       "name": "センリョウヤクシャ",
       "majorWins": [],
-      "raceRecord": {
-        "starts": 9,
-        "wins": 0
-      },
+      "raceRecord": null,
       "description": null,
-      "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%82%BB%E3%83%B3%E3%83%AA%E3%83%A7%E3%82%A6%E3%83%A4%E3%82%AF%E3%82%B7%E3%83%A3"
-        }
-      ]
+      "sources": []
     },
     "Q141826166": {
       "name": "セイリューオー",
@@ -6714,17 +6551,9 @@
     "Q17221841": {
       "name": "ウインデュエル",
       "majorWins": [],
-      "raceRecord": {
-        "starts": 10,
-        "wins": 8
-      },
+      "raceRecord": null,
       "description": null,
-      "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%82%A6%E3%82%A4%E3%83%B3%E3%83%87%E3%83%A5%E3%82%A8%E3%83%AB"
-        }
-      ]
+      "sources": []
     },
     "Q17222550": {
       "name": "ケイアイエレガント",
@@ -7382,10 +7211,6 @@
         {
           "race": "エリザベス女王杯",
           "year": null
-        },
-        {
-          "race": "大阪杯",
-          "year": null
         }
       ],
       "raceRecord": null,
@@ -7560,20 +7385,10 @@
     },
     "Q24866552": {
       "name": "アンビシャス",
-      "majorWins": [
-        {
-          "race": "大阪杯",
-          "year": null
-        }
-      ],
+      "majorWins": [],
       "raceRecord": null,
       "description": null,
-      "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%B3%E3%83%93%E3%82%B7%E3%83%A3%E3%82%B9_(%E7%AB%B6%E8%B5%B0%E9%A6%AC)"
-        }
-      ]
+      "sources": []
     },
     "Q24867067": {
       "name": "ディーマジェスティ",
@@ -7766,10 +7581,6 @@
       "name": "ダンシングブレーヴ",
       "majorWins": [
         {
-          "race": "ダイヤモンドステークス",
-          "year": null
-        },
-        {
           "race": "凱旋門賞",
           "year": null
         }
@@ -7863,17 +7674,9 @@
     "Q3269685": {
       "name": "リファール",
       "majorWins": [],
-      "raceRecord": {
-        "starts": 12,
-        "wins": 6
-      },
+      "raceRecord": null,
       "description": null,
-      "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%83%AA%E3%83%95%E3%82%A1%E3%83%BC%E3%83%AB"
-        }
-      ]
+      "sources": []
     },
     "Q3307189": {
       "name": "ニアークティック",
@@ -7922,16 +7725,9 @@
           "year": 2012
         }
       ],
-      "raceRecord": {
-        "starts": 8,
-        "wins": 6
-      },
+      "raceRecord": null,
       "description": null,
       "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%82%B4%E3%83%BC%E3%83%AB%E3%83%89%E3%82%B7%E3%83%83%E3%83%97"
-        },
         {
           "label": "Wikidata（優勝歴）",
           "url": "https://www.wikidata.org/wiki/Q4309285"
@@ -8472,20 +8268,10 @@
     },
     "Q53764512": {
       "name": "モシーン",
-      "majorWins": [
-        {
-          "race": "オークス",
-          "year": null
-        }
-      ],
+      "majorWins": [],
       "raceRecord": null,
       "description": null,
-      "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%83%A2%E3%82%B7%E3%83%BC%E3%83%B3"
-        }
-      ]
+      "sources": []
     },
     "Q53764526": {
       "name": "ジュールポレール",
@@ -8999,17 +8785,9 @@
     "Q6437279": {
       "name": "クリスエス",
       "majorWins": [],
-      "raceRecord": {
-        "starts": 5,
-        "wins": 3
-      },
+      "raceRecord": null,
       "description": null,
-      "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%82%AF%E3%83%AA%E3%82%B9%E3%82%A8%E3%82%B9"
-        }
-      ]
+      "sources": []
     },
     "Q64780095": {
       "name": "サイモンロード",
@@ -9966,20 +9744,10 @@
     },
     "Q96694884": {
       "name": "レーヌブランシュ",
-      "majorWins": [
-        {
-          "race": "オークス",
-          "year": null
-        }
-      ],
+      "majorWins": [],
       "raceRecord": null,
       "description": null,
-      "sources": [
-        {
-          "label": "Wikipedia（レース実績）",
-          "url": "https://ja.wikipedia.org/wiki/%E3%83%AC%E3%83%BC%E3%83%8C%E3%83%96%E3%83%A9%E3%83%B3%E3%82%B7%E3%83%A5"
-        }
-      ]
+      "sources": []
     },
     "Q97166633": {
       "name": "ファンシーブルー",
