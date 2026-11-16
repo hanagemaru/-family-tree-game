@@ -107,9 +107,9 @@ def wiki_infobox_facts(raw,language):
     """
     head=(raw or "")[:16000]
     if language=="ja":
-        record_match=re.search(r"(?m)^\\s*\\|\\s*績\\s*=\\s*(\\d{1,3})\\s*戦\\s*(\\d{1,3})\\s*勝",head)
+        record_match=re.search(r"(?m)^\s*\|\s*績\s*=\s*(\d{1,3})\s*戦\s*(\d{1,3})\s*勝",head)
     else:
-        record_match=re.search(r"(?mi)^\\s*\\|\\s*record\\s*=\\s*(\\d{1,3})\\s*:\\s*(\\d{1,3})\\s*[-–—:]\\s*\\d+",head)
+        record_match=re.search(r"(?mi)^\s*\|\s*record\s*=\s*(\d{1,3})\s*:\s*(\d{1,3})\s*[-–—:]\s*\d+",head)
     record=None
     if record_match:
         starts,wins=map(int,record_match.groups())
@@ -117,12 +117,12 @@ def wiki_infobox_facts(raw,language):
     medals=[]
     if language=="ja":
         # The dedicated MedalGI/GII/GIII templates identify a win, not a mere start.
-        pattern=r"\\{\\{Medal(?:GI|GII|GIII)\\s*\\|\\s*(\\[\\[[^\\]\\n]{2,100}\\]\\]|[^|{}\\n]{2,100})\\s*\\|\\s*([^{}\\n]{0,70})\\}\\}"
+        pattern=r"\{\{Medal(?:GI|GII|GIII)\s*\|\s*(\[\[[^\]\n]{2,100}\]\]|[^|{}\n]{2,100})\s*\|\s*([^{}\n]{0,70})\}\}"
         for match in re.finditer(pattern,head,re.I):
-            race=re.sub(r"\\[\\[([^\\]]+?)(?:\\|([^\\]]+))?\\]\\]",lambda m:m.group(2) or m.group(1),match[1])
+            race=re.sub(r"\[\[([^\]]+?)(?:\|([^\]]+))?\]\]",lambda m:m.group(2) or m.group(1),match[1])
             race=html.unescape(race).strip()
             if not race or len(race)>90 or re.search(r"[<>={}]",race):continue
-            year_match=re.search(r"(?:19|20)\\d{2}",match[2])
+            year_match=re.search(r"(?:19|20)\d{2}",match[2])
             year=int(year_match.group()) if year_match else None
             fact={"race":race,"year":year}
             if not any(x["race"]==race and x["year"]==year for x in medals):medals.append(fact)
