@@ -100,6 +100,35 @@ def wiki_lead(text):
         races=victories=None
     return wins,({"starts":races,"wins":victories} if races is not None else None)
 
+def wiki_infobox_facts(raw,language):
+    """Extract only explicit self-record and victory-medal fields from the article infobox.
+
+    Never search narrative race mentions: those can describe losses or relatives.
+    """
+    head=(raw or "")[:16000]
+    if language=="ja":
+        record_match=re.search(r"(?m)^\\s*\\|\\s*績\\s*=\\s*(\\d{1,3})\\s*戦\\s*(\\d{1,3})\\s*勝",head)
+    else:
+        record_match=re.search(r"(?mi)^\\s*\\|\\s*record\\s*=\\s*(\\d{1,3})\\s*:\\s*(\\d{1,3})\\s*[-–—:]\\s*\\d+",head)
+    record=None
+    if record_match:
+        starts,wins=map(int,record_match.groups())
+        if 0<=wins<=starts<=200:record={"starts":starts,"wins":wins}
+    medals=[]
+    if language=="ja":
+        # The dedicated MedalGI/GII/GIII templates identify a win, not a mere start.
+        pattern=r"\\{\\{Medal(?:GI|GII|GIII)\\s*\\|\\s*(\\[\\[[^\\]\\n]{2,100}\\]\\]|[^|{}\\n]{2,100})\\s*\\|\\s*([^{}\\n]{0,70})\\}\\}"
+        for match in re.finditer(pattern,head,re.I):
+            race=re.sub(r"\\[\\[([^\\]]+?)(?:\\|([^\\]]+))?\\]\\]",lambda m:m.group(2) or m.group(1),match[1])
+            race=html.unescape(race).strip()
+            if not race or len(race)>90 or re.search(r"[<>={}]",race):continue
+            year_match=re.search(r"(?:19|20)\\d{2}",match[2])
+            year=int(year_match.group()) if year_match else None
+            fact={"race":race,"year":year}
+            if not any(x["race"]==race and x["year"]==year for x in medals):medals.append(fact)
+            if len(medals)>=8:break
+    return record,medals
+
 def main():
     snapshot=json.loads(PEDIGREE.read_text("utf8"))
     fame=json.loads(FAME.read_text("utf8"))
@@ -215,6 +244,54 @@ def main():
         for src in fix["sources"]:
             if src["url"] not in {s["url"] for s in profile["sources"]}:
                 profile["sources"].append(src)
+    # A verified infobox field is higher precision than searching prose for wins.
+    # Only inspect sourced pages, with named article->QID mappings already held.
+    infoboxChecked=infoboxRecords=infoboxMedals=0
+    priority=sorted(named,key=lambda h:-(byFame.get(h["id"],{}).get("views12m") or 0))
+    needs={h["id"] for h in named if not (
+        profiles[h["id"]]["majorWins"] or profiles[h["id"]]["raceRecord"] or
+        profiles[h["id"]]["description"])}
+    # Also fill the race records of frequently seen horses lacking one.
+    needs.update(h["id"] for h in priority[:75] if not profiles[h["id"]]["raceRecord"])
+    for wiki,titleMap in wikiLookup.items():
+        targets={title:qid for title,qid in titleMap.items() if qid in needs}
+        for n,part in enumerate(batches(sorted(targets),5)):
+            try:
+                data=get(WIKIPEDIA[wiki],{
+                    "action":"query","prop":"revisions","rvprop":"content","rvslots":"main",
+                    "formatversion":"2","redirects":"1","titles":"|".join(part)
+                })
+                query=data.get("query",{})
+                normalized={x.get("from"):x.get("to") for x in query.get("normalized",[])}
+                redirects={x.get("from"):x.get("to") for x in query.get("redirects",[])}
+                pages={p.get("title"):p for p in query.get("pages",[])}
+                for title in part:
+                    canonical=redirects.get(normalized.get(title,title),normalized.get(title,title))
+                    page=pages.get(canonical) or pages.get(title)
+                    if not page or not page.get("revisions"):continue
+                    raw=page["revisions"][0].get("slots",{}).get("main",{}).get("content","")
+                    if not raw:continue
+                    infoboxChecked+=1
+                    record,medals=wiki_infobox_facts(raw,wiki)
+                    row=profiles[targets[title]]
+                    articleUrl=byFame.get(targets[title],{}).get("articleUrl","")
+                    if not articleUrl.startswith(("https://ja.wikipedia.org/wiki/","https://en.wikipedia.org/wiki/")):continue
+                    if record and row["raceRecord"] is None:
+                        row["raceRecord"]=record
+                        infoboxRecords+=1
+                    if medals and not row["majorWins"]:
+                        row["majorWins"]=medals[:8]
+                        infoboxMedals+=1
+                    if (record or medals) and articleUrl not in {x["url"] for x in row["sources"]}:
+                        row["sources"].append({"label":"Wikipedia（競走馬情報欄）","url":articleUrl})
+            except Exception as exc:
+                errors.append("Infobox "+wiki+" "+str(n)+": "+str(exc)[:140])
+            time.sleep(.1)
+    counters["wikiInfoboxChecked"]=infoboxChecked
+    counters["wikiInfoboxRecordsAdded"]=infoboxRecords
+    counters["wikiInfoboxMedalWinsAdded"]=infoboxMedals
+    if infoboxChecked<120:
+        raise RuntimeError("Wikipedia infobox audit incomplete: "+str(infoboxChecked))
     # The Japan Derby is also called Tokyo Yushun. Never list it twice.
     for profile in profiles.values():
         distinct=[]
@@ -241,7 +318,7 @@ def main():
     now=datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
     manifest={"version":"horse-profiles-v1","retrievedAtUTC":now,
       "pedigreeVersion":snapshot["version"],
-      "sourceMethod":"Wikidata P2522 victory claims, Wikipedia exintro explicitly stated wins/total career, editorial additions sourced from JRA/JBIS, JRA Hall flag from existing fame snapshot. No copied article prose.",
+      "sourceMethod":"Wikidata P2522 victory claims, Wikipedia exintro and explicit infobox race records / medal awards, JRA/JBIS editorial facts and Hall flag. No copied article prose.",
       "coverage":dict(counters),"horses":dict(sorted(profiles.items()))}
     OUTPUT.write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+"\n",encoding="utf8")
     top=sorted(named,key=lambda h:-(byFame.get(h["id"],{}).get("views12m") or 0))[:40]
@@ -254,6 +331,7 @@ def main():
       "- Wikipediaの文章はコピーせず、明示された「主な勝ち鞍」「通算戦績」から単独の事実としてのみ抽出",
       "- 勝った事実の記載がないレース名は記載しない。記事の一般的な説明文から戦績を推測しない",
       "- Wikidata優勝歴 P2522 がある場合は競走名の項目を直接照合",
+      "- Wikipedia競走馬記事の情報欄から『績＝NN戦NN勝』等の生涯成績・MedalGI/GII/GIIIの優勝歴のみ抽出（記事本文の出走・敗戦には触れない）",
       "- レース記録がない馬の項目は非表示。血統上の親子名をプロフィールに表示して未解決の答えを漏らさない",
       "- Wikidata P2522 とWikipedia間で同名レースの異なる年度がある場合は掲載前に別途照合が必要",
       "- 競走馬の顔写真は別途既存のCommonsライセンス監査済みJSONだけを参照",
