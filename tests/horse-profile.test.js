@@ -117,8 +117,16 @@ test('profile overlay hides close button and backdrop tap dismisses without affe
  assert.equal(modal.open,true);
  assert.equal(modal.classList.contains('horse-profile-dialog'),true);
  assert.ok(app.$('modal-close'),'the existing button remains for other dialogs');
+ // Tapping content (title, image or empty space) must dismiss without a close button.
+ const heading=app.$('modal-content').querySelector('.horse-profile-heading');
+ assert.ok(heading);
+ heading.click();
+ assert.equal(modal.open,false,'tapping inside the profile dismisses it');
+ assert.equal(modal.classList.contains('horse-profile-dialog'),false);
+ node.click({detail:0});
+ assert.equal(modal.open,true,'profile can be reopened');
  modal.fire('click',{target:modal,clientX:-10,clientY:-10});
- assert.equal(modal.open,false);
+ assert.equal(modal.open,false,'backdrop still dismisses the profile');
  assert.equal(modal.classList.contains('horse-profile-dialog'),false);
 });
 test('tapping a placed card opens profile, no penalty; selecting a hand card keeps the existing relation picker',async t=>{
