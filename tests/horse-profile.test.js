@@ -100,6 +100,19 @@ test('HTML labels, descriptions and remote URLs are escaped or rejected',()=>{
  assert.doesNotMatch(html,/https:\/\/www\.wikidata\.org\/wiki\/Q1/);
  assert.deepEqual(horseProfileSources({sources:[{label:'bad',url:'javascript:alert(1)'},{label:'Wikidata',url:'https://www.wikidata.org/wiki/Q1'}]}),[{label:'Wikidata',url:'https://www.wikidata.org/wiki/Q1'}]);
 });
+test('profile overlay hides close button and backdrop tap dismisses without affecting state',async t=>{
+ const app=await loadApp();t.after(()=>app.restore());
+ app.$('stage-list').querySelector('[data-random-start]').click();
+ const node=app.$('nodes').querySelector('[data-node]');
+ node.click({detail:0});
+ const modal=app.$('modal');
+ assert.equal(modal.open,true);
+ assert.equal(modal.classList.contains('horse-profile-dialog'),true);
+ assert.ok(app.$('modal-close'),'the existing button remains for other dialogs');
+ modal.fire('click',{target:modal,clientX:-10,clientY:-10});
+ assert.equal(modal.open,false);
+ assert.equal(modal.classList.contains('horse-profile-dialog'),false);
+});
 test('tapping a placed card opens profile, no penalty; selecting a hand card keeps the existing relation picker',async t=>{
  const app=await loadApp();t.after(()=>app.restore());
  app.$('stage-list').querySelector('[data-random-start]').click();
