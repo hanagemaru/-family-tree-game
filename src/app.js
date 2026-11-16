@@ -9,6 +9,8 @@ import {seededRandom,prepareHorseGraph,FAME_HORSE_GENERATOR_VERSION,EASIER_HORSE
 import {HORSE_DIFFICULTIES,prepareHorseFame} from './horse-fame.js';
 import {findCorrectPlacement,horsePlacementHint,completedAnswer} from './game-assistance.js';
 import {horseScore,useHorseHint,rankedHorseStage} from './horse-score.js';
+import {horseProfileHtml,horseProfileSources} from './horse-profile.js';
+import {pinchCamera} from './pinch-camera.js';
 import {playerIdentity,rankingName,saveRankingName,createRankedRun,loadRankings,submitRankedScore,updateRankingName,deleteRankingAccount} from './ranking-client.js';
 const $=id=>document.getElementById(id),storageKey='family-tree-game:v1';
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -16,12 +18,12 @@ let records={sessions:{},best:{}};
 try{const parsed=JSON.parse(localStorage.getItem(storageKey));if(parsed&&typeof parsed==='object')records={sessions:parsed.sessions||{},best:parsed.best||{},randomHorse:parsed.randomHorse||null,randomHorseByDifficulty:parsed.randomHorseByDifficulty||{},randomDifficulty:parsed.randomDifficulty||'normal',randomHorseLegacyEasy:parsed.randomHorseLegacyEasy||null,randomHorseLegacyByDifficulty:parsed.randomHorseLegacyByDifficulty||{},randomHorseLegacyV5ByDifficulty:parsed.randomHorseLegacyV5ByDifficulty||{},rankedRunTickets:parsed.rankedRunTickets||{}};}catch{}
 if(!records.randomHorseLegacyEasy&&records.randomHorseByDifficulty?.easy?.generatorVersion===FAME_HORSE_GENERATOR_VERSION)
  records.randomHorseLegacyEasy=records.randomHorseByDifficulty.easy;
-let horseSnapshot=null,fameSnapshot=null,randomHorse=null,randomHorseError='',randomHorseByDifficulty={},randomHorseLegacyEasy=null,randomHorseLegacyByDifficulty={},randomHorseLegacyV5ByDifficulty={},horsePhotos={};
+let horseSnapshot=null,fameSnapshot=null,randomHorse=null,randomHorseError='',randomHorseByDifficulty={},randomHorseLegacyEasy=null,randomHorseLegacyByDifficulty={},randomHorseLegacyV5ByDifficulty={},horsePhotos={},horseProfiles={};
 let selectedDifficulty=HORSE_DIFFICULTIES[records.randomDifficulty]?records.randomDifficulty:'normal';
 const onlineRankingEnabled=globalThis.location?.pathname?.startsWith('/games/horse-pedigree/play/')||false;
 if(onlineRankingEnabled){const link=document.querySelector('.hub-back');if(link){link.href='https://hanage.app/games/horse-pedigree/';link.textContent='ゲーム紹介へ戻る';}}
 let pendingRun=null,rankingError='';
-let state=null,selected=null,camera={x:0,y:0,scale:1},targetAnchor=null,hoverAnchor=null,drag=null,pan=null,frame=null,lastTick=performance.now(),lastSaved=0,diagram=null,lineFocus=null,lastLineDiagram=null,lastLineScale=null,lastLineFocus=null,dialogKind='info',dragPlacement=null;
+let state=null,selected=null,camera={x:0,y:0,scale:1},targetAnchor=null,hoverAnchor=null,drag=null,pan=null,frame=null,lastTick=performance.now(),lastSaved=0,diagram=null,lineFocus=null,lastLineDiagram=null,lastLineScale=null,lastLineFocus=null,dialogKind='info',dragPlacement=null,pinch=null,pinchFrame=0;
 const board=$('board'),modal=$('modal'),pointers=new Map();
 const person=id=>state.stage.people.find(p=>p.id===id);
 const isCurrentRankedStage=stage=>stage?.id?.includes(':'+CURRENT_HORSE_GENERATOR_VERSION+':')&&stage.people?.length===12;
@@ -86,41 +88,62 @@ function randomStageCard(){
 function renderHome(){
  $('stage-list').innerHTML=randomStageCard();
 }
-function openDialog(html,closeLabel='閉じる',kind='info'){dialogKind=kind;modal.classList.toggle('placement-dialog',kind==='relation'||kind==='anchor');$('modal-content').innerHTML=html;const heading=$('modal-content').querySelector('h2');if(heading)heading.id='dialog-title';$('modal-close').textContent=closeLabel;if(!modal.open)modal.showModal();const first=$('modal-content').querySelector('button');if(first)first.focus({preventScroll:true});lastTick=performance.now();}
+function openDialog(html,closeLabel='閉じる',kind='info'){dialogKind=kind;modal.classList.toggle('placement-dialog',kind==='relation'||kind==='anchor');modal.classList.toggle('horse-profile-dialog',kind==='horse-profile');$('modal-content').innerHTML=html;const heading=$('modal-content').querySelector('h2');if(heading)heading.id='dialog-title';$('modal-close').textContent=closeLabel;if(!modal.open)modal.showModal();const first=$('modal-content').querySelector('button');if(first)first.focus({preventScroll:true});else if(kind==='horse-profile')modal.focus({preventScroll:true});lastTick=performance.now();}
 function closeDialog(){modal.close();lastTick=performance.now();}
-modal.addEventListener('close',()=>{lastTick=performance.now();if(state)renderCaption();});
+modal.addEventListener('close',()=>{modal.classList.remove('horse-profile-dialog');lastTick=performance.now();if(state)renderCaption();});
 $('modal-close').addEventListener('click',closeDialog);
-// Tapping the dimmed area dismisses only the relation picker, exactly like Cancel.
-// Clicking the dialog's own padding must not dismiss it. Keep the hand selection
-// and do not create a placement action (therefore no mistake penalty).
+// The horse profile is read-only: tapping anywhere, including its contents, closes it.
+// Other dialogs retain their own controls; only the relation picker closes on the backdrop.
 modal.addEventListener('click',event=>{
- if(!modal.open||dialogKind!=='relation'||event.target!==modal)return;
+ if(!modal.open)return;
+ if(dialogKind==='horse-profile'){closeDialog();return;}
+ if(dialogKind!=='relation'||event.target!==modal)return;
  const bounds=modal.getBoundingClientRect();
  const outside=event.clientX<bounds.left||event.clientX>bounds.right||
   event.clientY<bounds.top||event.clientY>bounds.bottom;
  if(outside)closeDialog();
 });
-function help(){openDialog(`<p class="eyebrow">HOW TO PLAY</p><h2>手札を場につなぐ。</h2><ol><li>手札をタップし、場の相手をタップ。親・子・きょうだいなどを選ぶと配置します。</li><li>ドラッグ中は点線枠に位置マーカーを合わせ、少し止めて離すと直接配置できます。それ以外は関係を選ぶだけです。</li><li>同じ手札または盤面の余白をタップすると選択解除。ヒントは選択中の手札について表示されます。</li><li>相手が判別できないときは名前一覧から選べます。降参して答えを見る操作はメニュー内にあります。</li><li>●は実際の接続点、線の切れ目は非接続の交差。手札未選択で場のカードをタップすると関係線を強調します。</li><li>盤面をスワイプして移動。ピンチ、＋ / −で拡縮し、「全体」で見渡せます。</li><li>記録はプレイ時間にペナルティを加えた補正タイムです。ヒント +10秒、ミス +15秒、自動配置 +45秒。</li></ol><p class="scope">${state?escape(state.stage.scope):'進行はこのブラウザへ自動保存されます。'}</p>`);}
+function help(){openDialog(`<p class="eyebrow">HOW TO PLAY</p><h2>手札を場につなぐ。</h2><ol><li>手札をタップし、場の相手をタップ。親・子・きょうだいなどを選ぶと配置します。</li><li>ドラッグ中は点線枠に位置マーカーを合わせ、少し止めて離すと直接配置できます。それ以外は関係を選ぶだけです。</li><li>同じ手札または盤面の余白をタップすると選択解除。ヒントは選択中の手札について表示されます。</li><li>相手が判別できないときは名前一覧から選べます。降参して答えを見る操作はメニュー内にあります。</li><li>●は実際の接続点、線の切れ目は非接続の交差。手札を選んでいないときは、場のカードをタップしてその馬の実績を読めます。各馬の実績と写真の出典は、メニューの「題材・出典」にまとめています。</li><li>盤面をスワイプして移動。ピンチ、＋ / −で拡縮し、「全体」で見渡せます。</li><li>記録はプレイ時間にペナルティを加えた補正タイムです。ヒント +10秒、ミス +15秒、自動配置 +45秒。</li></ol><p class="scope">${state?escape(state.stage.scope):'進行はこのブラウザへ自動保存されます。'}</p>`);}
 $('help-button').addEventListener('click',help);
 $('home-menu-button').addEventListener('click',()=>openDialog('<h2>メニュー</h2><div class="home-menu-actions"><button type="button" class="button secondary" data-action="help">遊び方</button><a class="button secondary" href="https://hanage.app/games/horse-pedigree/">ゲーム紹介へ戻る</a><button type="button" class="button secondary" data-action="sources">題材・出典</button></div>'));
 function showSources(){
  const list=state?[state.stage]:randomHorseByDifficulty[selectedDifficulty]?[randomHorseByDifficulty[selectedDifficulty].stage]:[];
  const stagesHtml=list.map(stage=>{
-  const references=[...new Map([...stage.sources,...stage.people.map(p=>p.source)].filter(Boolean).map(s=>[s.url,s])).values()];
-  const photos=stage.people.map(p=>({p,photo:horsePhotos[p.id]})).filter(x=>x.photo);
-  const photoCredits=photos.length?'<h3>カード写真・著作者・ライセンス</h3><ul class="photo-credits">'+photos.map(({p,photo})=>{
+  // Horse sources are public by publisher here; specific citations for unrevealed
+  // cards must never be included in stage-level references.
+  const references=isHorseStage(stage)?[
+   {label:'JRA（競走馬情報）',url:'https://www.jra.go.jp/'},
+   {label:'JBISサーチ（競走成績）',url:'https://www.jbis.or.jp/'},
+   {label:'Wikidata',url:'https://www.wikidata.org/'},
+   {label:'Wikipedia',url:'https://ja.wikipedia.org/'}
+  ]:[...new Map([...stage.sources,...stage.people.map(p=>p.source)].filter(Boolean).map(s=>[s.url,s])).values()];
+  // Do not reveal horses still hidden in the stock by listing their credits.
+  const visible=state?.stage.id===stage.id?new Set([...state.placed,...state.hand]):new Set();
+  const placed=state?.stage.id===stage.id?new Set(state.placed):new Set();
+  const profileEntries=stage.people.filter(p=>placed.has(p.id)).map(p=>{
+   const links=horseProfileSources(horseProfiles[p.id],p.source?.url);
+   if(!links.length)return '';
+   return '<li><strong>'+escape(p.name)+'</strong>：'+links.map(src=>
+    '<a href="'+escape(src.url)+'" target="_blank" rel="noopener noreferrer">'+escape(src.label)+'</a>').join(' ／ ')+'</li>';
+  }).filter(Boolean);
+  const profileCredits=profileEntries.length?
+   '<h3>配置済みの馬のプロフィール資料</h3><ul class="profile-credits">'+profileEntries.join('')+'</ul>':'';
+  const photos=stage.people.map(p=>({p,photo:horsePhotos[p.id]})).filter(x=>visible.has(x.p.id)&&x.photo);
+  const photoCredits=photos.length?'<h3>表示中のカード写真・著作者・ライセンス</h3><ul class="photo-credits">'+photos.map(({p,photo})=>{
    const filePage=photo.filePage?.startsWith('https://commons.wikimedia.org/')?photo.filePage:'https://commons.wikimedia.org/';
    const licenseUrl=photo.licenseUrl?.startsWith('https://')?photo.licenseUrl:filePage;
    return '<li><strong>'+escape(p.name)+'</strong>：'+escape(photo.artist||'著作者不詳')+
     ' ／ <a href="'+escape(filePage)+'" target="_blank" rel="noopener noreferrer">元画像</a>'+
-    ' ／ <a href="'+escape(licenseUrl)+'" target="_blank" rel="noopener noreferrer">'+escape(photo.license)+'</a>'+
-    ' （カード表示では画像の一部を切り抜いて表示）</li>';
-  }).join('')+'</ul>':'<p>この問題のカードは、撮影写真の代わりにイラストを使用しています。</p>';
+    ' ／ <a href="'+escape(licenseUrl)+'" target="_blank" rel="noopener noreferrer">'+escape(photo.license||'ライセンス情報')+'</a>'+
+    ' （カード・プロフィールでは画像の一部を切り抜いて表示）</li>';
+  }).join('')+'</ul>':'';
   return '<h3>'+escape(stage.title)+'</h3><p>'+escape(stage.description)+'</p><p class="scope">'+escape(stage.scope)+
-    '</p><ul>'+references.map(s=>'<li><a href="'+escape(s.url)+'" target="_blank" rel="noopener noreferrer">'+escape(s.label)+'</a></li>').join('')+
-    '</ul>'+photoCredits;
+   '</p><ul>'+references.map(s=>'<li><a href="'+escape(s.url)+'" target="_blank" rel="noopener noreferrer">'+escape(s.label)+'</a></li>').join('')+
+   '</ul>'+profileCredits+photoCredits;
  }).join('');
- openDialog('<p class="eyebrow">DATA & IMAGE CREDITS</p><h2>題材・出典</h2>'+stagesHtml+
+ openDialog('<p class="eyebrow">DATA & IMAGE CREDITS</p><h2>題材・出典</h2>'+
+ '<p class="scope">競走成績・勝ち鞍・紹介文はJRA、JBISサーチ、Wikidata、Wikipedia等の資料で照合しています。個別資料と写真のクレジットは、ゲーム中に表示した馬について下に掲載します。</p>'+
+ stagesHtml+
  '<p class="scope">生年はWikidataとJBIS等で照合。<a href="https://github.com/hanagemaru/-family-tree-game/blob/main/data/source/horse-birth-enrichment-2026-11-15.json" target="_blank" rel="noopener noreferrer">生年補完の出典</a>。写真のない馬はイラストを表示します。</p>');
 }
 $('sources-button').addEventListener('click',showSources);
@@ -179,7 +202,7 @@ function start(stage,fresh=false){
  $('game-screen').classList.remove('inspect-mode');board.classList.remove('expanded');$('board-expand').textContent='広く';$('board-expand').setAttribute('aria-pressed','false');$('home-screen').hidden=true;$('game-screen').hidden=false;document.body.classList.add('playing');$('stage-category').textContent=stage.category;$('stage-title').textContent=stage.title;hoverAnchor=null;
  document.body.dataset.stage=stage.id;render();fit(false);previousWidth=board.clientWidth;previousHeight=board.clientHeight;lastTick=performance.now();say('');persist();window.scrollTo({top:0,behavior:'instant'});
 }
-function goHome(){persist();cancelDrag();pointers.clear();pan=null;state=null;selected=null;clearTargets();$('game-screen').hidden=true;$('home-screen').hidden=false;document.body.classList.remove('playing');renderHome();closeDialog();}
+function goHome(){persist();cancelDrag();finishPinch();pointers.clear();pan=null;state=null;selected=null;clearTargets();$('game-screen').hidden=true;$('home-screen').hidden=false;document.body.classList.remove('playing');renderHome();closeDialog();}
 function confirmAnswer(){openDialog('<h2>答えを見て終了しますか？</h2><p>残りのカードを正しい関係で配置し、完成図を表示します。通常のクリア記録には含まれません。</p><button class="button" data-action="give-up">答えを表示する</button>','プレイを続ける');}
 function menu(){if(!state){goHome();return;}const random=isRandomHorseStage(state.stage);openDialog(`<p class="eyebrow">${state.stage.category}</p><h2>${state.stage.title}</h2>${random?`<p class="random-seed">問題ID <code>${escape(randomDescriptorForStage(state.stage)?.seed||'')}</code></p>`:''}<p>進行は自動保存されています。</p><button class="button secondary" data-action="help">遊び方</button><button class="button secondary" data-action="sources">題材・出典</button><button class="button" data-action="home">ステージ選択へ</button><button class="button secondary" data-action="restart-confirm">${random?'同じ問題を最初から':'最初からやり直す'}</button>${random?'<button class="button secondary" data-action="random-retry-confirm">別の問題に挑戦</button>':''}${selected&&!state.complete?'<button class="button secondary" data-action="anchor-list">相手を一覧から選ぶ</button>':''}<button class="button secondary" data-action="board-expand">${board.classList.contains('expanded')?'盤面を元に戻す':'盤面を広く表示'}</button>${!state.complete?'<button class="button secondary" data-action="give-up-confirm">諦めて答えを見る</button>':''}${state.complete?`<button class="button secondary" data-action="result">${state.gaveUp?'答えの系譜を見る':'完成記録を見る'}</button>`:''}`);}
 $('menu-button').addEventListener('click',menu);$('home-button').addEventListener('click',()=>state?menu():goHome());
@@ -327,7 +350,7 @@ function completeGame(){
  persist();results();
 }
 // No voluntary hand exchange: playable cards are guaranteed by core.deal/ensurePlayable.
-function updateTransform(animate=false){board.classList.toggle('overview',camera.scale<.68);$('world').classList.toggle('following',animate);$('world').style.transform=`translate(${camera.x}px,${camera.y}px) scale(${camera.scale})`;renderLines();}
+function updateTransform(animate=false,refreshLines=true){board.classList.toggle('overview',camera.scale<.68);$('world').classList.toggle('following',animate);$('world').style.transform=`translate(${camera.x}px,${camera.y}px) scale(${camera.scale})`;if(refreshLines)renderLines();}
 function fit(animate=true){if(!state||board.clientWidth<=0||board.clientHeight<=0)return;camera=fitCamera(state.positions,board.clientWidth,board.clientHeight);updateTransform(animate);}
 $('fit-button').addEventListener('click',fit);
 function toggleBoardExpand(){const expanded=board.classList.toggle('expanded');$('game-screen').classList.toggle('inspect-mode',expanded);$('board-expand').textContent=expanded?'戻す':'広く';$('board-expand').setAttribute('aria-pressed',String(expanded));previousWidth=board.clientWidth;previousHeight=board.clientHeight;fit();}
@@ -382,6 +405,14 @@ function updateDragPreview(point){
  if(ready&&!wasArmed){
   say(`${relationName(hit.relation)}として配置できます。指を離してください。`);
  }
+}
+function showPlacedHorseProfile(id){
+ if(!state?.placed.includes(id)||selected)return;
+ if(!isHorseStage(state.stage)){focusLines(id);return;}
+ const horse=person(id),info=horseProfiles[id],photo=horsePhotos[id];
+ const articleUrl=fameSnapshot?.horses?.find(h=>h.id===id)?.articleUrl;
+ openDialog(horseProfileHtml(horse,{profile:info,photo,articleUrl,
+  sexLabel:horseSexLabel(horse.sex||horseSex(id))}),'閉じる','horse-profile');
 }
 function chooseRelations(id){
  if(!selected||!state.hand.includes(selected)||!state.placed.includes(id))return;
@@ -523,16 +554,51 @@ $('hand').addEventListener('click',e=>{
  const button=e.target.closest('[data-card]');
  if(button){if(selected===button.dataset.card)clearSelection();else selectCard(button.dataset.card);}
 });
+// Anchor two-finger movement to one starting snapshot, without per-event drift.
+function beginPinch(){
+ if(pointers.size!==2){pinch=null;return;}
+ pinch={camera:{...camera},fingers:new Map([...pointers].map(([id,p])=>[id,{...p}])),rect:board.getBoundingClientRect()};
+ if(pan)pan.moved=true;
+}
+function drawPinch(){
+ if(pointers.size!==2||!pinch)return;
+ const ids=[...pinch.fingers.keys()];
+ const a=pinch.fingers.get(ids[0]),b=pinch.fingers.get(ids[1]);
+ const currentA=pointers.get(ids[0]),currentB=pointers.get(ids[1]);
+ if(!currentA||!currentB)return;
+ const r=pinch.rect,local=p=>({x:p.x-r.left,y:p.y-r.top});
+ camera=pinchCamera(pinch.camera,local(a),local(b),local(currentA),local(currentB));
+ // Do not rebuild the (potentially expensive) SVG network every pointer event.
+ updateTransform(false,false);
+}
+function schedulePinch(){
+ if(pinchFrame)return;
+ pinchFrame=requestAnimationFrame(()=>{pinchFrame=0;drawPinch();});
+}
+function finishPinch(){
+ if(pinchFrame){cancelAnimationFrame(pinchFrame);pinchFrame=0;drawPinch();}
+ pinch=null;
+ if(state)updateTransform();
+}
 board.addEventListener('pointerdown',e=>{
- if(drag||modal.open||e.button!==0||e.target.closest('.board-tools'))return;e.preventDefault();board.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
- if(pointers.size===1)pan={id:e.pointerId,x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,node:e.target.closest('[data-node]')?.dataset.node,moved:false};else if(pan)pan.moved=true;
+ if(drag||modal.open||e.button!==0||e.target.closest('.board-tools'))return;
+ e.preventDefault();board.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(pointers.size===1){
+  pan={id:e.pointerId,x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,node:e.target.closest('[data-node]')?.dataset.node,moved:false};
+ }else if(pointers.size===2)beginPinch();
+ else finishPinch();
 });
 window.addEventListener('pointermove',e=>{
  if(drag&&e.pointerId===drag.pointerId){drag.x=e.clientX;drag.y=e.clientY;if(!drag.active&&Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)>6){drag.active=true;$('drag-ghost').innerHTML=cardFace(drag.id);$('drag-ghost').classList.toggle('horse',isHorseStage(state.stage));for(const cls of ['sex-male','sex-female','sex-gelding','sex-unknown'])$('drag-ghost').classList.toggle(cls,sexTone(drag.id)===cls);$('drag-ghost').hidden=false;document.body.classList.add('drag-active');$('hand').querySelector(`[data-card="${drag.id}"]`)?.classList.add('dragging');frame=requestAnimationFrame(autoPan);}
  if(drag.active){$('hint-button').hidden=true;$('hint-box').hidden=true;const point=dragHotspot(e.clientX,e.clientY);$('drag-ghost').style.left=`${point.x}px`;$('drag-ghost').style.top=`${point.y}px`;hoverAt(point.x,point.y);}return;}
- if(!pointers.has(e.pointerId))return;const old=[...pointers.values()];pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});const next=[...pointers.values()];
- if(pointers.size===2){const oldMid={x:(old[0].x+old[1].x)/2,y:(old[0].y+old[1].y)/2},mid={x:(next[0].x+next[1].x)/2,y:(next[0].y+next[1].y)/2},d1=Math.hypot(old[0].x-old[1].x,old[0].y-old[1].y),d2=Math.hypot(next[0].x-next[1].x,next[0].y-next[1].y),r=board.getBoundingClientRect();if(d1>2)zoomAt(d2/d1,oldMid.x-r.left,oldMid.y-r.top);camera.x+=mid.x-oldMid.x;camera.y+=mid.y-oldMid.y;updateTransform();if(pan)pan.moved=true;
- }else if(pan&&pan.id===e.pointerId){if(Math.hypot(e.clientX-pan.startX,e.clientY-pan.startY)>5)pan.moved=true;if(pan.moved){camera.x+=e.clientX-pan.x;camera.y+=e.clientY-pan.y;clearTargets();updateTransform();}pan.x=e.clientX;pan.y=e.clientY;}
+ if(!pointers.has(e.pointerId))return;
+ pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(pointers.size===2){schedulePinch();
+ }else if(pointers.size===1&&pan&&pan.id===e.pointerId){
+  if(Math.hypot(e.clientX-pan.startX,e.clientY-pan.startY)>5)pan.moved=true;
+  if(pan.moved){camera.x+=e.clientX-pan.x;camera.y+=e.clientY-pan.y;clearTargets();updateTransform();}
+  pan.x=e.clientX;pan.y=e.clientY;
+ }
 });
 function autoPan(){if(!drag?.active)return;const hotspot=dragHotspot(drag.x,drag.y),p=pointOnBoard(hotspot.x,hotspot.y);if(p.inside){if(!dragPlacement?.overSlot){const dx=p.x<28?3:p.x>board.clientWidth-28?-3:0,dy=p.y<34?3:p.y>board.clientHeight-34?-3:0;if(dx||dy){camera.x+=dx;camera.y+=dy;updateTransform();}}hoverAt(hotspot.x,hotspot.y);}frame=requestAnimationFrame(autoPan);}
 function cancelDrag(){if(frame)cancelAnimationFrame(frame);frame=null;if(drag){try{if($('app').hasPointerCapture(drag.pointerId))$('app').releasePointerCapture(drag.pointerId);}catch{}}drag=null;hoverAnchor=null;clearDragPreview();$('drag-ghost').hidden=true;$('drag-ghost').classList.remove('in-board');document.body.classList.remove('drag-active');$('hand').querySelectorAll('.dragging').forEach(b=>b.classList.remove('dragging'));paintTarget();if(state){renderCaption();renderSelection();renderHint();}}
@@ -555,26 +621,42 @@ window.addEventListener('pointerup',e=>{
  if(near&&camera.scale>=.55){chooseRelations(near);return;}
  say('場のカードに重ねると、相手を指定できます。');
  return;}
- if(!pointers.has(e.pointerId))return;pointers.delete(e.pointerId);if(pan&&pan.id===e.pointerId&&!pan.moved){if(selected){const point=pointOnBoard(e.clientX,e.clientY),id=pan.node||pickDropCard(point,screenNodes(state.positions,camera));if(id)chooseRelations(id);else clearSelection();}else if(pan.node)focusLines(pan.node);}
- if(pointers.size===1){const [id,p]=[...pointers.entries()][0];pan={id,x:p.x,y:p.y,startX:p.x,startY:p.y,moved:true};}else pan=null;
+ if(!pointers.has(e.pointerId))return;
+ const wasPinching=!!pinch;
+ if(wasPinching){pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});finishPinch();}
+ pointers.delete(e.pointerId);
+ if(!wasPinching&&pan&&pan.id===e.pointerId&&!pan.moved){
+  if(selected){const point=pointOnBoard(e.clientX,e.clientY),id=pan.node||pickDropCard(point,screenNodes(state.positions,camera));if(id)chooseRelations(id);else clearSelection();}
+  else if(pan.node)showPlacedHorseProfile(pan.node);
+ }
+ if(pointers.size===2){beginPinch();pan=null;}
+ else if(pointers.size===1){const [id,p]=[...pointers.entries()][0];pan={id,x:p.x,y:p.y,startX:p.x,startY:p.y,moved:true};}
+ else pan=null;
 });
-window.addEventListener('pointercancel',e=>{if(drag?.pointerId===e.pointerId){cancelDrag();clearTargets();}pointers.delete(e.pointerId);pan=null;});
-window.addEventListener('blur',()=>{cancelDrag();pointers.clear();pan=null;if(!(modal.open&&dialogKind==='relation'))clearTargets();persist();lastTick=performance.now();});
-$('nodes').addEventListener('click',e=>{if(e.detail!==0)return;const node=e.target.closest('[data-node]');if(node){if(selected)chooseRelations(node.dataset.node);else focusLines(node.dataset.node);}});
+window.addEventListener('pointercancel',e=>{
+ if(drag?.pointerId===e.pointerId){cancelDrag();clearTargets();}
+ if(pinch)finishPinch();
+ pointers.delete(e.pointerId);pan=null;
+ if(pointers.size===2)beginPinch();
+});
+window.addEventListener('blur',()=>{cancelDrag();finishPinch();pointers.clear();pan=null;if(!(modal.open&&dialogKind==='relation'))clearTargets();persist();lastTick=performance.now();});
+$('nodes').addEventListener('click',e=>{if(e.detail!==0)return;const node=e.target.closest('[data-node]');if(node){if(selected)chooseRelations(node.dataset.node);else showPlacedHorseProfile(node.dataset.node);}});
 window.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.open&&state){cancelDrag();clearSelection();}});
 let previousWidth=0,previousHeight=0;
 new ResizeObserver(()=>{if(!state||!board.clientWidth||!board.clientHeight)return;if(!previousWidth||!previousHeight||camera.scale<=0){previousWidth=board.clientWidth;previousHeight=board.clientHeight;fit(false);return;}camera.x+=(board.clientWidth-previousWidth)/2;camera.y+=(board.clientHeight-previousHeight)/2;previousWidth=board.clientWidth;previousHeight=board.clientHeight;updateTransform();positionHintButton();}).observe(board);
-setInterval(()=>{const now=performance.now(),playingSheet=dialogKind==='relation'||dialogKind==='anchor';if(state&&!state.complete&&!document.hidden&&(!modal.open||playingSheet)){state.elapsed+=Math.max(0,Math.min(now-lastTick,1500));$('timer').textContent=formatTime(state.elapsed);$('score-timer').textContent=formatTime(horseScore(state).totalMs);if(now-lastSaved>10000){persist();lastSaved=now;}}lastTick=now;},500);
-document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelDrag();pointers.clear();pan=null;persist();}lastTick=performance.now();});window.addEventListener('pagehide',persist);
+setInterval(()=>{const now=performance.now(),playingSheet=dialogKind==='relation'||dialogKind==='anchor'||dialogKind==='horse-profile';if(state&&!state.complete&&!document.hidden&&(!modal.open||playingSheet)){state.elapsed+=Math.max(0,Math.min(now-lastTick,1500));$('timer').textContent=formatTime(state.elapsed);$('score-timer').textContent=formatTime(horseScore(state).totalMs);if(now-lastSaved>10000){persist();lastSaved=now;}}lastTick=now;},500);
+document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelDrag();finishPinch();pointers.clear();pan=null;persist();}lastTick=performance.now();});window.addEventListener('pagehide',persist);
 document.addEventListener('error',event=>{
  if(event.target?.matches?.('img.horse-photo'))event.target.hidden=true;
 },true);
 renderHome();
 const readGameJSON=async path=>{const response=await fetch(path);if(!response.ok)throw Error('Failed to load '+path);return response.json();};
 void Promise.all([readGameJSON('./data/horse-pedigree.v1.json'),readGameJSON('./data/horse-fame-2026-10.v1.json'),
- readGameJSON('./data/horse-media.v1.json').catch(error=>{console.warn('Horse card photos unavailable, using illustrations',error);return {horses:{}};})
-]).then(([snapshot,fame,media])=>{
+ readGameJSON('./data/horse-media.v1.json').catch(error=>{console.warn('Horse card photos unavailable, using illustrations',error);return {horses:{}};}),
+ readGameJSON('./data/horse-profiles.v1.json').catch(error=>{console.warn('Horse profiles unavailable, falling back to birth year',error);return {horses:{}};})
+]).then(([snapshot,fame,media,profiles])=>{
  horsePhotos=media?.horses||{};
+ horseProfiles=profiles?.horses||{};
  // Validate that these scores belong to this exact pedigree data version.
  prepareHorseFame(snapshot,fame,prepareHorseGraph(snapshot));
  horseSnapshot=snapshot;fameSnapshot=fame;

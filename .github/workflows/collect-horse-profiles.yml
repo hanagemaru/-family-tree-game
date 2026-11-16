@@ -1,0 +1,65 @@
+name: Collect sourced horse biographies (872 named horses)
+on:
+  push:
+    branches: ['feature/horse-card-profiles-20261116']
+    paths:
+      - '.github/workflows/collect-horse-profiles.yml'
+      - 'scripts/collect_horse_profiles.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: collect-horse-profiles-development
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Sync latest research branch before generating data
+        run: |
+          git fetch origin feature/horse-card-profiles-20261116
+          git checkout -B feature/horse-card-profiles-20261116 origin/feature/horse-card-profiles-20261116
+      - name: Validate infobox parsing against explicit and adversarial samples
+        run: python3 tests/test_horse_infobox.py
+      - name: Audit all 872 QIDs via Wikidata and Wikipedia (explicit wins only)
+        run: python3 scripts/collect_horse_profiles.py
+      - name: Validate profile manifest integrity
+        run: |
+          python3 - <<'PY'
+          import json
+          h=json.load(open('data/horse-pedigree.v1.json'))
+          m=json.load(open('data/horse-profiles.v1.json'))
+          actual={x['id'] for x in h['horses'] if x['named']}
+          assert len(actual)==872 and set(m['horses'])==actual
+          for qid,p in m['horses'].items():
+            assert isinstance(p['majorWins'],list)
+            assert len(p['majorWins'])<=8
+            assert not p['majorWins'] or p['sources']
+            for fact in p['majorWins']:
+              assert isinstance(fact['race'],str) and 2<=len(fact['race'])<=90
+          print('PROFILE_MANIFEST_INTEGRITY_OK',len(actual),m['coverage'])
+          PY
+      - name: Commit evidence-linked profile data (never auto-publish production)
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/horse-profiles.v1.json docs/horse-profile-audit-2026-11-16.md
+          if ! git diff --cached --quiet; then
+            git commit -m 'data: 872-horse sourced race facts and collection coverage audit'
+            git fetch origin feature/horse-card-profiles-20261116
+            git rebase origin/feature/horse-card-profiles-20261116
+            git push origin HEAD:feature/horse-card-profiles-20261116
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: horse-profile-evidence
+          path: |
+            data/horse-profiles.v1.json
+            docs/horse-profile-audit-2026-11-16.md
+          if-no-files-found: warn
