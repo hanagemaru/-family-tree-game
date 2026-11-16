@@ -92,11 +92,12 @@ function openDialog(html,closeLabel='閉じる',kind='info'){dialogKind=kind;mod
 function closeDialog(){modal.close();lastTick=performance.now();}
 modal.addEventListener('close',()=>{modal.classList.remove('horse-profile-dialog');lastTick=performance.now();if(state)renderCaption();});
 $('modal-close').addEventListener('click',closeDialog);
-// Tapping the dimmed area dismisses only the relation picker, exactly like Cancel.
-// Clicking the dialog's own padding must not dismiss it. Keep the hand selection
-// and do not create a placement action (therefore no mistake penalty).
+// The horse profile is read-only: tapping anywhere, including its contents, closes it.
+// Other dialogs retain their own controls; only the relation picker closes on the backdrop.
 modal.addEventListener('click',event=>{
- if(!modal.open||!['relation','horse-profile'].includes(dialogKind)||event.target!==modal)return;
+ if(!modal.open)return;
+ if(dialogKind==='horse-profile'){closeDialog();return;}
+ if(dialogKind!=='relation'||event.target!==modal)return;
  const bounds=modal.getBoundingClientRect();
  const outside=event.clientX<bounds.left||event.clientX>bounds.right||
   event.clientY<bounds.top||event.clientY>bounds.bottom;
