@@ -13,6 +13,7 @@ PEDIGREE=ROOT/"data/horse-pedigree.v1.json"
 FAME=ROOT/"data/horse-fame-2026-10.v1.json"
 OUTPUT=ROOT/"data/horse-profiles.v1.json"
 REPORT=ROOT/"docs/horse-profile-audit-2026-11-16.md"
+EDITORIAL=ROOT/"data/source/horse-profile-editorial-2026-11-16.json"
 UA="HanageHorseProfileCollector/0.1 (https://github.com/hanagemaru/-family-tree-game)"
 WIKIDATA="https://www.wikidata.org/w/api.php"
 WIKIPEDIA={"ja":"https://ja.wikipedia.org/w/api.php","en":"https://en.wikipedia.org/w/api.php"}
@@ -192,10 +193,36 @@ def main():
         if record:counters["withRaceRecord"]+=1
         if description:counters["withDescription"]+=1
         if wins or record or description:counters["withProfileFacts"]+=1
+    # A small editorial pass improves important horses such as Sunday Silence,
+    # Stay Gold and Wind in Her Hair, which have poor lead/Wikidata coverage.
+    # Each fact is explicitly backed by its own source; no hidden parentage.
+    editorial=json.loads(EDITORIAL.read_text("utf8"))["horses"]
+    namedIds={horse["id"] for horse in named}
+    for qid,fix in editorial.items():
+        if qid not in namedIds:raise ValueError("Unknown editorial horse QID: "+qid)
+        profile=profiles[qid]
+        if fix.get("description"):profile["description"]=fix["description"]
+        known={w["race"] for w in profile["majorWins"]}
+        for w in fix.get("majorWins",[]):
+            if w["race"] not in known:
+                profile["majorWins"].append(w)
+                known.add(w["race"])
+        profile["majorWins"]=profile["majorWins"][:8]
+        if fix.get("raceRecord"):profile["raceRecord"]=fix["raceRecord"]
+        for src in fix["sources"]:
+            if src["url"] not in {s["url"] for s in profile["sources"]}:
+                profile["sources"].append(src)
+    for key,check in [
+        ("withWins",lambda p:bool(p["majorWins"])),
+        ("withRaceRecord",lambda p:bool(p["raceRecord"])),
+        ("withDescription",lambda p:bool(p["description"])),
+        ("withProfileFacts",lambda p:bool(p["majorWins"] or p["raceRecord"] or p["description"])),
+    ]:counters[key]=sum(bool(check(p)) for p in profiles.values())
+    counters["editoriallyCorroborated"]=len(editorial)
     now=datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
     manifest={"version":"horse-profiles-v1","retrievedAtUTC":now,
       "pedigreeVersion":snapshot["version"],
-      "sourceMethod":"Wikidata P2522 qualified winner items, Wikipedia exintro explicitly marked principal wins / career record; JRA honor from existing fame snapshot. No copied article prose.",
+      "sourceMethod":"Wikidata P2522 victory claims, Wikipedia exintro explicitly stated wins/total career, editorial additions sourced from JRA/JBIS, JRA Hall flag from existing fame snapshot. No copied article prose.",
       "coverage":dict(counters),"horses":dict(sorted(profiles.items()))}
     OUTPUT.write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+"\n",encoding="utf8")
     top=sorted(named,key=lambda h:-(byFame.get(h["id"],{}).get("views12m") or 0))[:40]
