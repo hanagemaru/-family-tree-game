@@ -20,23 +20,23 @@ export function horseProfileHtml(horse,{profile,photo,articleUrl,sexLabel}={}){
    (description?'<p class="horse-profile-description">'+esc(description)+'</p>':'')+'</div>';
  const picture=photo&&IMAGE.test(photo.photoUrl||'')?
   '<img class="horse-profile-photo" src="'+esc(photo.photoUrl)+'" alt="'+esc(horse.name)+'の写真" loading="lazy" decoding="async">':'';
- const photoCredit=photo&&typeof photo.filePage==='string'&&photo.filePage.startsWith('https://commons.wikimedia.org/')?
-  '<div class="horse-profile-photo-credit">'+esc(photo.artist||'')+' · <a target="_blank" rel="noopener noreferrer" href="'+esc(photo.filePage)+'">'+esc(photo.license||'写真の出典')+'</a></div>':'';
  const achievement=victories.length?
   '<section class="horse-profile-achievements"><h3>主な勝ち鞍</h3><ul>'+victories.map(w=>
    '<li>'+esc(w.race)+(Number.isInteger(w.year)?'（'+w.year+'年）':'')+'</li>').join('')+'</ul></section>':'';
  const career=validRecord?'<p class="horse-profile-record">競走成績 <strong>'+record.starts+'戦'+record.wins+'勝</strong></p>':'';
- const sources=Array.isArray(profile?.sources)?profile.sources.filter(s=>
-  s&&typeof s.label==='string'&&HTTPS.test(s.url||'')):[];
- if(!sources.length&&articleUrl&&HTTPS.test(articleUrl))
-  sources.push({url:articleUrl,label:'Wikipediaの記事'});
- const links=sources.slice(0,3).map(s=>
-  '<a href="'+esc(s.url)+'" target="_blank" rel="noopener noreferrer">'+esc(s.label)+'</a>').join(' · ');
  const empty=!achievement&&!career&&!description?
   '<p class="horse-profile-empty">競走成績などの情報はまだありません。</p>':'';
  return '<section class="horse-profile" aria-label="配置済みの競走馬プロフィール">'+
   (picture?'<div class="horse-profile-visual">'+picture+'</div>':'')+
   header+career+achievement+empty+
-  (links?'<div class="horse-profile-sources">出典：'+links+'</div>':'')+
-  photoCredit+'</section>';
+  '</section>';
+}
+
+/** Sources stay queryable but are displayed only in the centralized credits dialog. */
+export function horseProfileSources(profile,articleUrl){
+ const sources=Array.isArray(profile?.sources)?profile.sources.filter(s=>
+  s&&typeof s.label==='string'&&HTTPS.test(s.url||'')):[];
+ if(!sources.length&&articleUrl&&HTTPS.test(articleUrl))
+  sources.push({url:articleUrl,label:'Wikipediaの記事'});
+ return sources;
 }
