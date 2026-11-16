@@ -1,0 +1,242 @@
+{
+  "retrieved": "2026-11-16",
+  "purpose": "One-line non-spoiler editorial facts for highly viewed horses absent from the machine-readable race leads, corroborated against linked JRA / JBIS / trade primary sources. No copied source prose.",
+  "horses": {
+    "Q180387": {
+      "description": "米年度代表馬。引退後は日本で種牡馬として活躍。",
+      "majorWins": [
+        {
+          "race": "ケンタッキーダービー",
+          "year": 1989
+        },
+        {
+          "race": "プリークネスステークス",
+          "year": 1989
+        },
+        {
+          "race": "ブリーダーズカップ・クラシック",
+          "year": 1989
+        }
+      ],
+      "raceRecord": {
+        "starts": 14,
+        "wins": 9
+      },
+      "sources": [
+        {
+          "label": "ブリーダーズ・スタリオンステーション（血統資料）",
+          "url": "https://www.breeders.co.jp/files/libs/2351/202312060907345334.pdf"
+        }
+      ]
+    },
+    "Q11312249": {
+      "description": "引退レースの香港ヴァーズで初のGⅠ制覇。",
+      "majorWins": [
+        {
+          "race": "香港ヴァーズ",
+          "year": 2001
+        }
+      ],
+      "raceRecord": {
+        "starts": 50,
+        "wins": 7
+      },
+      "sources": [
+        {
+          "label": "JRA（2001年香港ヴァーズ）",
+          "url": "https://www.jra.go.jp/special/jra70th/pdf/history/2001-12-1.pdf"
+        },
+        {
+          "label": "JRA（競走馬情報）",
+          "url": "https://jra.jp/JRADB/accessU.html?CNAME=pw01dud101994108729%2F2D"
+        }
+      ]
+    },
+    "Q11288432": {
+      "description": "ドイツのGⅠを制した牝馬。",
+      "majorWins": [
+        {
+          "race": "アラルポカル",
+          "year": 1995
+        }
+      ],
+      "raceRecord": {
+        "starts": 13,
+        "wins": 3
+      },
+      "sources": [
+        {
+          "label": "JBISサーチ（戦績）",
+          "url": "https://www.jbis.or.jp/horse/0000430846/"
+        }
+      ]
+    },
+    "Q7514393": {
+      "description": "先頭で飛ばす逃げの走りで知られる。",
+      "majorWins": [
+        {
+          "race": "宝塚記念",
+          "year": 1998
+        },
+        {
+          "race": "毎日王冠",
+          "year": 1998
+        }
+      ],
+      "raceRecord": {
+        "starts": 16,
+        "wins": 9
+      },
+      "sources": [
+        {
+          "label": "JRA（サイレンススズカ）",
+          "url": "https://jra.jp/gallery/3minmeiba/horse25/"
+        }
+      ]
+    },
+    "Q11308798": {
+      "description": "日本とアメリカのオークスを制した牝馬。",
+      "majorWins": [
+        {
+          "race": "アメリカンオークス",
+          "year": 2005
+        }
+      ],
+      "raceRecord": {
+        "starts": 6,
+        "wins": 5
+      },
+      "sources": [
+        {
+          "label": "JRAレーシングビュアー（シーザリオ）",
+          "url": "https://prc.jp/jraracingviewer/contents/yushun/052.html"
+        }
+      ]
+    },
+    "Q24866183": {
+      "description": "中山グランドジャンプを6回制した障害の名馬。",
+      "majorWins": [
+        {
+          "race": "中山グランドジャンプ",
+          "year": null
+        },
+        {
+          "race": "中山大障害",
+          "year": null
+        }
+      ],
+      "raceRecord": {
+        "starts": 40,
+        "wins": 20
+      },
+      "sources": [
+        {
+          "label": "JRA競馬の殿堂（オジュウチョウサン）",
+          "url": "https://www.jra.go.jp/gallery/dendo/horse39/"
+        }
+      ]
+    },
+    "Q4309308": {
+      "description": "牝馬二冠を達成し、ジャパンカップも制覇。",
+      "majorWins": [
+        {
+          "race": "ジャパンカップ",
+          "year": null
+        }
+      ],
+      "sources": [
+        {
+          "label": "JRA（ブエナビスタ）",
+          "url": "https://www.jra.go.jp/gallery/3minmeiba/horse20/index.html"
+        }
+      ]
+    },
+    "Q64780107": {
+      "description": "日本調教馬として初めてブリーダーズカップで優勝。",
+      "majorWins": [
+        {
+          "race": "ブリーダーズカップ・フィリー＆メアターフ",
+          "year": 2021
+        }
+      ],
+      "sources": [
+        {
+          "label": "JRA（2021年BC）",
+          "url": "https://www.jra.go.jp/special/jra70th/pdf/history/2021-11-1.pdf"
+        }
+      ]
+    },
+    "Q57313819": {
+      "description": "マイル路線などでGⅠを6勝。",
+      "sources": [
+        {
+          "label": "JBISサーチ（戦績）",
+          "url": "https://www.jbis.or.jp/horse/0001220947/"
+        }
+      ]
+    },
+    "Q57875068": {
+      "description": "天皇賞（春）を連覇。",
+      "sources": [
+        {
+          "label": "JBISサーチ（戦績）",
+          "url": "https://www.jbis.or.jp/horse/0001204307/"
+        }
+      ]
+    },
+    "Q47469474": {
+      "description": "大阪杯やエリザベス女王杯で優勝。",
+      "sources": [
+        {
+          "label": "JRA（ラッキーライラック）",
+          "url": "https://www.jra.go.jp/JRADB/accessU.html?CNAME=pw01dud002015105046%2FAC"
+        }
+      ]
+    },
+    "Q116735320": {
+      "description": "2023年の皐月賞を制覇。",
+      "sources": [
+        {
+          "label": "JRA（ソールオリエンス）",
+          "url": "https://www.jra.go.jp/JRADB/accessU.html?CNAME=pw01dud102020102899%2FA6"
+        }
+      ]
+    },
+    "Q114269797": {
+      "description": "2022年のエリザベス女王杯で優勝。",
+      "sources": [
+        {
+          "label": "JRA（ジェラルディーナ）",
+          "url": "https://www.jra.go.jp/JRADB/accessU.html?CNAME=pw01dud102018105081%2F38"
+        }
+      ]
+    },
+    "Q24876319": {
+      "description": "2016年の菊花賞と有馬記念で優勝。",
+      "sources": [
+        {
+          "label": "JBISサーチ（戦績）",
+          "url": "https://www.jbis.or.jp/horse/0001175221/"
+        }
+      ]
+    },
+    "Q11317065": {
+      "description": "マイルチャンピオンシップを連覇。",
+      "sources": [
+        {
+          "label": "JRA（ダイワメジャー）",
+          "url": "https://www.jra.go.jp/gallery/update/race_horse/jrasho/2007.html"
+        }
+      ]
+    },
+    "Q11334537": {
+      "description": "2004年のスプリングステークスで優勝。",
+      "sources": [
+        {
+          "label": "Wikipedia（競走馬の経歴）",
+          "url": "https://ja.wikipedia.org/wiki/%E3%83%96%E3%83%A9%E3%83%83%E3%82%AF%E3%82%BF%E3%82%A4%E3%83%89"
+        }
+      ]
+    }
+  }
+}
