@@ -20,6 +20,14 @@ try{
    const errors=[];page.on('pageerror',error=>errors.push(error.message));
    await page.goto(base,{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>!document.querySelector('[data-random-start]')?.disabled,{timeout:30000});
+   await page.locator('#home-menu-button').click();
+   for(const [path,label] of [['privacy','プライバシーポリシー'],['terms','利用規約']]){
+    const link=page.locator('#modal a[href="https://hanage.app/'+path+'/"]');
+    assert.equal(await link.count(),1,engine+' home menu '+label);
+    assert.equal(await link.getAttribute('target'),'_blank');
+    assert.match(await link.getAttribute('rel')||'',/noopener/);
+   }
+   await page.locator('#modal-close').click();
    await page.locator('[data-random-level="easy"]').click();
    await page.locator('[data-random-start]').click();
    await page.waitForFunction(()=>document.body.classList.contains('playing'));
@@ -45,6 +53,9 @@ try{
    await page.mouse.click(5,5);
    assert.equal(await dialog.evaluate(x=>x.open),false,'backdrop tap still closes the profile');
    await page.locator('#menu-button').click();
+   for(const path of ['privacy','terms']){
+    assert.equal(await page.locator('#modal a[href="https://hanage.app/'+path+'/"]').count(),1,engine+' in-game legal link: '+path);
+   }
    await page.locator('[data-action="sources"]').click();
    assert.ok(await page.locator('.profile-credits').count(),'profile evidence must be available in centralized credits');
    assert.match(await page.locator('#modal-content').textContent(),/題材・出典/);
