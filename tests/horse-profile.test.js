@@ -111,10 +111,13 @@ test('HTML labels, descriptions and remote URLs are escaped or rejected',()=>{
 test('privacy and terms links are accessible in both menus without leaving the running game',async t=>{
  const app=await loadApp();t.after(()=>app.restore());
  const check=()=>{
-  const html=app.$('modal-content').innerHTML;
-  assert.match(html,/href="https:\/\/hanage\.app\/privacy\/"/);
-  assert.match(html,/href="https:\/\/hanage\.app\/terms\/"/);
-  assert.match(html,/target="_blank" rel="noopener noreferrer"/);
+  const content=app.$('modal-content');
+  for(const path of ['privacy','terms']){
+   const link=content.querySelector('[href="https://hanage.app/'+path+'/"]');
+   assert.ok(link,'missing '+path+' link');
+   assert.equal(link.getAttribute('target'),'_blank');
+   assert.equal(link.getAttribute('rel'),'noopener noreferrer');
+  }
  };
  app.$('home-menu-button').click();
  assert.ok(app.$('modal').open);
