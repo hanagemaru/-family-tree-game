@@ -108,6 +108,27 @@ test('HTML labels, descriptions and remote URLs are escaped or rejected',()=>{
  assert.doesNotMatch(html,/https:\/\/www\.wikidata\.org\/wiki\/Q1/);
  assert.deepEqual(horseProfileSources({sources:[{label:'bad',url:'javascript:alert(1)'},{label:'Wikidata',url:'https://www.wikidata.org/wiki/Q1'}]}),[{label:'Wikidata',url:'https://www.wikidata.org/wiki/Q1'}]);
 });
+test('privacy and terms links are accessible in both menus without leaving the running game',async t=>{
+ const app=await loadApp();t.after(()=>app.restore());
+ const check=()=>{
+  const content=app.$('modal-content');
+  for(const path of ['privacy','terms']){
+   const link=content.querySelector('[href="https://hanage.app/'+path+'/"]');
+   assert.ok(link,'missing '+path+' link');
+   assert.equal(link.getAttribute('target'),'_blank');
+   assert.equal(link.getAttribute('rel'),'noopener noreferrer');
+  }
+ };
+ app.$('home-menu-button').click();
+ assert.ok(app.$('modal').open);
+ check();
+ app.$('modal-close').click();
+ app.$('stage-list').querySelector('[data-random-start]').click();
+ app.$('menu-button').click();
+ check();
+ app.$('modal-close').click();
+ assert.ok(!app.$('modal').open);
+});
 test('profile overlay hides close button and backdrop tap dismisses without affecting state',async t=>{
  const app=await loadApp();t.after(()=>app.restore());
  app.$('stage-list').querySelector('[data-random-start]').click();
