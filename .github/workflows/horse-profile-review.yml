@@ -1,7 +1,7 @@
 name: Horse profile review (data, UI and mobile)
 on:
   push:
-    branches: ['feature/horse-card-profiles-20261116']
+    branches: ['feature/horse-card-profiles-20261116', 'feature/horse-legal-links-20261117']
     paths: ['.github/workflows/horse-profile-review.yml','tests/horse-profile.test.js','scripts/browser-horse-profile-smoke.mjs','src/app.js','src/horse-profile.js','horse-profile.css','data/horse-profiles.v1.json']
   workflow_dispatch:
 permissions:
