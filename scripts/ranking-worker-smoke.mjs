@@ -57,6 +57,15 @@ try{
  const html=await fetch(base);
  assert.equal(html.status,200,'horse game HTML should be accessible at exact hub path');
  assert.match(await html.text(),/競走馬血統ならべ/);
+ const eventUrl=base+'api/gameplay-events';
+ const sid=randomUUID(),rid=randomUUID();
+ const sendEvent=(body,origin='http://127.0.0.1:'+port)=>fetch(eventUrl,{method:'POST',headers:{'Content-Type':'application/json','Origin':origin},body:JSON.stringify(body)});
+ const evt={session:sid,source:'direct',event:'start',run:rid,difficulty:'normal',outcome:'none'};
+ assert.equal((await sendEvent(evt)).status,204,'valid gameplay start accepted');
+ assert.equal((await sendEvent(evt)).status,204,'duplicate gameplay start is idempotent');
+ assert.equal((await sendEvent({...evt,event:'complete',outcome:'clear'})).status,204);
+ assert.equal((await sendEvent(evt,'https://invalid.example')).status,403,'cross-origin gameplay event rejected');
+ assert.equal((await sendEvent({...evt,url:'https://x.example'})).status,400,'extra fields rejected');
  const {generated,state,score}=session();
  const descriptor=generated.descriptor;
  const payload={stageId:descriptor.stageId,seed:descriptor.seed,difficulty:descriptor.difficulty,horseIds:descriptor.cardIds,generatorVersion:descriptor.generatorVersion};
@@ -109,6 +118,6 @@ try{
  assert.equal(deletion.status,200);
  const gone=await api('rankings?difficulty=normal');
  assert.equal(gone.data.entries.length,0);
- console.log('HORSE_RANKING_WORKER_SMOKE_SUCCESS: signed start, replay, score reject, origin/auth, unique best, rename, delete, static hub path');
+ console.log('HORSE_RANKING_WORKER_SMOKE_SUCCESS: gameplay events, signed start, replay, score reject, origin/auth, unique best, rename, delete, static hub path');
 }catch(e){console.error(output.slice(-9000));throw e;}
 finally{try{process.kill(-child.pid,'SIGTERM');}catch{}child.stdout.destroy();child.stderr.destroy();child.unref();}

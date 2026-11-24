@@ -20,11 +20,13 @@
 - `hanagemaru/hanage-hub` 側の紹介ページ：`/games/horse-pedigree/`。**現時点では公開フラグOFF**のため、サイトの「遊ぶ」から未公開URLへ誘導しない。
 - `src/server/worker.js` と `migrations/0001_horse_ranking.sql`：専用Cloudflare Workerと**独立したD1**ランキングDB（Sweeper/PuttのDBは共用しない）。
 - `wrangler.hub.jsonc`：本番用のRoute設定案。**D1のdatabase_idは未設定**、`RANKING_SECRET` も本番では別途設定する。公開には接続・検証が必要。
+- `src/gameplay-analytics.js` / `src/server/gameplay-analytics.js` / `migrations/0002_gameplay_events.sql`：プレイ数計測（訪問・開始・完走）。**既定は無効**。仕様と有効化手順は [プレイ数計測](docs/gameplay-analytics-2026-11-24.md)。
 - `wrangler.test.jsonc`：ローカルE2Eテスト専用のダミーID・秘密鍵。**本番に使わないこと**。
 - **現行は生成器v6**（12頭・最大4世代）。以前のv5（12頭）、v1〜v4（18頭）も保存データから復元可能。v6ランキングは旧v5の記録と区別する。
 
 ## 関連資料
 
+- [プレイ数計測の仕様・有効化手順](docs/gameplay-analytics-2026-11-24.md)
 - [v6の難易度調整と100問×3難易度の実測](docs/horse-v6-difficulty-2026-11-15.md)
 - [12頭版・ランキング公開手順（旧v5を含む）](docs/horse-v5-ranking-release-2026-11-15.md)
 - [初級知名度調整と実測](docs/horse-easier-beginner-2026-11-15.md)

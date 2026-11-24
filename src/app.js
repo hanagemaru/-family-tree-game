@@ -11,7 +11,9 @@ import {findCorrectPlacement,horsePlacementHint,completedAnswer} from './game-as
 import {horseScore,useHorseHint,rankedHorseStage} from './horse-score.js';
 import {horseProfileHtml,horseProfileSources} from './horse-profile.js';
 import {pinchCamera} from './pinch-camera.js';
+import {createTracker} from './gameplay-analytics.js';
 import {playerIdentity,rankingName,saveRankingName,createRankedRun,loadRankings,submitRankedScore,updateRankingName,deleteRankingAccount} from './ranking-client.js';
+const analytics=createTracker();analytics.visit();
 const $=id=>document.getElementById(id),storageKey='family-tree-game:v1';
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let records={sessions:{},best:{}};
@@ -188,7 +190,9 @@ function startRandomHorse(fresh,difficulty=selectedDifficulty){
  }catch(error){console.error('Horse difficulty generation failed',error);randomHorseError='問題の生成に失敗しました。もう一度お試しください。';renderHome();}
 }
 function start(stage,fresh=false){
- persist();state=(!fresh&&savedGame(stage))||newStageGame(stage);if(state.complete&&!fresh)state=newStageGame(stage);selected=null;targetAnchor=null;lineFocus=null;state.positions=layoutFamily(state,{minimizeCrossings:true});
+ persist();const loaded=!fresh&&savedGame(stage);state=loaded||newStageGame(stage);if(state.complete&&!fresh)state=newStageGame(stage);
+ if(isRandomHorseStage(stage))analytics.play(randomDescriptorForStage(stage)?.difficulty,{resumed:!!loaded&&loaded===state});else analytics.play(null);
+ selected=null;targetAnchor=null;lineFocus=null;state.positions=layoutFamily(state,{minimizeCrossings:true});
  if(isCurrentRankedStage(stage)){
   if(fresh)delete records.rankedRunTickets?.[stage.id];
   if(onlineRankingEnabled&&!records.rankedRunTickets?.[stage.id]){
@@ -347,7 +351,7 @@ function completeGame(){
  const key=bestKeyForStage(state.stage,difficulty);
  const existing=records.best[key];
  if(!existing||(existing.totalMs??existing.elapsed)>score.totalMs)records.best[key]={...score,elapsed:state.elapsed,difficulty};
- persist();results();
+ analytics.complete('clear');persist();results();
 }
 // No voluntary hand exchange: playable cards are guaranteed by core.deal/ensurePlayable.
 function updateTransform(animate=false,refreshLines=true){board.classList.toggle('overview',camera.scale<.68);$('world').classList.toggle('following',animate);$('world').style.transform=`translate(${camera.x}px,${camera.y}px) scale(${camera.scale})`;if(refreshLines)renderLines();}
@@ -447,7 +451,7 @@ function showAnswer(){
  const answer=completedAnswer(state);
  if(!answer){say('答えを表示できませんでした。進行は変更されていません。',true);closeDialog();return;}
  try{answer.positions=layoutFamily(answer,{minimizeCrossings:true});}catch{say('完成図を作成できませんでした。進行は変更されていません。',true);closeDialog();return;}
- state=answer;selected=null;lineFocus=null;closeDialog();clearTargets();render();fit(false);persist();results();
+ analytics.complete('gaveup');state=answer;selected=null;lineFocus=null;closeDialog();clearTargets();render();fit(false);persist();results();
 }
 
 function rankingTable(data){

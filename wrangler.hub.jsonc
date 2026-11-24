@@ -4,6 +4,8 @@
   "name": "horse-pedigree-hub",
   "main": "src/server/worker.js",
   "compatibility_date": "2026-11-01",
+  // Play counting is off until the hub privacy text covers this game. Set to "production" to enable.
+  "vars": { "GAMEPLAY_ANALYTICS_MODE": "off" },
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
