@@ -1,5 +1,6 @@
 import {verifyHorseStage,verifyHorseActions} from './ranking-verification.js';
 import {HORSE_SCORE_VERSION} from '../horse-score.js';
+import {receiveGameplay} from './gameplay-analytics.js';
 
 const PREFIX='/games/horse-pedigree/play';
 const DIFFICULTIES=new Set(['easy','normal','hard']);
@@ -176,6 +177,7 @@ export async function handleRequest(request,env){
  let pathname=url.pathname;
  if(pathname===PREFIX)pathname='/';
  else if(pathname.startsWith(PREFIX+'/'))pathname=pathname.slice(PREFIX.length);
+ if(pathname==='/api/gameplay-events'&&request.method==='POST')return receiveGameplay(request,env);
  if(pathname.startsWith('/api/')){
   if(!env.DB)return fail('ランキング準備中',503);
   if(request.method==='GET'&&pathname==='/api/health')return json({ok:true});
