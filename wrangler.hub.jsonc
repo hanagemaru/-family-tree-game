@@ -1,11 +1,10 @@
 {
-  // Deploy only after creating a D1 named horse-pedigree-ranking and replacing database_id.
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "horse-pedigree-hub",
   "main": "src/server/worker.js",
   "compatibility_date": "2026-11-01",
-  // Play counting is off until the hub privacy text covers this game. Set to "production" to enable.
-  "vars": { "GAMEPLAY_ANALYTICS_MODE": "off" },
+  // Play counting (visit/start/complete). Set to "off" to stop; see docs/gameplay-analytics-2026-11-24.md.
+  "vars": { "GAMEPLAY_ANALYTICS_MODE": "production" },
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
@@ -15,7 +14,7 @@
     {
       "binding": "DB",
       "database_name": "horse-pedigree-ranking",
-      "database_id": "SET_DATABASE_ID_BEFORE_DEPLOY",
+      "database_id": "5272fcd6-f227-424d-b6f5-f3d5959c2206",
       "migrations_dir": "migrations"
     }
   ],
