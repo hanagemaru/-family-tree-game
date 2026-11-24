@@ -1,0 +1,59 @@
+name: Deploy 競走馬血統ならべ to hanage.app
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/deploy-hub.yml'
+      - 'wrangler.hub.jsonc'
+      - 'src/**'
+      - 'index.html'
+      - '*.css'
+      - 'data/**'
+      - 'scripts/build.mjs'
+  workflow_dispatch:
+
+concurrency:
+  group: horse-pedigree-hub-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check Cloudflare secrets exist
+        run: |
+          [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ] || {
+            echo "::error::Repository secrets CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID are required (Settings > Secrets and variables > Actions)."
+            exit 1
+          }
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - run: npm test
+      - run: npm run build
+      - name: Deploy only the horse-pedigree-hub Worker and its routes
+        run: npx --yes wrangler@4.47.0 deploy --config wrangler.hub.jsonc
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WRANGLER_SEND_METRICS: 'false'
+      - name: Verify the live game and play counting (no data written)
+        run: |
+          base=https://hanage.app/games/horse-pedigree/play
+          curl -fsS "$base/api/health"
+          curl -fsS "$base/" | grep -q '競走馬血統ならべ'
+          curl -fsS "$base/src/gameplay-analytics.js" >/dev/null
+          # Enabled mode rejects a foreign Origin with 403 (disabled mode would answer 204).
+          code=$(curl -s -o /dev/null -w '%{http_code}' -X POST "$base/api/gameplay-events" \
+            -H 'Content-Type: application/json' -H 'Origin: https://invalid.example' -d '{}')
+          echo "gameplay-events with foreign origin: HTTP $code"
+          [ "$code" = 403 ]
